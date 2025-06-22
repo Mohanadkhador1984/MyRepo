@@ -14,8 +14,9 @@ SECRET_KEY = 'django-insecure-2t8*sw&##r09j%n+_nopn61=j)4ltsyh5lk!*(8xbn12ldw(8$
 DEBUG = True
 # ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-ALLOWED_HOSTS = ["myrepo-28.onrender.com"]
-
+# ALLOWED_HOSTS = ["myrepo-28.onrender.com"]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'myrepo-28.onrender.com']
+APPEND_SLASH = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -45,7 +46,7 @@ ROOT_URLCONF = 'quiz_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
