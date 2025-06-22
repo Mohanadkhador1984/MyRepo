@@ -37,6 +37,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
 ]
 
 ROOT_URLCONF = 'quiz_project.urls'
@@ -119,9 +120,10 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'quiz' / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # إعدادات PWA (اختياري إذا تستخدم مكتبة PWA من Django)
 PWA_APP_NAME = 'Quiz App'
