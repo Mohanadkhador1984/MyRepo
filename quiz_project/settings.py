@@ -14,11 +14,7 @@ SECRET_KEY = 'django-insecure-2t8*sw&##r09j%n+_nopn61=j)4ltsyh5lk!*(8xbn12ldw(8$
 DEBUG = True
 # ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'myrepo-28.onrender.com',  # Add your domain here
-]
+ALLOWED_HOSTS = ["myrepo-28.onrender.com"]
 
 
 INSTALLED_APPS = [
