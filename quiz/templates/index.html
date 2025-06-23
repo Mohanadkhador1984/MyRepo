@@ -99,10 +99,13 @@
   <!-- زر الرجوع للرئيسية -->
   <button id="home-button" onclick="goHome()" title="العودة للرئيسية">🏠</button>
 
-  <!-- زر التثبيت (ثابت في أسفل الصفحة) -->
-  <button id="install-btn" style="display: none; position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background-color: #28a745; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; z-index: 1000;">
-    📲 تثبيت التطبيق
-  </button>
+ <div id="install-wrapper" style="position: fixed; top: 0; left: 0; right: 0; background: #222; color: white; padding: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 9999;">
+  <span>📲 يمكنك تثبيت التطبيق على جهازك</span>
+  <button id="install-btn" style="background: #28a745; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; display: none;">تثبيت التطبيق</button>
+</div>
+
+<!-- شريط تقدم التثبيت -->
+<div id="install-progress" style="height: 4px; background: #28a745; width: 0%; transition: width 0.4s; position: fixed; top: 50px; left: 0; z-index: 9999;"></div>
 
   <!-- الكود الخاص بزر التثبيت ووحدة التثبيت يعمل من خلال app.js -->
 </body>

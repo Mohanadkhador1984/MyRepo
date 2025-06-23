@@ -259,37 +259,59 @@ let deferredPrompt; // متغير لتخزين الحدث
 // ✅ أحداث عند تحميل الصفحة
 window.onload = () => {
   const installBtn = document.getElementById('install-btn');
+  const installProgress = document.getElementById('install-progress');
 
+  // ✅ حدث يظهر زر التثبيت عند توفره
   window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); // منع ظهور نافذة التثبيت الافتراضية
+    e.preventDefault(); // منع النافذة الافتراضية
     deferredPrompt = e; // تخزين الحدث
-    installBtn.style.display = 'block'; // إظهار زر التثبيت
+    installBtn.style.display = 'inline-block'; // إظهار الزر
 
-    // إضافة حدث عند النقر على زر التثبيت
+    // ✅ عند النقر على زر التثبيت
     installBtn.addEventListener('click', () => {
       installBtn.style.display = 'none'; // إخفاء الزر
+      installProgress.style.width = '10%'; // بدء شريط التقدم
       deferredPrompt.prompt(); // إظهار نافذة التثبيت
+
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
           console.log('✅ تم قبول التثبيت');
+          simulateInstallProgress(); // بدء شريط التثبيت
         } else {
           console.log('❌ تم رفض التثبيت');
+          installProgress.style.width = '0%'; // إعادة تعيين الشريط
         }
-        deferredPrompt = null; // إعادة تعيين المتغير
+        deferredPrompt = null; // تفريغ المتغير
       });
     });
   });
 
+  // ✅ عند اكتمال التثبيت
   window.addEventListener('appinstalled', () => {
     console.log('✅ تم تثبيت التطبيق');
-    installBtn.style.display = 'none'; // إخفاء الزر بعد التثبيت
+    installProgress.style.width = '100%'; // تعبئة الشريط
+    setTimeout(() => {
+      installProgress.style.display = 'none';
+      alert('🎉 تم تثبيت التطبيق بنجاح! يمكنك الآن تشغيله من الشاشة الرئيسية.');
+    }, 1000);
   });
 
+  // ✅ تحميل الأسئلة عند فتح الصفحة
+  loadQuestions();
+};
+function simulateInstallProgress() {
+  let width = 10;
+  const interval = setInterval(() => {
+    width += 10;
+    installProgress.style.width = width + '%';
+    if (width >= 100) {
+      clearInterval(interval);
+    }
+  }, 200);
+}
   
 
 
-  loadQuestions(); // تحميل الأسئلة
-};
 
 // ✅ التعامل مع زر الرجوع
 window.addEventListener('popstate', () => {
