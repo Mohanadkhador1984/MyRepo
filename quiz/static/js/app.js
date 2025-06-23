@@ -16,22 +16,25 @@ let currentYear = 1;
 let currentBranch = 'A';
 let answeredState = {};
 const screenStack = [];
+let deferredPrompt; // لتخزين حدث التثبيت
 
-
-// ✅ تحميل الأسئلة
+// ✅ تحميل الأسئلة من ملف JSON
 async function loadQuestions() {
-  const response = await fetch('/static/data/questions.json');
-  if (response.ok) {
+  try {
+    const response = await fetch('/static/data/questions.json');
+    if (!response.ok) throw new Error("فشل تحميل الأسئلة من الملف");
     allQuestions = await response.json();
-  } else {
-    console.error("❌ فشل تحميل الأسئلة من الملف");
+    console.log("✅ تم تحميل الأسئلة بنجاح");
+  } catch (error) {
+    console.error("❌", error.message);
   }
 }
 
 // ✅ عرض شاشة معينة
 function showScreen(screenId) {
   document.querySelectorAll('.quiz-container').forEach(el => el.style.display = 'none');
-  document.getElementById(screenId).style.display = 'block';
+  const screen = document.getElementById(screenId);
+  if (screen) screen.style.display = 'block';
   screenStack.push(screenId);
   history.pushState({ screen: screenId }, '', '');
 }
@@ -116,7 +119,7 @@ function checkAnswer(selectedIndex) {
   const q = questions[currentQuestionIndex];
   const correctIndex = q.correct_answer - 1;
 
-  document.querySelectorAll(".answers button").forEach((b, i) => {
+  document.querySelectorAll(".answer-button").forEach((b, i) => {
     b.disabled = true;
     if (i === correctIndex) b.classList.add("correct");
     else if (i === selectedIndex) b.classList.add("wrong");
@@ -145,7 +148,7 @@ function nextQuestion() {
   }
 }
 
-// ✅ العودة للسؤال السابق
+// ✅ الرجوع للسؤال السابق
 function prevQuestion() {
   if (currentQuestionIndex > 0) {
     currentQuestionIndex--;
@@ -166,7 +169,7 @@ function updateQuestionDropdown() {
   });
 }
 
-// ✅ الانتقال مباشرة لسؤال
+// ✅ الانتقال لسؤال معين
 function jumpToQuestion(index) {
   currentQuestionIndex = parseInt(index);
   loadQuestion();
@@ -215,10 +218,7 @@ function showFinalResult() {
       responsive: true,
       plugins: {
         legend: {
-          position: 'top',
-          labels: {
-            color: '#fff'
-          }
+          position: 'top'
         }
       }
     }
@@ -250,68 +250,65 @@ function startTimer() {
     totalSeconds--;
     const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
     const seconds = (totalSeconds % 60).toString().padStart(2, '0');
-    document.getElementById('timer').textContent = `00:${minutes}:${seconds}`;
+    const timerEl = document.getElementById('timer');
+    if (timerEl) timerEl.textContent = `00:${minutes}:${seconds}`;
   }, 1000);
 }
 
-let deferredPrompt; // متغير لتخزين الحدث
-
-// ✅ أحداث عند تحميل الصفحة
+// ✅ التثبيت كتطبيق PWA
 window.onload = () => {
   const installBtn = document.getElementById('install-btn');
   const installProgress = document.getElementById('install-progress');
+  const installWrapper = document.getElementById('install-wrapper');
 
-  // ✅ حدث يظهر زر التثبيت عند توفره
   window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); // منع النافذة الافتراضية
-    deferredPrompt = e; // تخزين الحدث
-    installBtn.style.display = 'inline-block'; // إظهار الزر
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
 
-    // ✅ عند النقر على زر التثبيت
     installBtn.addEventListener('click', () => {
-      installBtn.style.display = 'none'; // إخفاء الزر
-      installProgress.style.width = '10%'; // بدء شريط التقدم
-      deferredPrompt.prompt(); // إظهار نافذة التثبيت
-
+      installBtn.style.display = 'none';
+      installProgress.style.width = '10%';
+      deferredPrompt.prompt();
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
           console.log('✅ تم قبول التثبيت');
-          simulateInstallProgress(); // بدء شريط التثبيت
+          simulateInstallProgress();
         } else {
           console.log('❌ تم رفض التثبيت');
-          installProgress.style.width = '0%'; // إعادة تعيين الشريط
+          installProgress.style.width = '0%';
         }
-        deferredPrompt = null; // تفريغ المتغير
+        deferredPrompt = null;
       });
     });
   });
 
-  // ✅ عند اكتمال التثبيت
   window.addEventListener('appinstalled', () => {
     console.log('✅ تم تثبيت التطبيق');
-    installProgress.style.width = '100%'; // تعبئة الشريط
+    installProgress.style.width = '100%';
     setTimeout(() => {
       installProgress.style.display = 'none';
-      alert('🎉 تم تثبيت التطبيق بنجاح! يمكنك الآن تشغيله من الشاشة الرئيسية.');
+      installWrapper.style.display = 'none';
+      alert('🎉 تم تثبيت التطبيق بنجاح!');
     }, 1000);
   });
 
-  // ✅ تحميل الأسئلة عند فتح الصفحة
   loadQuestions();
 };
+
+// ✅ تقدم شريط التثبيت
 function simulateInstallProgress() {
+  const progress = document.getElementById('install-progress');
   let width = 10;
   const interval = setInterval(() => {
-    width += 10;
-    installProgress.style.width = width + '%';
     if (width >= 100) {
       clearInterval(interval);
+    } else {
+      width += 10;
+      progress.style.width = width + '%';
     }
-  }, 200);
+  }, 100);
 }
-  
-
-
 
 // ✅ التعامل مع زر الرجوع
 window.addEventListener('popstate', () => {
@@ -322,6 +319,8 @@ window.addEventListener('popstate', () => {
     document.getElementById(prev).style.display = 'block';
   }
 });
+
+// ✅ تسجيل Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/serviceworker.js')
