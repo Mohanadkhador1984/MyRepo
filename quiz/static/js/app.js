@@ -254,42 +254,92 @@ function startTimer() {
   }, 1000);
 }
 
-let deferredPrompt; // متغير لتخزين الحدث
+let deferredPrompt = null;
 
-// ✅ أحداث عند تحميل الصفحة
-window.onload = () => {
-  const installBtn = document.getElementById('install-btn');
+    window.addEventListener('load', () => {
+      const installContainer = document.getElementById('install-container');
+      const installBtn = document.getElementById('install-btn');
+      const progressBar = document.getElementById('progress');
+      const progressText = document.getElementById('progress-text');
+      const installMessage = document.getElementById('install-message');
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); // منع ظهور نافذة التثبيت الافتراضية
-    deferredPrompt = e; // تخزين الحدث
-    installBtn.style.display = 'block'; // إظهار زر التثبيت
+      // تسجيل service worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(() => console.log('✅ Service Worker مسجل'))
+          .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
+      }
 
-    // إضافة حدث عند النقر على زر التثبيت
-    installBtn.addEventListener('click', () => {
-      installBtn.style.display = 'none'; // إخفاء الزر
-      deferredPrompt.prompt(); // إظهار نافذة التثبيت
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('✅ تم قبول التثبيت');
-        } else {
-          console.log('❌ تم رفض التثبيت');
-        }
-        deferredPrompt = null; // إعادة تعيين المتغير
+      // دعم beforeinstallprompt
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installContainer.style.display = 'flex';
+
+        installBtn.addEventListener('click', () => {
+          installBtn.disabled = true;
+          installBtn.textContent = "⏳ جارٍ التثبيت...";
+
+          // شريط تحميل وهمي
+          let progress = 0;
+          const interval = setInterval(() => {
+            progress += Math.floor(Math.random() * 10) + 5;
+            if (progress >= 100) {
+              progress = 100;
+              clearInterval(interval);
+              progressText.textContent = '100%';
+
+              deferredPrompt.prompt();
+              deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                  console.log('✅ تم التثبيت');
+                  installContainer.style.display = 'none';
+                  showInstallMessage();
+                } else {
+                  console.log('❌ تم الرفض');
+                  installBtn.disabled = false;
+                  installBtn.textContent = "📲 تثبيت التطبيق";
+                }
+                deferredPrompt = null;
+              });
+            } else {
+              progressBar.style.width = progress + '%';
+              progressText.textContent = progress + '%';
+            }
+          }, 200);
+        });
       });
+
+      // في حالة iOS أو متصفحات لا تدعم beforeinstallprompt
+      const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+      const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+
+      if (isIos && !isInStandaloneMode) {
+        installContainer.style.display = 'flex';
+        installBtn.textContent = "📲 أضف إلى الشاشة الرئيسية يدويًا";
+        installBtn.onclick = () => {
+          alert("لإضافة التطبيق: اضغط على زر المشاركة في متصفح Safari ثم اختر 'Add to Home Screen'.");
+        };
+      }
+
+      // بعد التثبيت
+      window.addEventListener('appinstalled', () => {
+        console.log('✅ تم تثبيت التطبيق');
+        showInstallMessage();
+        installContainer.style.display = 'none';
+      });
+
+              loadQuestions(); // تحميل الأسئلة
+
+      function showInstallMessage() {
+        installMessage.style.display = 'block';
+        setTimeout(() => {
+          installMessage.style.display = 'none';
+        }, 4000);
+      }
     });
-  });
 
-  window.addEventListener('appinstalled', () => {
-    console.log('✅ تم تثبيت التطبيق');
-    installBtn.style.display = 'none'; // إخفاء الزر بعد التثبيت
-  });
-
-  
-
-
-  loadQuestions(); // تحميل الأسئلة
-};
+     
 
 // ✅ التعامل مع زر الرجوع
 window.addEventListener('popstate', () => {
