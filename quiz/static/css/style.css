@@ -255,7 +255,7 @@
     direction: ltr; /* اتجاه النص من اليمين إلى اليسار */
 }
 
- #install-container {
+#install-container {
       position: fixed;
       bottom: 20px;
       right: 20px;

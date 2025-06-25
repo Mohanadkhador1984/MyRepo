@@ -263,40 +263,47 @@ let deferredPrompt = null;
       const progressText = document.getElementById('progress-text');
       const installMessage = document.getElementById('install-message');
 
-      // تسجيل service worker
+      // ✅ عرض رسالة إذا كان التطبيق مثبت ويعمل من الشاشة الرئيسية
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      if (isStandalone) {
+        showInstallMessage();
+      }
+
+      // 🔧 تسجيل Service Worker
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js')
           .then(() => console.log('✅ Service Worker مسجل'))
           .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
       }
 
-      // دعم beforeinstallprompt
+      // ✅ دعم beforeinstallprompt
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
         installContainer.style.display = 'flex';
+      });
 
-        installBtn.addEventListener('click', () => {
+      // ✅ زر التثبيت
+      installBtn.addEventListener('click', () => {
+        if (deferredPrompt) {
           installBtn.disabled = true;
           installBtn.textContent = "⏳ جارٍ التثبيت...";
 
-          // شريط تحميل وهمي
           let progress = 0;
           const interval = setInterval(() => {
-            progress += Math.floor(Math.random() * 10) + 5;
+            progress += Math.floor(Math.random() * 10) + 10;
             if (progress >= 100) {
-              progress = 100;
               clearInterval(interval);
+              progress = 100;
+              progressBar.style.width = '100%';
               progressText.textContent = '100%';
 
               deferredPrompt.prompt();
               deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === 'accepted') {
-                  console.log('✅ تم التثبيت');
-                  installContainer.style.display = 'none';
                   showInstallMessage();
+                  installContainer.style.display = 'none';
                 } else {
-                  console.log('❌ تم الرفض');
                   installBtn.disabled = false;
                   installBtn.textContent = "📲 تثبيت التطبيق";
                 }
@@ -307,10 +314,20 @@ let deferredPrompt = null;
               progressText.textContent = progress + '%';
             }
           }, 200);
-        });
+        } else {
+          alert("يرجى استخدام متصفح يدعم التثبيت التلقائي مثل Chrome أو Edge.");
+        }
       });
 
-      // في حالة iOS أو متصفحات لا تدعم beforeinstallprompt
+      // ✅ بعد التثبيت
+      window.addEventListener('appinstalled', () => {
+        console.log('✅ تم تثبيت التطبيق');
+        showInstallMessage();
+        installContainer.style.display = 'none';
+      });
+       loadQuestions(); // تحميل الأسئلة
+
+      // ✅ دعم iOS (Safari)
       const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
       const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
 
@@ -318,18 +335,9 @@ let deferredPrompt = null;
         installContainer.style.display = 'flex';
         installBtn.textContent = "📲 أضف إلى الشاشة الرئيسية يدويًا";
         installBtn.onclick = () => {
-          alert("لإضافة التطبيق: اضغط على زر المشاركة في متصفح Safari ثم اختر 'Add to Home Screen'.");
+          alert("لإضافة التطبيق: اضغط على زر المشاركة في Safari ثم اختر 'إضافة إلى الشاشة الرئيسية'.");
         };
       }
-
-      // بعد التثبيت
-      window.addEventListener('appinstalled', () => {
-        console.log('✅ تم تثبيت التطبيق');
-        showInstallMessage();
-        installContainer.style.display = 'none';
-      });
-
-              loadQuestions(); // تحميل الأسئلة
 
       function showInstallMessage() {
         installMessage.style.display = 'block';
@@ -338,8 +346,8 @@ let deferredPrompt = null;
         }, 4000);
       }
     });
-
-     
+      
+         
 
 // ✅ التعامل مع زر الرجوع
 window.addEventListener('popstate', () => {
