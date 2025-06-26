@@ -5,16 +5,8 @@ import pandas as pd
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse  # تأكد من استيراد JsonResponse
 from .models import Question, Book
-
-# مسارات ملفات Excel
-excel_file_path = r'C:\Users\Mohanad\Desktop\1.xlsx'
-books_excel_file_path = r'C:\Users\Mohanad\Desktop\books.xlsx'
-
-
-
-from django.http import HttpResponse
 from django.conf import settings
-import os
+
 
 def service_worker(request):
     sw_path = os.path.join(settings.BASE_DIR, 'quiz', 'static', 'serviceworker.js')
@@ -23,13 +15,18 @@ def service_worker(request):
         response['Service-Worker-Allowed'] = '/'
         return response
 
-from django.shortcuts import render
+# مسارات ملفات Excel
+excel_file_path = r'C:\Users\Mohanad\Desktop\1.xlsx'
+books_excel_file_path = r'C:\Users\Mohanad\Desktop\books.xlsx'
 
-def home(request):
-    return render(request, 'index.html')
+
+def index(request):
+    return render(request, "quiz/index.html")
+
 
 def offline(request):
-    return render(request, 'offline.html')
+    return render(request, "quiz/offline.html")
+
 
 def import_data_from_excel(request):
     """استيراد البيانات الجديدة فقط من ملفات Excel إلى قاعدة البيانات."""

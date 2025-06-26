@@ -1,24 +1,34 @@
 from pathlib import Path
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templets')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+CSRF_TRUSTED_ORIGINS = ['https://yourdomain.com']
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2t8*sw&##r09j%n+_nopn61=j)4ltsyh5lk!*(8xbn12ldw(8$'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
-# ALLOWED_HOSTS = ["myrepo-28.onrender.com"]
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'myrepo-28.onrender.com']
-APPEND_SLASH = True
+
+
+DEBUG = True
+
+SECRET_KEY = 'your-very-unique-and-random-secret-key'
+
+
+
+
+
+# LOGIN_REDIRECT_URL = 'account:home'
+# LOGIN_URL = 'login'
+# LOGOUT_REDIRECT_URL = 'login'
+
 
 INSTALLED_APPS = [
+    'crispy_forms',
+    'crispy_bootstrap4',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -26,9 +36,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
      'quiz',
-      
+     'account'
+    
      
 ]
+CRISPY_TEMPLATE_PACK = 'bootstrap4'   
+     
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -39,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', 
+    
 ]
 
 ROOT_URLCONF = 'quiz_project.urls'
@@ -46,7 +61,7 @@ ROOT_URLCONF = 'quiz_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/templates'],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

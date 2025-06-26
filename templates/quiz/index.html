@@ -1,0 +1,118 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+
+  <meta charset="UTF-8">
+    <title>PWA Django</title>
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <script>
+        if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/serviceworker.js')
+      .then((registration) => {
+        console.log('✅ Service Worker مسجل عند:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('❌ فشل تسجيل Service Worker:', error);
+      });
+  });
+}
+    </script>
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>بكالوريا انكليزي</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  
+
+   <link rel="icon" href="{% static 'icons/icon-192x192.png' %}">
+
+  <!-- ربط ملف CSS -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <!-- تحميل Chart.js إن كنت تستخدمه -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- تحميل سكريبت التطبيق. تأكد من استخدام defer حتى تُحمّل العناصر أولاً -->
+ 
+
+ 
+</head>
+<body>
+  
+  <h1>تطبيق بكالوريا إنكليزي</h1>
+    <script src="{% static 'js/app.js' %}"></script>
+
+  <!-- شاشات التطبيق -->
+  <div id="branch-screen" class="quiz-container">
+    <h1>اختر الفرع</h1>
+    <div class="year-selection">
+      <button onclick="selectBranch('A')">الفرع الأدبي </button>
+      <button onclick="selectBranch('B')">الفرع العلمي </button>
+    </div>
+  </div>
+
+  <div id="year-screen" class="quiz-container" style="display:none;">
+    <h1>اختر الاختبار</h1>
+    <div class="year-selection">
+      <button onclick="selectYear(1)">الاختبار الأول</button>
+      <button onclick="selectYear(2)">الاختبار الثاني</button>
+      <button onclick="selectYear(3)">الاختبار الثالث</button>
+      <button onclick="selectYear(4)">الاختبار الرابع</button>
+      <button onclick="selectYear(5)">الاختبار الخامس</button>
+      <button onclick="selectYear(6)">الاختبار السادس</button>
+      <button onclick="selectYear(7)">الاختبار السابع</button>
+      <button onclick="selectYear(8)">الاختبار الثامن</button>
+      <button onclick="selectYear(9)">الاختبار التاسع</button>
+      <button onclick="selectYear(2022)">2022</button>
+      <button onclick="selectYear(2023)">2023</button>
+      <button onclick="selectYear(2024)">2024</button>
+    </div>
+  </div>
+
+  <div id="quiz-screen" class="quiz-container" style="display:none;">
+    <div class="score-summary" id="score-summary">إجابات صحيحة: 0 | خاطئة: 0</div>
+    <div class="question-nav">
+      <select id="question-jump" class="form-select w-100" onchange="jumpToQuestion(this.value)"></select>
+      <div class="timer" id="timer">00:90:00</div>
+    </div>
+    <h1 id="question">جاري التحميل...</h1>
+    <div class="answers" id="answers"></div>
+    <div class="nav-btns">
+      <button onclick="prevQuestion()">السابق</button>
+      <button id="next-btn" onclick="nextQuestion()">التالي</button>
+    </div>
+    <div class="floating-info">
+      <button onclick="openTextScreen()" id="text-button" style="display: none;">📝</button>
+      <button onclick="toggleLanguage()">🌐</button>
+    </div>
+    <div id="result"></div>
+  </div>
+
+  <div id="text-screen" class="quiz-container" style="display:none;">
+    <h1>النص المرفق</h1>
+    <div id="attached-text" class="attached-text"></div>
+  </div>
+
+  <!-- زر الرجوع للرئيسية -->
+  <button id="home-button" onclick="goHome()" title="العودة للرئيسية">🏠</button>
+
+ <!-- رسالة نجاح -->
+  <div id="install-message">✅ تم تثبيت التطبيق على الشاشة الرئيسية!</div>
+
+  <!-- حاوية زر التثبيت -->
+  <div id="install-container">
+    <button id="install-btn">📲 تثبيت التطبيق</button>
+    <div id="progress-bar">
+      <div id="progress"></div>
+    </div>
+    <div id="progress-text">0%</div>
+  </div>
+
+
+
+  <!-- الكود الخاص بزر التثبيت ووحدة التثبيت يعمل من خلال app.js -->
+</body>
+</html>

@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>My Website</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #d0d0d6, #e5e9f0);
+            color: #fff;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: hsl(0, 0%, 100%);
+            color: #000;
+        }
+        .card-header {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, #5a0fbf, #1f6ae6);
+        }
+        .input-group-text {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+        }
+    </style>
+    
+</head>
+<body>
+    {% if request.path != '/login/' and request.path != '/signup/' and request.path != '/account/login/' and request.path != '/account/signup/' and request.path != '/' and request.path != '/home/' %}
+        {% include 'partials/_navbar.html' %}
+    {% endif %}
+    
+    <div class="container mt-5">
+        {% if messages %}
+            <div class="alert alert-info text-center" role="alert">
+                {% for message in messages %}
+                    <p class="mb-0">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block content %}
+        <!-- Dynamic content will be inserted here -->
+        {% endblock content %}
+    </div>
+
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        });
+        $(".year").text((new Date).getFullYear());
+    </script>
+</body>
+</html>

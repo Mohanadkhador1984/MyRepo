@@ -1,8 +1,5 @@
-# quiz/models.py
-
-# quiz/models.py
-
 from django.db import models
+
 
 class Question(models.Model):
     id = models.IntegerField(primary_key=True)

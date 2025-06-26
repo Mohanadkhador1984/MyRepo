@@ -19,8 +19,14 @@ from django.urls import path, include
 from quiz.views import service_worker, offline
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('quiz.urls')),
+     path('admin/', admin.site.urls),
+    path('', include('account.urls')),  # الصفحة الرئيسية = تسجيل الدخول
+    path('quiz/', include('quiz.urls', namespace='quiz')),  # جميع مسارات quiz تبدأ بـ /quiz
     path('serviceworker.js', service_worker),  # لإتاحة service worker
-    path('offline.html', offline),             # صفحة offline
+    path('offline.html', offline), 
+   
+                          
 ]
+
+
+
