@@ -132,8 +132,7 @@ USE_TZ        = True
 # 10. ملفات الستاتيك (Static Files)
 # ------------------------------------------------------------------------------
 # مسار URL لطلب static
-STATIC_URL = '/staticfiles/'
-
+STATIC_URL = '/static/'
 
 # أثناء التطوير: Django يلتقط تلقائيًا:
 #  - BASE_DIR/static/
