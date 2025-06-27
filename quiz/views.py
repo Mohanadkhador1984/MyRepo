@@ -8,12 +8,21 @@ from .models import Question, Book
 from django.conf import settings
 
 
+import os
+from django.http import HttpResponse, Http404
+from django.conf import settings
+
 def service_worker(request):
-    sw_path = os.path.join(settings.BASE_DIR, 'quiz', 'static', 'serviceworker.js')
-    with open(sw_path, 'r') as f:
-        response = HttpResponse(f.read(), content_type='application/javascript')
-        response['Service-Worker-Allowed'] = '/'
-        return response
+    # تحديد المسار للموقع الذي يوجد به ملف service-worker.js
+    sw_path = os.path.join(settings.BASE_DIR, 'static', 'pwa', 'service-worker.js')
+    try:
+        with open(sw_path, 'r', encoding='utf-8') as sw_file:
+            content = sw_file.read()
+    except FileNotFoundError:
+        raise Http404("Service Worker file not found.")
+    return HttpResponse(content, content_type='application/javascript')
+
+
 
 # مسارات ملفات Excel
 excel_file_path = r'C:\Users\Mohanad\Desktop\1.xlsx'

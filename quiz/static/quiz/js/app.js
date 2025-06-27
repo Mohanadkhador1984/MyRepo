@@ -1,8 +1,9 @@
-// ✅ تحميل الأصوات
-const clickSound = new Audio('/static/sounds/click.mp3');
-const correctSound = new Audio('/static/sounds/correct.mp3');
-const wrongSound = new Audio('/static/sounds/wrong.mp3');
-const bgMusic = new Audio('/static/sounds/bg-music.mp3');
+// ✅ تحميل الأصوات باستخدام المسار الجديد
+const clickSound = new Audio('/staticfiles/quiz/sounds/click.mp3');
+const correctSound = new Audio('/staticfiles/quiz/sounds/correct.mp3');
+const wrongSound = new Audio('/staticfiles/quiz/sounds/wrong.mp3');
+const bgMusic = new Audio('/staticfiles/quiz/sounds/bg-music.mp3');
+
 
 // ✅ متغيرات الحالة
 let allQuestions = [];
@@ -19,14 +20,16 @@ const screenStack = [];
 
 
 // ✅ تحميل الأسئلة
+// ✅ تحميل الأسئلة
 async function loadQuestions() {
-  const response = await fetch('/static/data/questions.json');
+  const response = await fetch('/staticfiles/quiz/data/questions.json');
   if (response.ok) {
     allQuestions = await response.json();
   } else {
     console.error("❌ فشل تحميل الأسئلة من الملف");
   }
 }
+
 
 // ✅ عرض شاشة معينة
 function showScreen(screenId) {
@@ -270,11 +273,18 @@ let deferredPrompt = null;
       }
 
       // 🔧 تسجيل Service Worker
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(() => console.log('✅ Service Worker مسجل'))
-          .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
-      }
+       if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('{% static "pwa/service-worker.js" %}')
+
+      .then((registration) => {
+        console.log('✅ Service Worker مسجل عند:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('❌ فشل تسجيل Service Worker:', error);
+      });
+  });
+}
 
       // ✅ دعم beforeinstallprompt
       window.addEventListener('beforeinstallprompt', (e) => {
@@ -358,14 +368,3 @@ window.addEventListener('popstate', () => {
     document.getElementById(prev).style.display = 'block';
   }
 });
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/serviceworker.js')
-      .then((registration) => {
-        console.log('✅ Service Worker مسجل عند:', registration.scope);
-      })
-      .catch((error) => {
-        console.error('❌ فشل تسجيل Service Worker:', error);
-      });
-  });
-}

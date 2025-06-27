@@ -1,72 +1,90 @@
-from pathlib import Path
-import os
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
+# settings.py
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from pathlib import Path
+
+# ------------------------------------------------------------------------------
+# 1. المسار الأساسي للمشروع
+# ------------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# CSRF_TRUSTED_ORIGINS = ['https://yourdomain.com']
+# ------------------------------------------------------------------------------
+# 2. الأمان
+# ------------------------------------------------------------------------------
+SECRET_KEY = 'your-very-unique-and-random-secret-key'  # غيّره في بيئة الإنتاج
+DEBUG = True  # اجعله False في الإنتاج
+
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'myrepo-28.onrender.com',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://yourdomain.com',
+    'https://myrepo-28.onrender.com',
+]
 
 
-
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'myrepo-28.onrender.com']
-
-
-DEBUG = True
-
-SECRET_KEY = 'your-very-unique-and-random-secret-key'
-
-
-
-
-
-# LOGIN_REDIRECT_URL = 'account:home'
-# LOGIN_URL = 'login'
-# LOGOUT_REDIRECT_URL = 'login'
-
-
+# ------------------------------------------------------------------------------
+# 3. التطبيقات المثبتة
+# ------------------------------------------------------------------------------
 INSTALLED_APPS = [
-    'crispy_forms',
-    'crispy_bootstrap4',
+    # تطبيقات Django الافتراضية
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'quiz',
-     'account'
-    
-     
+
+    # مكتبات الطرف الثالث
+    'crispy_forms',
+    'crispy_bootstrap4',
+    'pwa',  # لدعم PWA تلقائيًا
+
+    # تطبيقات المشروع
+    'quiz',
+    'account',
 ]
-CRISPY_TEMPLATE_PACK = 'bootstrap4'   
-     
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
+# ------------------------------------------------------------------------------
+# 4. الميدلوير
+# ------------------------------------------------------------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # لضغط وتقديم static في الإنتاج
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', 
-    
 ]
 
-ROOT_URLCONF = 'quiz_project.urls'
 
+# ------------------------------------------------------------------------------
+# 5. الروتس و WSGI/ASGI
+# ------------------------------------------------------------------------------
+ROOT_URLCONF = 'quiz_project.urls'
+WSGI_APPLICATION = 'quiz_project.wsgi.application'
+# if using ASGI:
+# ASGI_APPLICATION = 'quiz_project.asgi.application'
+
+
+# ------------------------------------------------------------------------------
+# 6. القوالب (Templates)
+# ------------------------------------------------------------------------------
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'],  # قالب عام: base.html، errors.html…
+        'APP_DIRS': True,  # يبحث تلقائيًا في كل app/templates/
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                'django.template.context_processors.request',  # auth & csrf
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -74,90 +92,106 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'quiz_project.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+# ------------------------------------------------------------------------------
+# 7. قاعدة البيانات (PostgreSQL)
+# ------------------------------------------------------------------------------
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'quizdb',
-        'USER': 'postgres',
+        'ENGINE':   'django.db.backends.postgresql',
+        'NAME':     'quizdb',
+        'USER':     'postgres',
         'PASSWORD': '123456',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'HOST':     'localhost',
+        'PORT':     '5432',
     }
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
+# ------------------------------------------------------------------------------
+# 8. Validators لكلمات المرور
+# ------------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
+# ------------------------------------------------------------------------------
+# 9. التدويل والمنطقة الزمنية
+# ------------------------------------------------------------------------------
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
+TIME_ZONE     = 'UTC'
+USE_I18N      = True
+USE_TZ        = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
+# ------------------------------------------------------------------------------
+# 10. ملفات الستاتيك (Static Files)
+# ------------------------------------------------------------------------------
+# مسار URL لطلب static
+STATIC_URL = '/staticfiles/'
 
 
+# أثناء التطوير: Django يلتقط تلقائيًا:
+#  - BASE_DIR/static/
+#  - كل مجلد static/ داخل كل تطبيق
+# لكن يمكنك إضافة أي مجلد إضافي هنا:
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # مجلد عام (pwa/, icons/, مشترك)
+    # إن احتجت موارد مشتركة أخرى خارج هذا:
+    # BASE_DIR / 'assets',
+]
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+# عند تنفيذ collectstatic في الإنتاج:
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-from pathlib import Path
-import os
-
-BASE_DIR = Path(__file__).resolve().parent.parent
+# لضغط وتجميع ملفات الستاتيك مع cache-busting
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
+# ------------------------------------------------------------------------------
+# 11. ملفات الميديا (User-uploaded Media)
+# ------------------------------------------------------------------------------
+MEDIA_URL  = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# إعدادات PWA (اختياري إذا تستخدم مكتبة PWA من Django)
-PWA_APP_NAME = 'Quiz App'
-PWA_APP_DESCRIPTION = "تطبيق ويب بدون اتصال"
-PWA_APP_THEME_COLOR = '#0A0302'
+# ------------------------------------------------------------------------------
+# 12. تسجيل الدخول وإعادة التوجيه
+# ------------------------------------------------------------------------------
+LOGIN_REDIRECT_URL  = '/home/'
+LOGIN_URL           = '/login/'
+LOGOUT_REDIRECT_URL = '/login/'
+
+
+# ------------------------------------------------------------------------------
+# 13. إعدادات PWA
+# ------------------------------------------------------------------------------
+PWA_APP_NAME             = 'Quiz App'
+PWA_APP_DESCRIPTION      = "تطبيق ويب دون اتصال"
+PWA_APP_THEME_COLOR      = '#0A0302'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
-PWA_APP_DISPLAY = 'standalone'
-PWA_APP_SCOPE = '/'
-PWA_APP_START_URL = '/'
+PWA_APP_DISPLAY          = 'standalone'
+PWA_APP_SCOPE            = '/'
+PWA_APP_START_URL        = '/'
 PWA_APP_STATUS_BAR_COLOR = 'default'
-
-PWA_APP_ICONS = [
+PWA_APP_ICONS            = [
     {
-        'src': '/static/icons/icon-192x192.png',
-        'sizes': '192x192'
+        'src': '/static/pwa/icons/icon-192x192.png',
+        'sizes': '192x192',
     },
     {
-        'src': '/static/icons/icon-512x512.png',
-        'sizes': '512x512'
-    }
+        'src': '/static/pwa/icons/icon-512x512.png',
+        'sizes': '512x512',
+    },
 ]
+
+
+# ------------------------------------------------------------------------------
+# 14. تعريب لاحق (إن أردت)
+# ------------------------------------------------------------------------------
+# LANGUAGE_CODE = 'ar'
+# LOCALE_PATHS = [BASE_DIR / 'locale']
