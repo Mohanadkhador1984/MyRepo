@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     # مكتبات الطرف الثالث
     'crispy_forms',
     'crispy_bootstrap4',
-    'pwa',  # لدعم PWA تلقائيًا
+    
 
     # تطبيقات المشروع
     'quiz',
@@ -132,7 +132,8 @@ USE_TZ        = True
 # 10. ملفات الستاتيك (Static Files)
 # ------------------------------------------------------------------------------
 # مسار URL لطلب static
-STATIC_URL = '/static/'
+STATIC_URL = '/staticfiles/'
+
 
 # أثناء التطوير: Django يلتقط تلقائيًا:
 #  - BASE_DIR/static/
