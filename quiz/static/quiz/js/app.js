@@ -19,6 +19,7 @@ let currentYear = 1;
 let currentBranch = 'A';
 let answeredState = {};
 const screenStack = [];
+let allUsers     = [];
 
 
 // ✅ تحميل الأسئلة
@@ -30,6 +31,37 @@ async function loadQuestions() {
     console.error("❌ فشل تحميل الأسئلة من الملف");
   }
 }
+
+
+
+async function loadUsers() {
+  const res = await fetch('/static/quiz/data/users.json');
+  if (!res.ok) throw new Error('Failed to load users');
+  allUsers = await res.json();
+}
+
+
+async function initQuiz() {
+  try {
+    await Promise.all([loadQuestions(), loadUsers()]);
+    console.log('Questions:', allQuestions);
+    console.log('Users:',     allUsers);
+    // مثال: عرض أول مستخدم
+    if (allUsers.length > 0) {
+      document.getElementById('username').textContent = allUsers[0].username;
+      document.getElementById('location').textContent = allUsers[0].location;
+    }
+    // متابعة لبقية منطق اللعبة…
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+window.addEventListener('load', initQuiz);
+
+
+
+
 
 // ✅ عرض شاشة معينة
 function showScreen(screenId) {

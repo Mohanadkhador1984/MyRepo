@@ -9,7 +9,10 @@ const urlsToCache = [
   '/static/quiz/sounds/bg-music.mp3',
   '/static/quiz/data/questions.json',
   '/static/pwa/icons/icon-192x192.png',
-  '/static/pwa/icons/icon-512x512.png'
+  '/static/pwa/icons/icon-512x512.png',
+  '/static/quiz/data/users.json', 
+  '/static/quiz/data/questions.json'
+
 ];
 
 // التثبيت
