@@ -1,58 +1,67 @@
-{% extends 'base.html' %}    {# 1. هذا هو أول وسم في الملف #}
+
 {% load static %}
-{% block content %}
-<!-- لاحظ: وسوم <html> و<head> و</html> قد تكون مُعَرَّفة في base.html مسبقًا -->
+
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 
   <meta charset="UTF-8">
-  <title>PWA Django</title>
-  <!-- CORRECTION: تصحيح مسار المانيفست -->
-  <link rel="manifest" href="{% static 'pwa/manifest.json' %}">
+    <title>PWA Django</title>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        // CORRECTION: تسجيل ملف الـ service-worker من مسار static
-        navigator.serviceWorker.register("{% static 'pwa/service-worker.js' %}")
-          .then((registration) => {
-            console.log('✅ Service Worker مسجل عند:', registration.scope);
-          })
-          .catch((error) => {
-            console.error('❌ فشل تسجيل Service Worker:', error);
-          });
+    
+   
+    <link rel="manifest" href="{% static 'pwa/manifest.json' %}">
+
+    <!-- أيقونات المتصفح (favicon) -->
+  <link rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="{% static 'pwa/icons/icon-192x192.png' %}">
+  <link rel="apple-touch-icon"
+        href="{% static 'pwa/icons/icon-192x192.png' %}">
+  <meta name="theme-color" content="#4a90e2">
+  
+
+    <script>
+        if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/serviceworker.js')
+      .then((registration) => {
+        console.log('✅ Service Worker مسجل عند:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('❌ فشل تسجيل Service Worker:', error);
       });
-    }
-  </script>
+  });
+}
+    </script>
+
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>بكالوريا انكليزي</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-  <!-- تم استدعاء Chart.js مرتين، قد يفيد أبقاء واحدة فقط -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <link rel="icon" href="{% static 'pwa/icons/icon-192x192.png' %}"><!-- CORRECTION: مسار الأيقونة -->
-
+   <!-- <link rel="icon" href="{% static 'icons/icon-192x192.png' %}"> -->
   <!-- ربط ملف CSS -->
-  <!-- CORRECTION: تضمين مجلد quiz لملف الستايل -->
   <link rel="stylesheet" href="{% static 'quiz/css/style.css' %}">
-
-  <!-- تحميل Chart.js إن كنت تستخدمه (مكرر) -->
+  <!-- تحميل Chart.js إن كنت تستخدمه -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- تحميل سكريبت التطبيق. تأكد من استخدام defer حتى تُحمّل العناصر أولاً -->
+ 
 
+ 
 </head>
 <body>
+  
+  <h1>تطبيق ويب جانغو بدون إنترنت</h1>
 
-  <h1>تطبيق بكالوريا إنكليزي</h1>
-  <!-- CORRECTION: تضمين مجلد quiz لسكريبت التطبيق -->
-  <script src="{% static 'quiz/js/app.js' %}"></script>
-
+ <script src="{% static 'quiz/js/app.js' %}" defer></script>
   <!-- شاشات التطبيق -->
   <div id="branch-screen" class="quiz-container">
     <h1>اختر الفرع</h1>
     <div class="year-selection">
-      <button onclick="selectBranch('A')">الفرع الأدبي</button>
-      <button onclick="selectBranch('B')">الفرع العلمي</button>
+      <button onclick="selectBranch('A')">الفرع الأدبي (A)</button>
+      <button onclick="selectBranch('B')">الفرع العلمي (B)</button>
     </div>
   </div>
 
@@ -101,21 +110,11 @@
   <!-- زر الرجوع للرئيسية -->
   <button id="home-button" onclick="goHome()" title="العودة للرئيسية">🏠</button>
 
-  <!-- رسالة نجاح -->
-  <div id="install-message">✅ تم تثبيت التطبيق على الشاشة الرئيسية!</div>
-
-  <!-- حاوية زر التثبيت -->
-  <div id="install-container">
-    <button id="install-btn">📲 تثبيت التطبيق</button>
-    <div id="progress-bar">
-      <div id="progress"></div>
-    </div>
-    <div id="progress-text">0%</div>
-  </div>
-
-  <!-- CORRECTION: السكريبت الأساسي موجود مسبقًا أعلى الصفحة -->
+  <!-- زر التثبيت (ثابت في أسفل الصفحة) -->
+  <button id="install-btn" style="display: none; position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background-color: #28a745; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; z-index: 1000;">
+    📲 تثبيت التطبيق
+  </button>
+<
   <!-- الكود الخاص بزر التثبيت ووحدة التثبيت يعمل من خلال app.js -->
-
 </body>
 </html>
-{% endblock %}

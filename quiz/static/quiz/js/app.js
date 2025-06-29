@@ -1,8 +1,10 @@
-// ✅ تحميل الأصوات باستخدام المسار الجديد
-const clickSound = new Audio('/staticfiles/quiz/sounds/click.mp3');
-const correctSound = new Audio('/staticfiles/quiz/sounds/correct.mp3');
-const wrongSound = new Audio('/staticfiles/quiz/sounds/wrong.mp3');
-const bgMusic = new Audio('/staticfiles/quiz/sounds/bg-music.mp3');
+// ✅ تحميل الأصوات
+const clickSound = new Audio('/static/quiz/sounds/click.mp3');
+const correctSound = new Audio('/static/quiz/sounds/correct.mp3');
+const wrongSound = new Audio('/static/quiz/sounds/wrong.mp3');
+const bgMusic = new Audio('/static/quiz/sounds/bg-music.mp3');
+bgMusic.loop = true;
+
 
 
 // ✅ متغيرات الحالة
@@ -20,16 +22,14 @@ const screenStack = [];
 
 
 // ✅ تحميل الأسئلة
-// ✅ تحميل الأسئلة
 async function loadQuestions() {
-  const response = await fetch('/staticfiles/quiz/data/questions.json');
+  const response = await fetch('/static/quiz/data/questions.json');
   if (response.ok) {
     allQuestions = await response.json();
   } else {
     console.error("❌ فشل تحميل الأسئلة من الملف");
   }
 }
-
 
 // ✅ عرض شاشة معينة
 function showScreen(screenId) {
@@ -257,107 +257,42 @@ function startTimer() {
   }, 1000);
 }
 
-let deferredPrompt = null;
+let deferredPrompt; // متغير لتخزين الحدث
 
-    window.addEventListener('load', () => {
-      const installContainer = document.getElementById('install-container');
-      const installBtn = document.getElementById('install-btn');
-      const progressBar = document.getElementById('progress');
-      const progressText = document.getElementById('progress-text');
-      const installMessage = document.getElementById('install-message');
+// ✅ أحداث عند تحميل الصفحة
+window.onload = () => {
+  const installBtn = document.getElementById('install-btn');
 
-      // ✅ عرض رسالة إذا كان التطبيق مثبت ويعمل من الشاشة الرئيسية
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-      if (isStandalone) {
-        showInstallMessage();
-      }
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); // منع ظهور نافذة التثبيت الافتراضية
+    deferredPrompt = e; // تخزين الحدث
+    installBtn.style.display = 'block'; // إظهار زر التثبيت
 
-      // 🔧 تسجيل Service Worker
-       if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('{% static "pwa/service-worker.js" %}')
-
-      .then((registration) => {
-        console.log('✅ Service Worker مسجل عند:', registration.scope);
-      })
-      .catch((error) => {
-        console.error('❌ فشل تسجيل Service Worker:', error);
-      });
-  });
-}
-
-      // ✅ دعم beforeinstallprompt
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installContainer.style.display = 'flex';
-      });
-
-      // ✅ زر التثبيت
-      installBtn.addEventListener('click', () => {
-        if (deferredPrompt) {
-          installBtn.disabled = true;
-          installBtn.textContent = "⏳ جارٍ التثبيت...";
-
-          let progress = 0;
-          const interval = setInterval(() => {
-            progress += Math.floor(Math.random() * 10) + 10;
-            if (progress >= 100) {
-              clearInterval(interval);
-              progress = 100;
-              progressBar.style.width = '100%';
-              progressText.textContent = '100%';
-
-              deferredPrompt.prompt();
-              deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                  showInstallMessage();
-                  installContainer.style.display = 'none';
-                } else {
-                  installBtn.disabled = false;
-                  installBtn.textContent = "📲 تثبيت التطبيق";
-                }
-                deferredPrompt = null;
-              });
-            } else {
-              progressBar.style.width = progress + '%';
-              progressText.textContent = progress + '%';
-            }
-          }, 200);
+    // إضافة حدث عند النقر على زر التثبيت
+    installBtn.addEventListener('click', () => {
+      installBtn.style.display = 'none'; // إخفاء الزر
+      deferredPrompt.prompt(); // إظهار نافذة التثبيت
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('✅ تم قبول التثبيت');
         } else {
-          alert("يرجى استخدام متصفح يدعم التثبيت التلقائي مثل Chrome أو Edge.");
+          console.log('❌ تم رفض التثبيت');
         }
+        deferredPrompt = null; // إعادة تعيين المتغير
       });
-
-      // ✅ بعد التثبيت
-      window.addEventListener('appinstalled', () => {
-        console.log('✅ تم تثبيت التطبيق');
-        showInstallMessage();
-        installContainer.style.display = 'none';
-      });
-       loadQuestions(); // تحميل الأسئلة
-
-      // ✅ دعم iOS (Safari)
-      const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-      const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
-
-      if (isIos && !isInStandaloneMode) {
-        installContainer.style.display = 'flex';
-        installBtn.textContent = "📲 أضف إلى الشاشة الرئيسية يدويًا";
-        installBtn.onclick = () => {
-          alert("لإضافة التطبيق: اضغط على زر المشاركة في Safari ثم اختر 'إضافة إلى الشاشة الرئيسية'.");
-        };
-      }
-
-      function showInstallMessage() {
-        installMessage.style.display = 'block';
-        setTimeout(() => {
-          installMessage.style.display = 'none';
-        }, 4000);
-      }
     });
-      
-         
+  });
+
+  window.addEventListener('appinstalled', () => {
+    console.log('✅ تم تثبيت التطبيق');
+    installBtn.style.display = 'none'; // إخفاء الزر بعد التثبيت
+  });
+
+  
+
+
+  loadQuestions(); // تحميل الأسئلة
+};
 
 // ✅ التعامل مع زر الرجوع
 window.addEventListener('popstate', () => {
@@ -368,3 +303,14 @@ window.addEventListener('popstate', () => {
     document.getElementById(prev).style.display = 'block';
   }
 });
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/serviceworker.js')
+      .then((registration) => {
+        console.log('✅ Service Worker مسجل عند:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('❌ فشل تسجيل Service Worker:', error);
+      });
+  });
+}

@@ -1,6 +1,5 @@
-# settings.py
-
 from pathlib import Path
+import os
 
 # ------------------------------------------------------------------------------
 # 1. المسار الأساسي للمشروع
@@ -10,8 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------------------------------------------------------
 # 2. الأمان
 # ------------------------------------------------------------------------------
-SECRET_KEY = 'your-very-unique-and-random-secret-key'  # غيّره في بيئة الإنتاج
-DEBUG = True  # اجعله False في الإنتاج
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-dev-secret-key')  # استخدم متغير بيئة في الإنتاج
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -29,18 +28,19 @@ CSRF_TRUSTED_ORIGINS = [
 # 3. التطبيقات المثبتة
 # ------------------------------------------------------------------------------
 INSTALLED_APPS = [
-    # تطبيقات Django الافتراضية
+    # Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'whitenoise.runserver_nostatic',
 
-    # مكتبات الطرف الثالث
+    # طرف ثالث
     'crispy_forms',
     'crispy_bootstrap4',
-    
+    'pwa',
 
     # تطبيقات المشروع
     'quiz',
@@ -54,7 +54,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # ------------------------------------------------------------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # لضغط وتقديم static في الإنتاج
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # تقديم static files بكفاءة
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -65,26 +65,24 @@ MIDDLEWARE = [
 
 
 # ------------------------------------------------------------------------------
-# 5. الروتس و WSGI/ASGI
+# 5. الروت و WSGI
 # ------------------------------------------------------------------------------
 ROOT_URLCONF = 'quiz_project.urls'
 WSGI_APPLICATION = 'quiz_project.wsgi.application'
-# if using ASGI:
-# ASGI_APPLICATION = 'quiz_project.asgi.application'
 
 
 # ------------------------------------------------------------------------------
-# 6. القوالب (Templates)
+# 6. القوالب
 # ------------------------------------------------------------------------------
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # قالب عام: base.html، errors.html…
-        'APP_DIRS': True,  # يبحث تلقائيًا في كل app/templates/
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',  # auth & csrf
+                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -94,7 +92,7 @@ TEMPLATES = [
 
 
 # ------------------------------------------------------------------------------
-# 7. قاعدة البيانات (PostgreSQL)
+# 7. قاعدة البيانات
 # ------------------------------------------------------------------------------
 DATABASES = {
     'default': {
@@ -109,7 +107,7 @@ DATABASES = {
 
 
 # ------------------------------------------------------------------------------
-# 8. Validators لكلمات المرور
+# 8. التحقق من كلمات المرور
 # ------------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -120,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # ------------------------------------------------------------------------------
-# 9. التدويل والمنطقة الزمنية
+# 9. التدويل
 # ------------------------------------------------------------------------------
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE     = 'UTC'
@@ -128,39 +126,25 @@ USE_I18N      = True
 USE_TZ        = True
 
 
-# ------------------------------------------------------------------------------
-# 10. ملفات الستاتيك (Static Files)
-# ------------------------------------------------------------------------------
-# مسار URL لطلب static
-STATIC_URL = '/staticfiles/'
+# static settings
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # مهم عند استخدام collectstatic للإنتاج
 
-
-# أثناء التطوير: Django يلتقط تلقائيًا:
-#  - BASE_DIR/static/
-#  - كل مجلد static/ داخل كل تطبيق
-# لكن يمكنك إضافة أي مجلد إضافي هنا:
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # مجلد عام (pwa/, icons/, مشترك)
-    # إن احتجت موارد مشتركة أخرى خارج هذا:
-    # BASE_DIR / 'assets',
-]
-
-# عند تنفيذ collectstatic في الإنتاج:
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# لضغط وتجميع ملفات الستاتيك مع cache-busting
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# PWA manifest and service worker
+PWA_APP_NAME = 'Quiz App'
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static', 'pwa', 'serviceworker.js')
 
 
 # ------------------------------------------------------------------------------
-# 11. ملفات الميديا (User-uploaded Media)
+# 11. ملفات الميديا (التي يرفعها المستخدمون)
 # ------------------------------------------------------------------------------
 MEDIA_URL  = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # ------------------------------------------------------------------------------
-# 12. تسجيل الدخول وإعادة التوجيه
+# 12. تسجيل الدخول
 # ------------------------------------------------------------------------------
 LOGIN_REDIRECT_URL  = '/home/'
 LOGIN_URL           = '/login/'
@@ -171,27 +155,41 @@ LOGOUT_REDIRECT_URL = '/login/'
 # 13. إعدادات PWA
 # ------------------------------------------------------------------------------
 PWA_APP_NAME             = 'Quiz App'
-PWA_APP_DESCRIPTION      = "تطبيق ويب دون اتصال"
+PWA_APP_DESCRIPTION      = "تطبيق يعمل دون اتصال"
 PWA_APP_THEME_COLOR      = '#0A0302'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
 PWA_APP_DISPLAY          = 'standalone'
 PWA_APP_SCOPE            = '/'
 PWA_APP_START_URL        = '/'
 PWA_APP_STATUS_BAR_COLOR = 'default'
-PWA_APP_ICONS            = [
+
+# استخدم {% static %} دائمًا للحصول على المسار الصحيح للصور
+PWA_APP_ICONS = [
     {
-        'src': '/static/pwa/icons/icon-192x192.png',
-        'sizes': '192x192',
+  
+  "icons":[
+    {
+      "src": "/static/pwa/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-        'src': '/static/pwa/icons/icon-512x512.png',
-        'sizes': '512x512',
-    },
+      "src": "/static/pwa/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
 ]
+
+PWA_SERVICE_WORKER_PATH = BASE_DIR / 'static' / 'pwa' / 'service-worker.js'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # ------------------------------------------------------------------------------
-# 14. تعريب لاحق (إن أردت)
+# 14. تعريب لاحق (اختياري)
 # ------------------------------------------------------------------------------
 # LANGUAGE_CODE = 'ar'
 # LOCALE_PATHS = [BASE_DIR / 'locale']

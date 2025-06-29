@@ -3,30 +3,32 @@ URL configuration for quiz_project project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include
-from quiz.views import service_worker, offline
+from django.urls import path, include, re_path
+from django.conf import settings
+from django.views.static import serve
+from quiz.views import offline  # تأكد أن لديك هذا الـ view في quiz/views.py
 
 urlpatterns = [
-     path('admin/', admin.site.urls),
-    path('', include('account.urls')),  # الصفحة الرئيسية = تسجيل الدخول
-    path('quiz/', include('quiz.urls', namespace='quiz')),  # جميع مسارات quiz تبدأ بـ /quiz
-    path('serviceworker.js', service_worker),  # لإتاحة service worker
-    path('offline.html', offline), 
-   
-                          
+    # لوحة التحكم
+    path('admin/', admin.site.urls),
+
+    # التطبيق الأساسي (تسجيل الدخول، تسجيل حساب، الصفحة الرئيسية)
+    path('', include('account.urls')),
+
+    # تطبيق الكويز (quiz)
+    path('quiz/', include(('quiz.urls', 'quiz'), namespace='quiz')),
+
+    # صفحة عدم الاتصال
+    path('offline.html', offline, name='offline'),
+
+    # ملفات PWA: service worker و manifest
+    re_path(r'^serviceworker\.js$', serve, {'path': 'pwa/serviceworker.js', 'document_root': settings.STATIC_ROOT}),
+    re_path(r'^manifest\.json$', serve, {'path': 'pwa/manifest.json', 'document_root': settings.STATIC_ROOT}),
 ]
 
-
-
+# إضافة مسارات الملفات الثابتة أثناء وضع التطوير
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
