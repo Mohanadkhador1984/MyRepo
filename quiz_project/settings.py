@@ -11,33 +11,29 @@ load_dotenv(BASE_DIR / ".env")
 # ------------------------------------------------------------------------------
 # 2) مفاتيح الأمان و DEBUG
 # ------------------------------------------------------------------------------
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "unsafe-secret-key")
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
 # ------------------------------------------------------------------------------
 # 3) Hosts و CSRF
 # ------------------------------------------------------------------------------
-import os
-
-# 1) اقرأ المتغير أو استعمل القيمة الافتراضية للتطوير
+# ALLOWED_HOSTS: قائمة النطاقات المسموحة
 raw_hosts = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1")
 ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(",") if h.strip()]
 
-# 2) قراء CSRF_TRUSTED_ORIGINS وتحويل كل قيمة إلى عنوان صحيح
+# CSRF_TRUSTED_ORIGINS: قائمة النطاقات الموثوقة لحماية CSRF
 raw_csrf = os.getenv("CSRF_TRUSTED_ORIGINS", raw_hosts)
 CSRF_TRUSTED_ORIGINS = []
 for origin in raw_csrf.split(","):
     o = origin.strip()
     if not o:
         continue
-    # إذا لم يبدأ بـ http:// أو https:// نضيف https://
     if not o.startswith(("http://", "https://")):
         o = f"https://{o}"
     CSRF_TRUSTED_ORIGINS.append(o)
 
-
 # ------------------------------------------------------------------------------
-# 4) قواعد البيانات (محلي / بعيد)
+# 4) إعدادات قواعد البيانات
 # ------------------------------------------------------------------------------
 USE_REMOTE_DB = os.getenv("USE_REMOTE_DB", "False").lower() in ("true", "1", "yes")
 
@@ -75,7 +71,7 @@ else:
         }
 
 # ------------------------------------------------------------------------------
-# 5) التطبيقات والوسيطات وقوالب العرض
+# 5) التطبيقات المثبتة
 # ------------------------------------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -92,6 +88,9 @@ INSTALLED_APPS = [
     "account",
 ]
 
+# ------------------------------------------------------------------------------
+# 6) الوسيطات (Middleware)
+# ------------------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -103,9 +102,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "quiz_project.urls"
-WSGI_APPLICATION = "quiz_project.wsgi.application"
-
+# ------------------------------------------------------------------------------
+# 7) إعدادات القوالب
+# ------------------------------------------------------------------------------
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -122,33 +121,42 @@ TEMPLATES = [
     },
 ]
 
+ROOT_URLCONF = "quiz_project.urls"
+WSGI_APPLICATION = "quiz_project.wsgi.application"
+
 # ------------------------------------------------------------------------------
-# 6) المصادقة والمسارات الثابتة والوسائط
-# ---------------------------------------A---------------------------------------
-
-CRISPY_TEMPLATE_PACK = "bootstrap4"
-
+# 8) إعدادات اللغة والوقت
+# ------------------------------------------------------------------------------
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# ------------------------------------------------------------------------------
+# 9) الملفات الثابتة والوسائط
+# ------------------------------------------------------------------------------
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = (
-    "whitenoise.storage.CompressedManifestStaticFilesStorage"
-)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# ------------------------------------------------------------------------------
+# 10) إعدادات الدخول والخروج
+# ------------------------------------------------------------------------------
 LOGIN_REDIRECT_URL = "/home/"
 LOGIN_URL = "/login/"
 LOGOUT_REDIRECT_URL = "/login/"
 
 # ------------------------------------------------------------------------------
-# 7) إعدادات PWA
+# 11) إعدادات crispy forms
+# ------------------------------------------------------------------------------
+CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+# ------------------------------------------------------------------------------
+# 12) إعدادات PWA
 # ------------------------------------------------------------------------------
 PWA_APP_NAME = "Quiz App"
 PWA_APP_DESCRIPTION = "تطبيق يعمل دون اتصال"
