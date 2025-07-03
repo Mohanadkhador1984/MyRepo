@@ -17,18 +17,24 @@ DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 # ------------------------------------------------------------------------------
 # 3) Hosts و CSRF
 # ------------------------------------------------------------------------------
-ALLOWED_HOSTS = [
-    h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()
-]
+import os
 
-_raw_csrf = os.getenv("CSRF_TRUSTED_ORIGINS", "")
-CSRF_TRUSTED_ORIGINS = [
-    origin
-    if origin.startswith(("http://", "https://"))
-    else f"https://{origin}"
-    for origin in (_o.strip() for _o in _raw_csrf.split(","))
-    if origin
-]
+# 1) اقرأ المتغير أو استعمل القيمة الافتراضية للتطوير
+raw_hosts = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(",") if h.strip()]
+
+# 2) قراء CSRF_TRUSTED_ORIGINS وتحويل كل قيمة إلى عنوان صحيح
+raw_csrf = os.getenv("CSRF_TRUSTED_ORIGINS", raw_hosts)
+CSRF_TRUSTED_ORIGINS = []
+for origin in raw_csrf.split(","):
+    o = origin.strip()
+    if not o:
+        continue
+    # إذا لم يبدأ بـ http:// أو https:// نضيف https://
+    if not o.startswith(("http://", "https://")):
+        o = f"https://{o}"
+    CSRF_TRUSTED_ORIGINS.append(o)
+
 
 # ------------------------------------------------------------------------------
 # 4) قواعد البيانات (محلي / بعيد)
