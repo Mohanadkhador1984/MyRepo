@@ -1,196 +1,161 @@
-from pathlib import Path
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
 # ------------------------------------------------------------------------------
-# 1. المسار الأساسي للمشروع
+# 1) تحميل المتغيرات من .env
 # ------------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 # ------------------------------------------------------------------------------
-# 2. الأمان
+# 2) مفاتيح الأمان و DEBUG
 # ------------------------------------------------------------------------------
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-dev-secret-key')  # استخدم متغير بيئة في الإنتاج
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
+# ------------------------------------------------------------------------------
+# 3) Hosts و CSRF
+# ------------------------------------------------------------------------------
 ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    'myrepo-28.onrender.com',
+    h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()
 ]
 
+_raw_csrf = os.getenv("CSRF_TRUSTED_ORIGINS", "")
 CSRF_TRUSTED_ORIGINS = [
-    'https://yourdomain.com',
-    'https://myrepo-28.onrender.com',
+    origin
+    if origin.startswith(("http://", "https://"))
+    else f"https://{origin}"
+    for origin in (_o.strip() for _o in _raw_csrf.split(","))
+    if origin
 ]
-
 
 # ------------------------------------------------------------------------------
-# 3. التطبيقات المثبتة
+# 4) قواعد البيانات (محلي / بعيد)
+# ------------------------------------------------------------------------------
+USE_REMOTE_DB = os.getenv("USE_REMOTE_DB", "False").lower() in ("true", "1", "yes")
+
+if USE_REMOTE_DB:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST_EXTERNAL"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+            "OPTIONS": {"sslmode": "require"},
+        }
+    }
+else:
+    local_engine = os.getenv("DATABASE_LOCAL_ENGINE", "sqlite3")
+    if local_engine == "sqlite3":
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / os.getenv("DATABASE_LOCAL_NAME", "db.sqlite3"),
+            }
+        }
+    else:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": os.getenv("DATABASE_LOCAL_NAME"),
+                "USER": os.getenv("DATABASE_LOCAL_USER"),
+                "PASSWORD": os.getenv("DATABASE_LOCAL_PASSWORD"),
+                "HOST": os.getenv("DATABASE_LOCAL_HOST"),
+                "PORT": os.getenv("DATABASE_LOCAL_PORT", "5432"),
+            }
+        }
+
+# ------------------------------------------------------------------------------
+# 5) التطبيقات والوسيطات وقوالب العرض
 # ------------------------------------------------------------------------------
 INSTALLED_APPS = [
-    # Django
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'whitenoise.runserver_nostatic',
-
-    # طرف ثالث
-    'crispy_forms',
-    'crispy_bootstrap4',
-    'pwa',
-
-    # تطبيقات المشروع
-    'quiz',
-    'account',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "whitenoise.runserver_nostatic",
+    "crispy_forms",
+    "crispy_bootstrap4",
+    "pwa",
+    "quiz",
+    "account",
 ]
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-
-# ------------------------------------------------------------------------------
-# 4. الميدلوير
-# ------------------------------------------------------------------------------
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # تقديم static files بكفاءة
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+ROOT_URLCONF = "quiz_project.urls"
+WSGI_APPLICATION = "quiz_project.wsgi.application"
 
-# ------------------------------------------------------------------------------
-# 5. الروت و WSGI
-# ------------------------------------------------------------------------------
-ROOT_URLCONF = 'quiz_project.urls'
-WSGI_APPLICATION = 'quiz_project.wsgi.application'
-
-
-# ------------------------------------------------------------------------------
-# 6. القوالب
-# ------------------------------------------------------------------------------
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
+# ------------------------------------------------------------------------------
+# 6) المصادقة والمسارات الثابتة والوسائط
+# ---------------------------------------A---------------------------------------
+
+CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
+USE_I18N = True
+USE_TZ = True
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = (
+    "whitenoise.storage.CompressedManifestStaticFilesStorage"
+)
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+LOGIN_REDIRECT_URL = "/home/"
+LOGIN_URL = "/login/"
+LOGOUT_REDIRECT_URL = "/login/"
 
 # ------------------------------------------------------------------------------
-# 7. قاعدة البيانات
+# 7) إعدادات PWA
 # ------------------------------------------------------------------------------
-import dj_database_url
+PWA_APP_NAME = "Quiz App"
+PWA_APP_DESCRIPTION = "تطبيق يعمل دون اتصال"
+PWA_APP_THEME_COLOR = "#0A0302"
+PWA_APP_BACKGROUND_COLOR = "#ffffff"
+PWA_APP_DISPLAY = "standalone"
+PWA_APP_SCOPE = "/"
+PWA_APP_START_URL = "/"
+PWA_APP_STATUS_BAR_COLOR = "default"
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
-
-
-
-
-# ------------------------------------------------------------------------------
-# 8. التحقق من كلمات المرور
-# ------------------------------------------------------------------------------
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
-
-# ------------------------------------------------------------------------------
-# 9. التدويل
-# ------------------------------------------------------------------------------
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE     = 'UTC'
-USE_I18N      = True
-USE_TZ        = True
-
-
-# static settings
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # مهم عند استخدام collectstatic للإنتاج
-
-# PWA manifest and service worker
-PWA_APP_NAME = 'Quiz App'
-PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static', 'pwa', 'serviceworker.js')
-
-
-# ------------------------------------------------------------------------------
-# 11. ملفات الميديا (التي يرفعها المستخدمون)
-# ------------------------------------------------------------------------------
-MEDIA_URL  = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-
-# ------------------------------------------------------------------------------
-# 12. تسجيل الدخول
-# ------------------------------------------------------------------------------
-LOGIN_REDIRECT_URL  = '/home/'
-LOGIN_URL           = '/login/'
-LOGOUT_REDIRECT_URL = '/login/'
-
-
-# ------------------------------------------------------------------------------
-# 13. إعدادات PWA
-# ------------------------------------------------------------------------------
-PWA_APP_NAME             = 'Quiz App'
-PWA_APP_DESCRIPTION      = "تطبيق يعمل دون اتصال"
-PWA_APP_THEME_COLOR      = '#0A0302'
-PWA_APP_BACKGROUND_COLOR = '#ffffff'
-PWA_APP_DISPLAY          = 'standalone'
-PWA_APP_SCOPE            = '/'
-PWA_APP_START_URL        = '/'
-PWA_APP_STATUS_BAR_COLOR = 'default'
-
-# استخدم {% static %} دائمًا للحصول على المسار الصحيح للصور
 PWA_APP_ICONS = [
-    {
-  
-  "icons":[
-    {
-      "src": "/static/pwa/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/static/pwa/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}
-
+    {"src": "/static/pwa/icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/static/pwa/icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
 ]
 
-PWA_SERVICE_WORKER_PATH = BASE_DIR / 'static' / 'pwa' / 'service-worker.js'
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-
-# ------------------------------------------------------------------------------
-# 14. تعريب لاحق (اختياري)
-# ------------------------------------------------------------------------------
-# LANGUAGE_CODE = 'ar'
-# LOCALE_PATHS = [BASE_DIR / 'locale']
+PWA_SERVICE_WORKER_PATH = BASE_DIR / "static" / "pwa" / "serviceworker.js"
