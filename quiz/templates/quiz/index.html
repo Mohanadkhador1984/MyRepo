@@ -1,6 +1,8 @@
 
+{% extends 'base.html' %}
 {% load static %}
 
+{% block content %}
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -114,7 +116,8 @@
   <button id="install-btn" style="display: none; position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background-color: #28a745; color: #fff; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; z-index: 1000;">
     📲 تثبيت التطبيق
   </button>
-<
+
   <!-- الكود الخاص بزر التثبيت ووحدة التثبيت يعمل من خلال app.js -->
 </body>
 </html>
+{% endblock %}
