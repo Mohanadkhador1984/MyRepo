@@ -30,16 +30,25 @@ CSRF_TRUSTED_ORIGINS = [
 # --------------------------------------------------
 # اختيار القاعدة: محلي أو بعيد
 # --------------------------------------------------
+# --------------------------------------------------
+# إعداد قاعدة البيانات
+# --------------------------------------------------
+def get_env_or_raise(key: str) -> str:
+    value = os.getenv(key)
+    if not value:
+        raise RuntimeError(f"Missing required environment variable: {key}")
+    return value
+
 USE_REMOTE_DB = os.getenv("USE_REMOTE_DB", "False").lower() in ("true", "1", "yes")
 
 if USE_REMOTE_DB:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST_EXTERNAL"),   # تأكد من تطابق المفتاح
+            "NAME": get_env_or_raise("DB_NAME"),
+            "USER": get_env_or_raise("DB_USER"),
+            "PASSWORD": get_env_or_raise("DB_PASSWORD"),
+            "HOST": get_env_or_raise("DB_HOST_EXTERNAL"),
             "PORT": os.getenv("DB_PORT", "5432"),
             "OPTIONS": {"sslmode": "require"},
         }
