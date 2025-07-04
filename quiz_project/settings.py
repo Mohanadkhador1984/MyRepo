@@ -53,9 +53,9 @@ for origin in raw_csrf.split(","):
 # ------------------------------------------------------------------------------
 # 4) قواعد البيانات (محلي / بعيد)
 # ------------------------------------------------------------------------------
-USE_REMOTE_DB = os.getenv("USE_REMOTE_DB", "False").lower() in ("true", "1", "yes")
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
-if USE_REMOTE_DB:
+if DEBUG:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -179,3 +179,4 @@ PWA_APP_ICONS = [
 ]
 
 PWA_SERVICE_WORKER_PATH = BASE_DIR / "static" / "pwa" / "serviceworker.js"
+
