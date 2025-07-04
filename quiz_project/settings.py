@@ -11,9 +11,13 @@ load_dotenv(BASE_DIR / ".env")
 # ------------------------------------------------------------------------------
 # 2) مفاتيح الأمان و DEBUG
 # ------------------------------------------------------------------------------
+# SECRET_KEY ضروري في الإنتاج
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
+if not SECRET_KEY:
+    raise RuntimeError("Missing DJANGO_SECRET_KEY")
 
+# Debug اختياري للتشخيص
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("true","1","yes")
 # ------------------------------------------------------------------------------
 # 3) Hosts و CSRF
 # ------------------------------------------------------------------------------
@@ -116,6 +120,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ROOT_URLCONF = "quiz_project.urls"
 WSGI_APPLICATION = "quiz_project.wsgi.application"
