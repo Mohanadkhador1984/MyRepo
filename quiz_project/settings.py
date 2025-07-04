@@ -3,7 +3,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # --------------------------------------------------
-# تحميل بيئة المشروع
+# تحميل متغيرات البيئة
 # --------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
@@ -13,23 +13,41 @@ load_dotenv(BASE_DIR / ".env")
 # --------------------------------------------------
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
-    raise RuntimeError("❌ متغير DJANGO_SECRET_KEY مفقود!")
+    raise RuntimeError("Missing DJANGO_SECRET_KEY in environment")
 
 DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
 
-# --------------------------------------------------
-# المضيفون المسموح بهم
-# --------------------------------------------------
-ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "").split(",") if host.strip()]
-CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if origin.strip()]
+ALLOWED_HOSTS = [
+    h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    uri.strip()
+    for uri in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if uri.strip()
+]
 
 # --------------------------------------------------
-# قاعدة البيانات
+# اختيار القاعدة: محلي أو بعيد
 # --------------------------------------------------
-if DEBUG:
+USE_REMOTE_DB = os.getenv("USE_REMOTE_DB", "False").lower() in ("true", "1", "yes")
+
+if USE_REMOTE_DB:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST_EXTERNAL"),   # تأكد من تطابق المفتاح
+            "PORT": os.getenv("DB_PORT", "5432"),
+            "OPTIONS": {"sslmode": "require"},
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": f"django.db.backends.{os.getenv('DATABASE_LOCAL_ENGINE', 'postgresql')}",
             "NAME": os.getenv("DATABASE_LOCAL_NAME", "quizdb"),
             "USER": os.getenv("DATABASE_LOCAL_USER", "postgres"),
             "PASSWORD": os.getenv("DATABASE_LOCAL_PASSWORD", ""),
@@ -37,21 +55,9 @@ if DEBUG:
             "PORT": os.getenv("DATABASE_LOCAL_PORT", "5432"),
         }
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
-            "PORT": os.getenv("DB_PORT", "5432"),
-            "OPTIONS": {"sslmode": "require"},
-        }
-    }
 
 # --------------------------------------------------
-# التطبيقات
+# التطبيقات والوسيطات
 # --------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -68,9 +74,6 @@ INSTALLED_APPS = [
     "account",
 ]
 
-# --------------------------------------------------
-# الوسيطات
-# --------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -93,30 +96,28 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
+        "OPTIONS": {"context_processors": [
+            "django.template.context_processors.debug",
+            "django.template.context_processors.request",
+            "django.contrib.auth.context_processors.auth",
+            "django.contrib.messages.context_processors.messages",
+        ]},
     },
 ]
 
 # --------------------------------------------------
-# الملفات الثابتة والوسائط
+# الملفات الثابتة وWhiteNoise
 # --------------------------------------------------
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # --------------------------------------------------
-# المصادقة
+# المصادقة وإعادة التوجيه
 # --------------------------------------------------
 LOGIN_REDIRECT_URL = "/home/"
 LOGIN_URL = "/login/"
