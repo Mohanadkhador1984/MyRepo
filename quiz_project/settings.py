@@ -19,7 +19,7 @@ DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 # ------------------------------------------------------------------------------
 # 1) تفعيل أو تعطيل وضع التصحيح عبر متغير بيئي DJANGO_DEBUG
 #    القيم المقبولة: "True", "true", "1", "yes" لتفعيل الـ Debug
-DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
 
 # 2) بناء القيمة الافتراضية لقائمة المضيفين المسموح بها حسب وضع الـ Debug
 if DEBUG:
@@ -36,7 +36,7 @@ if DEBUG:
     print("DEBUG =", DEBUG)
     print("ALLOWED_HOSTS =", ALLOWED_HOSTS)
 
-    
+
 # 2) قراء CSRF_TRUSTED_ORIGINS وتحويل كل قيمة إلى عنوان صحيح
 raw_csrf = os.getenv("CSRF_TRUSTED_ORIGINS", raw_hosts)
 CSRF_TRUSTED_ORIGINS = []
