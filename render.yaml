@@ -1,0 +1,43 @@
+# render.yaml
+
+services:
+  - type: web
+    name: quiz-pwa
+    env: python
+
+    # 1) أوامر البناء: تثبيت المتطلبات
+    buildCommand: pip install -r requirements.txt
+
+    # 2) Start Command: migrate, collectstatic, وإنشاء superuser، ثم تشغيل Gunicorn
+    startCommand: >
+      python manage.py migrate --noinput &&
+      python manage.py collectstatic --noinput &&
+      # أمر تلقائي لإنشاء superuser إذا لم يكن موجوداً
+      python - << 'PYCODE'
+from django.contrib.auth import get_user_model
+User = get_user_model()
+if not User.objects.filter(username="admin").exists():
+    User.objects.create_superuser("admin", "admin@example.com", "StrongP@ssw0rd")
+PYCODE
+      && gunicorn quiz_project.wsgi:application
+
+    # 3) متغيرات البيئة
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "myrepo-28.onrender.com,localhost,127.0.0.1"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://myrepo-28.onrender.com,https://localhost,https://127.0.0.1"
+      - key: USE_REMOTE_DB
+        value: "True"
+      - key: DB_NAME
+        value: "quizdb_48zp"
+      - key: DB_USER
+        value: "quizdb_48zp_user"
+      - key: DB_PASSWORD
+        value: "HSnoVUJu1bEp0qQVFAeCshxXcD8QHUFy"
+      - key: DB_HOST_EXTERNAL
+        value: "dpg-d18ld78gjchc73996mpg-a.oregon-postgres.render.com"
+      - key: DB_PORT
+        value: "5432"
