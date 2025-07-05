@@ -2,6 +2,19 @@
 {% load static %}
 
 {% block content %}
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/serviceworker.js')
+        .then(reg => console.log('✅ Service Worker مسجل:', reg.scope))
+        .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
+    });
+  }
+</script>
+
+<!-- سكريبت التطبيق -->
+<script src="{% static 'quiz/js/app.js' %}" defer></script>
 <div class="container text-center py-4">
 
   <h1 class="mb-4 text-primary">تطبيق البكالوريا الإنجليزي</h1>
@@ -34,64 +47,49 @@
     </div>
   </div>
 
-  <!-- شاشة الاختبار -->
-  <div id="quiz-screen" class="quiz-container my-4 d-none">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <div class="text-success fw-bold" id="score-summary">إجابات صحيحة: 0 | خاطئة: 0</div>
-      <div class="text-danger fw-bold" id="timer">00:90:00</div>
+  <div id="quiz-screen" class="quiz-container" style="display:none;">
+    <div class="score-summary" id="score-summary">إجابات صحيحة: 0 | خاطئة: 0</div>
+    <div class="question-nav">
+      <select id="question-jump" class="form-select w-100" onchange="jumpToQuestion(this.value)"></select>
+      <div class="timer" id="timer">00:90:00</div>
     </div>
-
-    <div class="mb-3">
-      <select id="question-jump" class="form-select" onchange="jumpToQuestion(this.value)">
-        <option value="">انتقل إلى سؤال</option>
-      </select>
+    <h1 id="question">جاري التحميل...</h1>
+    <div class="answers" id="answers"></div>
+    <div class="nav-btns">
+      <button onclick="prevQuestion()">السابق</button>
+      <button id="next-btn" onclick="nextQuestion()">التالي</button>
     </div>
-
-    <h4 id="question" class="mb-3">جاري التحميل...</h4>
-    <div id="answers" class="answers mb-4"></div>
-
-    <div class="d-flex justify-content-between">
-      <button class="btn btn-outline-secondary" onclick="prevQuestion()">السابق</button>
-      <button id="next-btn" class="btn btn-primary" onclick="nextQuestion()">التالي</button>
+    <div class="floating-info">
+      <button onclick="openTextScreen()" id="text-button" style="display: none;">📝</button>
+      <button onclick="toggleLanguage()">🌐</button>
     </div>
-
-    <div class="floating-info mt-4">
-      <button class="btn btn-outline-dark me-2" onclick="openTextScreen()" id="text-button" style="display: none;">📝 النص</button>
-      <button class="btn btn-outline-dark" onclick="toggleLanguage()">🌐 اللغة</button>
-    </div>
-
-    <div id="result" class="mt-3"></div>
+    <div id="result"></div>
   </div>
 
-  <!-- شاشة النص المرفق -->
-  <div id="text-screen" class="quiz-container d-none my-4">
-    <h3 class="mb-3">النص المرفق</h3>
-    <div id="attached-text" class="border p-3 rounded bg-light"></div>
+  <div id="text-screen" class="quiz-container" style="display:none;">
+    <h1>النص المرفق</h1>
+    <div id="attached-text" class="attached-text"></div>
   </div>
 
   <!-- زر الرجوع للرئيسية -->
-  <button id="home-button" onclick="goHome()" title="العودة للرئيسية" class="btn btn-light rounded-circle shadow position-fixed bottom-0 end-0 m-4">
-    🏠
-  </button>
+  <button id="home-button" onclick="goHome()" title="العودة للرئيسية">🏠</button>
 
-  <!-- زر التثبيت PWA -->
-  <button id="install-btn" class="btn btn-success position-fixed bottom-0 start-0 m-4 d-none" style="z-index: 1000;">
-    📲 تثبيت التطبيق
-  </button>
+ <!-- رسالة نجاح -->
+  <div id="install-message">✅ تم تثبيت التطبيق على الشاشة الرئيسية!</div>
 
-</div>
+  <!-- حاوية زر التثبيت -->
+  <div id="install-container">
+    <button id="install-btn">📲 تثبيت التطبيق</button>
+    <div id="progress-bar">
+      <div id="progress"></div>
+    </div>
+    <div id="progress-text">0%</div>
+  </div>
+
+
+
+  <!-- الكود الخاص بزر التثبيت ووحدة التثبيت يعمل من خلال app.js -->
 
 <!-- تسجيل Service Worker -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/serviceworker.js')
-        .then(reg => console.log('✅ Service Worker مسجل:', reg.scope))
-        .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
-    });
-  }
-</script>
 
-<!-- سكريبت التطبيق -->
-<script src="{% static 'quiz/js/app.js' %}" defer></script>
 {% endblock %}
