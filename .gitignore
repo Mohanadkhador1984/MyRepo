@@ -9,4 +9,4 @@ db.sqlite3
 *.log
 *.env
 node_modules/
-staticfiles/
+# staticfiles/
