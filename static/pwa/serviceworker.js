@@ -12,6 +12,7 @@ const urlsToCache = [
   '/static/pwa/icons/icon-512x512.png',
   '/static/quiz/data/questions.json',
   '/static/quiz/data/users.json', 
+  '/static/pwa/manifest.json', 
 
 ];
 

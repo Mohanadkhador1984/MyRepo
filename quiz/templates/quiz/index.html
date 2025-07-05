@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+<link rel="manifest" href="{% static 'pwa/manifest.json' %}">
 
 <script>
   if ('serviceWorker' in navigator) {
@@ -18,9 +19,7 @@
 <div class="container text-center py-4">
 
   <h1 class="mb-4 text-primary">تطبيق البكالوريا الإنجليزي</h1>
-  <p class="lead text-muted">اختر الفرع ثم الاختبار لبدء التمرين التفاعلي</p>
-
-  <!-- شاشة اختيار الفرع -->
+    <!-- شاشة اختيار الفرع -->
   <div id="branch-screen" class="quiz-container my-4">
     <h3 class="mb-3">اختر الفرع</h3>
     <div class="d-grid gap-3 d-sm-flex justify-content-center">
@@ -91,5 +90,5 @@
   <!-- الكود الخاص بزر التثبيت ووحدة التثبيت يعمل من خلال app.js -->
 
 <!-- تسجيل Service Worker -->
-
+<script src="{% static 'quiz/js/app.js' %}" defer></script>
 {% endblock %}

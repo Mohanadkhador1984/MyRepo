@@ -346,3 +346,10 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+function updateProgress(percent) {
+  const progress = document.getElementById('progress');
+  const progressText = document.getElementById('progress-text');
+  progress.style.width = percent + '%';
+  progressText.textContent = percent + '%';
+}
