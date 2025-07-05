@@ -15,7 +15,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
     raise RuntimeError("Missing DJANGO_SECRET_KEY in environment")
 
-DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
+DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() in ("true", "1", "yes")
 
 ALLOWED_HOSTS = [
     h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()
@@ -55,15 +55,15 @@ if USE_REMOTE_DB:
     }
 else:
     DATABASES = {
-        "default": {
-            "ENGINE": f"django.db.backends.{os.getenv('DATABASE_LOCAL_ENGINE', 'postgresql')}",
-            "NAME": os.getenv("DATABASE_LOCAL_NAME", "quizdb"),
-            "USER": os.getenv("DATABASE_LOCAL_USER", "postgres"),
-            "PASSWORD": os.getenv("DATABASE_LOCAL_PASSWORD", ""),
-            "HOST": os.getenv("DATABASE_LOCAL_HOST", "localhost"),
-            "PORT": os.getenv("DATABASE_LOCAL_PORT", "5432"),
-        }
+    'default': {
+        'ENGINE':   'django.db.backends.postgresql',
+        'NAME':     'quizdb',
+        'USER':     'postgres',
+        'PASSWORD': '123456',
+        'HOST':     'localhost',
+        'PORT':     '5432',
     }
+}
 
 # --------------------------------------------------
 # التطبيقات والوسيطات

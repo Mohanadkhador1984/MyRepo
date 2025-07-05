@@ -16,15 +16,21 @@
     </div>
   </div>
 
-  <!-- شاشة اختيار السنة -->
-  <div id="year-screen" class="quiz-container my-4 d-none">
-    <h3 class="mb-3">اختر الاختبار</h3>
-    <div class="row row-cols-2 row-cols-md-4 g-3">
-      {% for year in "1,2,3,4,5,6,7,8,9,2022,2023,2024".split(',') %}
-      <div class="col">
-        <button class="btn btn-secondary w-100" onclick="selectYear({ year })">الاختبار {{ year }}</button>
-      </div>
-      {% endfor %}
+ <div id="year-screen" class="quiz-container" style="display:none;">
+    <h1>اختر الاختبار</h1>
+    <div class="year-selection">
+      <button onclick="selectYear(1)">الاختبار الأول</button>
+      <button onclick="selectYear(2)">الاختبار الثاني</button>
+      <button onclick="selectYear(3)">الاختبار الثالث</button>
+      <button onclick="selectYear(4)">الاختبار الرابع</button>
+      <button onclick="selectYear(5)">الاختبار الخامس</button>
+      <button onclick="selectYear(6)">الاختبار السادس</button>
+      <button onclick="selectYear(7)">الاختبار السابع</button>
+      <button onclick="selectYear(8)">الاختبار الثامن</button>
+      <button onclick="selectYear(9)">الاختبار التاسع</button>
+      <button onclick="selectYear(2022)">2022</button>
+      <button onclick="selectYear(2023)">2023</button>
+      <button onclick="selectYear(2024)">2024</button>
     </div>
   </div>
 
