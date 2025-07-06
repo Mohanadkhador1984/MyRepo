@@ -13,24 +13,27 @@ body {
   overflow-x: hidden;
 }
 
+/* لمعة ذهبية */
 @keyframes gold-shine {
-  0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
-  50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.9); }
-  100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.9);
+  }
 }
 
-/* الحاوية الرئيسية */
+/* الحاوية */
 .quiz-container {
   background: linear-gradient(to bottom, #111, #000);
-  border: 4px solid #FFD700;
-  border-radius: 20px;
-  padding: 25px 20px;
+  border: 6px solid #FFD700;
+  border-radius: 25px;
+  padding: 30px 20px;
   width: 100%;
-  max-width: 500px;
-  box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+  max-width: 98vw;
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
   text-align: center;
   animation: gold-shine 3s infinite ease-in-out;
-  margin: 0 auto;
   transition: transform 0.3s ease;
 }
 
@@ -41,82 +44,129 @@ body {
 /* العناوين */
 .quiz-container h1,
 .quiz-container h2 {
-  font-size: 28px;
+  font-size: 36px;
+  font-weight: bold;
+  letter-spacing: 1px;
   color: #FFD700;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   text-shadow: 1px 1px 5px #000;
-}
-
-/* النصوص */
-#text-screen .attached-text {
-  background: linear-gradient(to bottom, rgba(255,215,0,0.1), rgba(0,0,0,0.9));
-  padding: 20px;
-  border-radius: 15px;
-  border: 2px dashed #FFD700;
-  box-shadow: 0 0 15px #FFD700;
-  font-size: 18px;
-  line-height: 1.8;
-  color: #fff;
-  direction: rtl;
-  text-align: justify;
-  white-space: pre-wrap;
 }
 
 /* زر العودة */
 #home-button {
   position: fixed;
-  bottom: 15px;
-  left: 15px;
-  width: 55px;
-  height: 55px;
+  bottom: 20px;
+  left: 20px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background-color: #FFD700;
   color: #000;
-  font-size: 22px;
+  font-size: 26px;
+  font-weight: bold;
   border: none;
-  box-shadow: 0 0 12px #FFD700;
+  box-shadow: 0 0 15px #FFD700;
   z-index: 9999;
   transition: 0.3s ease;
 }
 
 #home-button:hover {
   background-color: #e0c200;
-  transform: scale(1.12) rotate(5deg);
+  transform: scale(1.15) rotate(5deg);
 }
 
 /* المؤقت */
 .timer {
-  font-size: 22px;
+  font-size: 26px;
+  font-weight: bold;
   color: #00ffff;
   margin-bottom: 15px;
 }
 
-/* أزرار الإجابات */
+/* التنقل */
+.controls, .question-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+/* زر علمي/أدبي */
+.year-selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 35px;
+}
+
+.year-selection button {
+  background-color: #111;
+  border: 3px solid #FFD700;
+  color: #FFD700;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 16px 28px;
+  border-radius: 15px;
+  transition: 0.3s;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+  flex: 1 1 calc(45% - 20px);
+  white-space: nowrap;
+}
+
+.year-selection button:hover {
+  background-color: #FFD700;
+  color: #111;
+}
+
+/* السؤال */
+#question {
+  font-size: 26px;
+  line-height: 1.6;
+  padding: 20px;
+  margin: 0 auto 25px;
+  color: #FFD700;
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid #FFD700;
+  border-radius: 12px;
+  text-align: center;
+  direction: ltr;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* الإجابات */
 .answers {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 18px;
+  gap: 20px;
   margin-top: 25px;
 }
 
 .answers button {
-  background: #000428;
+  background: #001f3f;
   border: 3px solid #FFD700;
   color: white;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
-  padding: 15px 25px;
+  padding: 14px 26px;
   border-radius: 50px;
-  min-width: 45%;
-  box-shadow: 0 0 12px #FFD700;
+  max-width: 100%;
+  min-width: 160px;
+  white-space: nowrap;
   transition: all 0.3s ease;
+  box-shadow: 0 0 12px #FFD700;
+  flex: 1 1 auto;
 }
 
 .answers button:hover {
   background: #FFD700;
-  color: #000428;
-  transform: scale(1.08);
+  color: #001f3f;
+  transform: scale(1.05);
 }
 
 /* صحيحة وخاطئة */
@@ -132,12 +182,12 @@ body {
   border-color: white !important;
 }
 
-/* أزرار التنقل (التالي / السابق) */
+/* أزرار التنقل */
 .nav-btns {
-  margin-top: 25px;
+  margin-top: 30px;
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: center;
+  gap: 15px;
   flex-wrap: wrap;
 }
 
@@ -145,65 +195,25 @@ body {
   background-color: #FFD700;
   color: #001f3f;
   font-weight: bold;
-  padding: 12px 28px;
-  border-radius: 30px;
-  font-size: 16px;
-  transition: 0.3s;
-  flex: 1;
   border: none;
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+  padding: 14px 30px;
+  border-radius: 30px;
+  font-size: 18px;
+  white-space: nowrap;
+  transition: 0.3s;
+  flex: 1 1 auto;
 }
 
 .nav-btns button:hover {
   background-color: #e6be00;
+  transform: scale(1.05);
 }
 
 /* ملخص النقاط */
 .score-summary {
-  font-size: 20px;
+  font-size: 22px;
   color: #FFD700;
   margin-bottom: 20px;
-}
-
-/* اختيار السنوات وأزرار الدخول */
-.year-selection {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: center;
-  margin-top: 35px;
-}
-
-.year-selection button {
-  background-color: #001f3f;
-  border: 2px solid #FFD700;
-  color: #fff;
-  font-size: 18px;
-  padding: 12px 22px;
-  border-radius: 12px;
-  transition: 0.3s;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-  flex: 1 1 calc(33% - 30px);
-}
-
-.year-selection button:hover {
-  background-color: #FFD700;
-  color: #001f3f;
-}
-
-/* السؤال */
-#question {
-  font-size: 24px;
-  line-height: 1.6;
-  padding: 15px;
-  margin: 0 auto 15px;
-  color: #FFD700;
-  background-color: rgba(0, 0, 0, 0.8);
-  border: 2px solid #FFD700;
-  border-radius: 12px;
-  text-align: center;
-  direction: ltr;
-  max-width: 100%;
 }
 
 /* أزرار عائمة */
@@ -232,7 +242,7 @@ body {
   transform: scale(1.1);
 }
 
-/* زر التثبيت */
+/* تثبيت */
 #install-btn {
   background-color: #28a745;
   color: white;
@@ -254,7 +264,6 @@ body {
   background-color: #218838;
 }
 
-/* رسالة التثبيت */
 #install-message {
   background-color: #d4edda;
   color: #155724;
@@ -270,32 +279,28 @@ body {
 }
 
 /* شاشة النص */
+.attached-text {
+  display: none;
+}
+
 #text-screen {
   display: none;
-  justify-content: center;
-  align-items: center;
 }
 
 #text-screen .quiz-container {
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: rgba(0, 0, 0, 0.9);
   overflow-x: hidden;
 }
 
-/* استجابة الهاتف */
-@media (max-width: 600px) {
-  .quiz-container {
-    padding: 20px 15px;
-  }
-
-  .answers button,
-  .year-selection button,
-  .nav-btns button {
-    min-width: 100%;
-    font-size: 16px;
-    padding: 12px 18px;
-  }
-
-  #question {
-    font-size: 20px;
-  }
+#text-screen .attached-text {
+  display: block;
+  color: #ffc;
+  font-size: 18px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  text-align: right;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
 }
