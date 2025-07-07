@@ -18,15 +18,19 @@
 <script src="{% static 'quiz/js/app.js' %}" defer></script>
 <div class="container text-center py-4">
 
-  <h1 class="mb-4 text-primary">تطبيق البكالوريا الإنجليزي</h1>
-    <!-- شاشة اختيار الفرع -->
-  <div id="branch-screen" class="quiz-container my-4">
-    <h3 class="mb-3">اختر الفرع</h3>
-    <div class="d-grid gap-3 d-sm-flex justify-content-center">
-      <button class="btn btn-outline-primary px-4 py-2" onclick="selectBranch('A')">الفرع الأدبي (A)</button>
-      <button class="btn btn-outline-success px-4 py-2" onclick="selectBranch('B')">الفرع العلمي (B)</button>
+  
+ <!-- شاشات التطبيق -->
+  <div id="branch-screen" class="quiz-container">
+    <h1>اختر الفرع</h1>
+    <div class="year-selection">
+      <button onclick="selectBranch('A')">الفرع الأدبي (A)</button>
+      <button onclick="selectBranch('B')">الفرع العلمي (B)</button>
     </div>
   </div>
+
+
+
+
 
  <div id="year-screen" class="quiz-container" style="display:none;">
     <h1>اختر الاختبار</h1>
