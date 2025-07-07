@@ -4,15 +4,6 @@
 {% block content %}
 <link rel="manifest" href="{% static 'pwa/manifest.json' %}">
 
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/serviceworker.js')
-        .then(reg => console.log('✅ Service Worker مسجل:', reg.scope))
-        .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
-    });
-  }
-</script>
 
 <!-- سكريبت التطبيق -->
 <script src="{% static 'quiz/js/app.js' %}" defer></script>
@@ -77,20 +68,7 @@
   <!-- زر الرجوع للرئيسية -->
   <button id="home-button" onclick="goHome()" title="العودة للرئيسية">🏠</button>
 
- <!-- رسالة نجاح -->
-  <div id="install-message">✅ تم تثبيت التطبيق على الشاشة الرئيسية!</div>
-
-  <!-- حاوية زر التثبيت -->
-  <div id="install-container">
-    <button id="install-btn">📲 تثبيت التطبيق</button>
-    <div id="progress-bar">
-      <div id="progress"></div>
-    </div>
-    <div id="progress-text">0%</div>
-  </div>
-
-
-
+ <
   <!-- الكود الخاص بزر التثبيت ووحدة التثبيت يعمل من خلال app.js -->
 
 <!-- تسجيل Service Worker -->
