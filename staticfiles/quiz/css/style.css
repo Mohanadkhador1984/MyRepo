@@ -9,9 +9,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      padding: 2px;
-      margin: 2px;
-  
+      padding: 10px;
     }
 
 #text-screen .attached-text {
@@ -54,24 +52,20 @@
 }
 
     .quiz-container {
-      box-sizing: border-box;          /* يشمل البادينج والحدود ضمن الحسابات */
-      width: 100vw;                    /* عرض يعادل 100% من عرض النافذة */
-      min-height: 100vh;               /* ارتفاع على الأقل بارتفاع النافذة */
       background-color: rgba(0, 0, 0, 0.85);
-      border: 5px solid #000;          /* إطار أسود على حدود الشاشة */
-      border-radius: 0;                /* إزالة التقويس لجعل الإطار مشدوداً */
-      padding: 20px;                   /* مسافة داخلية للعناصر */
+      border: 5px solid #FFD700;
+      border-radius: 20px;
+      padding: 10px 20px;
+      width: 100%;
+      max-width:1800px;
+      box-shadow: 0 0 25px #FFD700;
       text-align: center;
+      
+      
     }
 
-      .quiz-container .inner {
-        /* إزالة المحددات التي تحد من الاتساع */
-        max-width: none;
-        width: 100%;
-      }
-
     .quiz-container h1 {
-      font-size: 20px;
+      font-size: 28px;
       color: #FFD700;
       margin-bottom: 20px;
     }
