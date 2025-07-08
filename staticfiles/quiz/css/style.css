@@ -1,67 +1,78 @@
 
+    /* ✅ تصميم الجسم العام */
     body {
       font-family: 'Arial', sans-serif;
       background: radial-gradient(circle at center, #000428, #004e92);
       color: #fff;
-      min-height: 100vh;
+      height: 100vh;
       margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      padding: 10px;
     }
 
-#text-screen .attached-text {
-  display: block;
-  color: #fff;
-  font-size: 20px;
-  line-height: 2;
-  padding: 10px;
-  background: linear-gradient(to bottom, rgba(255,215,0,0.2), rgba(0,0,0,0.7));
-  border-radius: 15px;
-  text-align: right;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  max-width: 100%;
-  border: 2px dashed #FFD700;
-  box-shadow: 0 0 15px #FFD700;
-  direction: rtl;
-  text-align: justify;
-}
+    /* ✅ الحاويات العامة */
+    .quiz-container, .auth-page, #text-screen .quiz-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+      padding: 15px;
+      box-sizing: border-box;
+    }
 
-#home-button {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  background-color: #17a2b8;
-  color: white;
-  font-size: 24px;
-  border: none;
-  box-shadow: 0 0 12px #17a2b8;
-  z-index: 9999;
-  transition: 0.3s;
-}
+    /* ✅ النص المرفق داخل صفحة النصوص */
+    #text-screen .attached-text {
+      display: block;
+      color: #fff;
+      font-size: 20px;
+      line-height: 2;
+      padding: 10px;
+      background: linear-gradient(to bottom, rgba(255,215,0,0.2), rgba(0,0,0,0.7));
+      border-radius: 15px;
+      text-align: justify;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      max-width: 100%;
+      border: 2px dashed #FFD700;
+      box-shadow: 0 0 15px #FFD700;
+    }
 
-#home-button:hover {
-  background-color: #138496;
-  transform: scale(1.1);
-}
+    /* ✅ زر العودة إلى الصفحة الرئيسية */
+    #home-button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background-color: #17a2b8;
+      color: white;
+      font-size: 24px;
+      border: none;
+      box-shadow: 0 0 12px #17a2b8;
+      z-index: 9999;
+      transition: 0.3s;
+    }
 
+    #home-button:hover {
+      background-color: #138496;
+      transform: scale(1.1);
+    }
+
+    /* ✅ حاوية الكويز */
     .quiz-container {
       background-color: rgba(0, 0, 0, 0.85);
       border: 5px solid #FFD700;
       border-radius: 20px;
-      padding: 10px 20px;
+      padding: 20px;
       width: 100%;
-      max-width:1800px;
+      max-width: 800px;
       box-shadow: 0 0 25px #FFD700;
       text-align: center;
-      
-      
     }
 
     .quiz-container h1 {
@@ -73,16 +84,16 @@
     .timer {
       font-size: 24px;
       color: #00ffff;
-      margin: 0 auto 15px;
+      margin-bottom: 15px;
       text-align: center;
     }
 
     .controls, .question-nav {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       gap: 10px;
     }
 
@@ -121,14 +132,14 @@
 
     .wrong {
       background-color: red !important;
-      color: white !important;
+      color: black !important;
       border-color: white !important;
     }
 
     .nav-btns {
       margin-top: 20px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       gap: 10px;
       flex-wrap: wrap;
     }
@@ -166,7 +177,7 @@
       border: 2px solid #FFD700;
       color: #fff;
       font-size: 18px;
-      padding: 10px 10px;
+      padding: 10px;
       border-radius: 10px;
       transition: 0.3s;
       flex: 1 1 calc(33% - 30px);
@@ -237,22 +248,82 @@
       white-space: pre-wrap;
       max-width: 100%;
     }
-    
- #question {
-    word-wrap: break-word; /* يسمح بكسر الكلمات إذا كانت طويلة جدًا */
-    overflow-wrap: break-word; /* يسمح بكسر الكلمات إذا كانت طويلة جدًا */
-    white-space: normal; /* يسمح بتدفق النص بشكل طبيعي */
-    text-align: center; /* توسيط النص */
-    margin: 0 auto; /* مركزية العنصر */
-    max-width: 100%; /* عرض أقصى */
-    font-size: 24px; /* حجم النص */
-    line-height: 1.5; /* تحسين المسافة بين السطور */
-    padding: 10px; /* إضافة مسافة داخلية */
-    color: #FFD700; /* لون النص */
-    background-color: rgba(0, 0, 0, 0.7); /* خلفية شفافة */
-    border: 2px solid #FFD700; /* إطار ذهبي */
-    border-radius: 10px; /* حواف مستديرة */
-    direction: ltr; /* اتجاه النص من اليمين إلى اليسار */
-}
 
+    #question {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+      text-align: center;
+      margin: 0 auto;
+      max-width: 100%;
+      font-size: 24px;
+      line-height: 1.5;
+      padding: 10px;
+      color: #FFD700;
+      background-color: rgba(0, 0, 0, 0.7);
+      border: 2px solid #FFD700;
+      border-radius: 10px;
+      direction: rtl;
+    }
+
+    .auth-page {
+      width: 100%;
+      max-width: 500px;
+      margin: auto;
+      background-color: rgba(0, 0, 0, 0.85);
+      border: 2px solid #FFD700;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 0 15px #FFD700;
+    }
+
+    .auth-page input, .auth-page button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      font-size: 16px;
+      border: none;
+    }
+
+    .auth-page button {
+      background-color: #FFD700;
+      color: #001f3f;
+      font-weight: bold;
+    }
+
+    .auth-page button:hover {
+      background-color: #ffc107;
+    }
+
+    
+
+    /* ✅ زر التثبيت - تصميم فاخر */
+    #install-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #28a745;
+      color: white;
+      font-size: 28px;
+      border: none;
+      box-shadow: 0 0 15px rgba(40, 167, 69, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease;
+      z-index: 1050;
+    }
+
+    #install-btn:hover {
+      background-color: #218838;
+      transform: scale(1.1);
+    }
+
+    #install-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1050;
+    }
 

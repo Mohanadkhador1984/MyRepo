@@ -289,42 +289,39 @@ function startTimer() {
   }, 1000);
 }
 
-let deferredPrompt; // متغير لتخزين الحدث
-
-// ✅ أحداث عند تحميل الصفحة
-window.onload = () => {
+ let deferredPrompt;
   const installBtn = document.getElementById('install-btn');
+  const installContainer = document.getElementById('install-container');
 
   window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); // منع ظهور نافذة التثبيت الافتراضية
-    deferredPrompt = e; // تخزين الحدث
-    installBtn.style.display = 'block'; // إظهار زر التثبيت
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'flex';
+  });
 
-    // إضافة حدث عند النقر على زر التثبيت
-    installBtn.addEventListener('click', () => {
-      installBtn.style.display = 'none'; // إخفاء الزر
-      deferredPrompt.prompt(); // إظهار نافذة التثبيت
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('✅ تم قبول التثبيت');
-        } else {
-          console.log('❌ تم رفض التثبيت');
-        }
-        deferredPrompt = null; // إعادة تعيين المتغير
-      });
-    });
+  installBtn.addEventListener('click', async () => {
+    installBtn.style.display = 'none';
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('✅ المستخدم وافق على التثبيت');
+      } else {
+        console.log('❌ المستخدم رفض التثبيت');
+      }
+      deferredPrompt = null;
+    }
   });
 
   window.addEventListener('appinstalled', () => {
-    console.log('✅ تم تثبيت التطبيق');
-    installBtn.style.display = 'none'; // إخفاء الزر بعد التثبيت
+    console.log('✅ التطبيق تم تثبيته');
+    installBtn.style.display = 'none';
   });
-
   
 
 
   loadQuestions(); // تحميل الأسئلة
-};
+
 
 // ✅ التعامل مع زر الرجوع
 window.addEventListener('popstate', () => {
