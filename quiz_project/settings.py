@@ -1,148 +1,152 @@
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# --------------------------------------------------
+# تحميل متغيرات البيئة
+# --------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
+# --------------------------------------------------
+# الأمان و التصحيح
+# --------------------------------------------------
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("Missing DJANGO_SECRET_KEY in environment")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() in ("true", "1", "yes")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2t8*sw&##r09j%n+_nopn61=j)4ltsyh5lk!*(8xbn12ldw(8$'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
-# ALLOWED_HOSTS = ["myrepo-28.onrender.com"]
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'myrepo-28.onrender.com']
-APPEND_SLASH = True
-
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-     'quiz',
-      
-     
+ALLOWED_HOSTS = [
+    h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()
 ]
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', 
+CSRF_TRUSTED_ORIGINS = [
+    uri.strip()
+    for uri in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if uri.strip()
 ]
 
-ROOT_URLCONF = 'quiz_project.urls'
+# --------------------------------------------------
+# اختيار القاعدة: محلي أو بعيد
+# --------------------------------------------------
+# --------------------------------------------------
+# إعداد قاعدة البيانات
+# --------------------------------------------------
+def get_env_or_raise(key: str) -> str:
+    value = os.getenv(key)
+    if not value:
+        raise RuntimeError(f"Missing required environment variable: {key}")
+    return value
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+USE_REMOTE_DB = os.getenv("USE_REMOTE_DB", "False").lower() in ("true", "1", "yes")
 
-WSGI_APPLICATION = 'quiz_project.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
+if USE_REMOTE_DB:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": get_env_or_raise("DB_NAME"),
+            "USER": get_env_or_raise("DB_USER"),
+            "PASSWORD": get_env_or_raise("DB_PASSWORD"),
+            "HOST": get_env_or_raise("DB_HOST_EXTERNAL"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+            "OPTIONS": {"sslmode": "require"},
+        }
+    }
+else:
+    DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'quizdb',
-        'USER': 'postgres',
+        'ENGINE':   'django.db.backends.postgresql',
+        'NAME':     'quizdb',
+        'USER':     'postgres',
         'PASSWORD': '123456',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'HOST':     'localhost',
+        'PORT':     '5432',
     }
 }
 
+# --------------------------------------------------
+# التطبيقات والوسيطات
+# --------------------------------------------------
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "whitenoise.runserver_nostatic",
+    "crispy_forms",
+    "crispy_bootstrap4",
+    "pwa",
+    "quiz",
+    "account",
+]
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
 
-AUTH_PASSWORD_VALIDATORS = [
+ROOT_URLCONF = "quiz_project.urls"
+WSGI_APPLICATION = "quiz_project.wsgi.application"
+
+# --------------------------------------------------
+# القوالب
+# --------------------------------------------------
+TEMPLATES = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {"context_processors": [
+            "django.template.context_processors.debug",
+            "django.template.context_processors.request",
+            "django.contrib.auth.context_processors.auth",
+            "django.contrib.messages.context_processors.messages",
+        ]},
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
-from pathlib import Path
-import os
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-
+# --------------------------------------------------
+# الملفات الثابتة وWhiteNoise
+# --------------------------------------------------
+# settings.py
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # فقط في الإنتاج
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# إعدادات PWA (اختياري إذا تستخدم مكتبة PWA من Django)
-PWA_APP_NAME = 'Quiz App'
-PWA_APP_DESCRIPTION = "تطبيق ويب بدون اتصال"
-PWA_APP_THEME_COLOR = '#0A0302'
-PWA_APP_BACKGROUND_COLOR = '#ffffff'
-PWA_APP_DISPLAY = 'standalone'
-PWA_APP_SCOPE = '/'
-PWA_APP_START_URL = '/'
-PWA_APP_STATUS_BAR_COLOR = 'default'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
+# --------------------------------------------------
+# المصادقة وإعادة التوجيه
+# --------------------------------------------------
+LOGIN_REDIRECT_URL = "/home/"
+LOGIN_URL = "/login/"
+LOGOUT_REDIRECT_URL = "/login/"
+
+# --------------------------------------------------
+# إعدادات PWA
+# --------------------------------------------------
+PWA_APP_NAME = "Quiz App"
+PWA_APP_DESCRIPTION = "تطبيق يعمل دون اتصال"
+PWA_APP_THEME_COLOR = "#0A0302"
+PWA_APP_BACKGROUND_COLOR = "#ffffff"
+PWA_APP_DISPLAY = "standalone"
+PWA_APP_SCOPE = "/"
+PWA_APP_START_URL = "/"
+PWA_APP_STATUS_BAR_COLOR = "default"
 PWA_APP_ICONS = [
-    {
-        'src': '/static/icons/icon-192x192.png',
-        'sizes': '192x192'
-    },
-    {
-        'src': '/static/icons/icon-512x512.png',
-        'sizes': '512x512'
-    }
+    {"src": "/static/pwa/icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/static/pwa/icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
 ]
+PWA_SERVICE_WORKER_PATH = BASE_DIR / "static" / "pwa" / "serviceworker.js"
