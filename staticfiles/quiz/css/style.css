@@ -126,14 +126,21 @@ body {
 }
 
 
-
-/* ✅ المؤقت */
 .timer {
   font-size: 24px;
   color: #00ffff;
-  margin-bottom: 15px;
+  margin: 0 auto 15px;
   text-align: center;
+  display: inline-flex;
+  align-items: center;
 }
+
+/* تنسيقات الأيقونة داخل المؤقت */
+.timer i {
+  font-size: 1em;        /* يساوي حجم الخط */
+  margin-inline-end: 0.5em;
+}
+
 
 /* ✅ الأزرار العامة */
 .controls, .question-nav {
@@ -448,4 +455,71 @@ canvas {
 
 .custom-sidebar .nav-link i {
   font-size: 1.1rem;
+}
+
+
+
+
+.splash-screen {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #1e293b;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.splash-logo {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #38bdf8;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+/* خلفية داكنة وبطاقة بأطراف دائرية وظل ناعم */
+.result-card {
+  background: #2a2a3e;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+.result-card .card-title {
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
+.display-6 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffd700; /* لون ذهبي */
+}
+
+/* إضافة ظل وحواف للرسم البياني */
+.chart-container {
+  background: #2a2a3e;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
 }

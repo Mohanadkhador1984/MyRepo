@@ -45,7 +45,15 @@
     <div class="score-summary" id="score-summary">إجابات صحيحة: 0 | خاطئة: 0</div>
     <div class="question-nav">
       <select id="question-jump" class="form-select w-100" onchange="jumpToQuestion(this.value)"></select>
+
       <div class="timer" id="timer">00:90:00</div>
+      <!-- مثال على HTML -->
+      <div class="timer">
+        <i class="bi bi-clock-fill"></i>
+        <span id="time">00:90:00</span>
+      </div>
+
+      
     </div>
     <h1 id="question">جاري التحميل...</h1>
     <div class="answers" id="answers"></div>
@@ -64,6 +72,52 @@
     <h1>النص المرفق</h1>
     <div id="attached-text" class="attached-text"></div>
   </div>
+
+
+  <div id="quiz-screen" class="text-center p-4" style="background: #1c1c2e; color: #fff;">
+  <h1 class="mb-4" style="font-weight: 700; letter-spacing: 1px;">تقرير الأداء النهائي</h1>
+
+  <!-- بطاقات النتائج -->
+  <div class="row mb-5">
+    <div class="col-sm-4 mb-3">
+      <div class="card result-card">
+        <div class="card-body">
+          <h5 class="card-title">إجابات صحيحة</h5>
+          <p id="correct-count" class="display-6 mb-0"></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4 mb-3">
+      <div class="card result-card">
+        <div class="card-body">
+          <h5 class="card-title">إجابات خاطئة</h5>
+          <p id="wrong-count" class="display-6 mb-0"></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4 mb-3">
+      <div class="card result-card">
+        <div class="card-body">
+          <h5 class="card-title">نسبة النجاح</h5>
+          <p id="percentage" class="display-6 mb-0"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- الرسم البياني -->
+  <div class="chart-container mx-auto" style="max-width: 360px; position: relative;">
+    <canvas id="resultChart"></canvas>
+  </div>
+
+  <!-- زر الإعادة -->
+  <button class="btn btn-outline-light btn-lg mt-4" onclick="location.reload()">
+    إعادة المحاولة
+  </button>
+</div>
+
+
+
 
   <!-- زر الرجوع للرئيسية -->
   <button id="home-button" onclick="goHome()" title="العودة للرئيسية">🏠</button>

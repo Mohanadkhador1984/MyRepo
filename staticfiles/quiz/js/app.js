@@ -145,7 +145,6 @@ function loadQuestion() {
   document.getElementById("text-button").style.display = hasText ? "inline-block" : "none";
 }
 
-// ✅ التحقق من الإجابة
 function checkAnswer(selectedIndex) {
   clickSound.play();
   const q = questions[currentQuestionIndex];
@@ -157,13 +156,21 @@ function checkAnswer(selectedIndex) {
     else if (i === selectedIndex) b.classList.add("wrong");
   });
 
+  const resultEl = document.getElementById("result");
+  // نظف أي حالة لون سابقة
+  resultEl.classList.remove("text-success", "text-danger");
+
   if (selectedIndex === correctIndex) {
     correctSound.play();
     correctCount++;
-    document.getElementById("result").textContent = "إجابة صحيحة!";
+    resultEl.textContent = "إجابة صحيحة!";
+    // لون أخضر للنص
+    resultEl.classList.add("text-success");
   } else {
     wrongSound.play();
-    document.getElementById("result").textContent = "إجابة خاطئة!";
+    resultEl.textContent = "إجابة خاطئة!";
+    // لون أحمر للنص
+    resultEl.classList.add("text-danger");
   }
 
   answeredState[q.id] = selectedIndex;
@@ -220,45 +227,82 @@ function updateScoreSummary() {
     `إجابات صحيحة: ${correctCount} | خاطئة: ${wrong >= 0 ? wrong : 0}`;
 }
 
-// ✅ عرض النتيجة النهائية
+// سجل الإضافة قبل أي إنشاء للرسم  
+Chart.register(ChartDataLabels);
+
 function showFinalResult() {
-  const total = questions.length;
+  const total      = questions.length;
   const wrongCount = total - correctCount;
   const percentage = Math.round((correctCount / total) * 100);
 
-  document.getElementById("quiz-screen").innerHTML = `
-    <h1>النتيجة النهائية</h1>
-    <p>إجابات صحيحة: ${correctCount}</p>
-    <p>إجابات خاطئة: ${wrongCount}</p>
-    <p>المجموع النهائي: ${percentage}%</p>
-    <canvas id="resultChart"></canvas>
-    <button class="btn btn-warning mt-3" onclick="location.reload()">إعادة المحاولة</button>
-  `;
+  // عبِّئ أرقام النتائج في البطاقات
+  document.getElementById('correct-count').textContent = correctCount;
+  document.getElementById('wrong-count').textContent   = wrongCount;
+  document.getElementById('percentage').textContent    = percentage + '%';
 
+  // أنشئ الرسم البياني
   const ctx = document.getElementById('resultChart').getContext('2d');
+
+  // تدرجات الألوان
+  const gradSuccess = ctx.createLinearGradient(0, 0, 0, 300);
+  gradSuccess.addColorStop(0, '#8cf29b');
+  gradSuccess.addColorStop(1, '#28a745');
+
+  const gradError = ctx.createLinearGradient(0, 0, 0, 300);
+  gradError.addColorStop(0, '#ff8c8c');
+  gradError.addColorStop(1, '#dc3545');
+
   new Chart(ctx, {
     type: 'doughnut',
     data: {
       labels: ['صحيحة', 'خاطئة'],
       datasets: [{
         data: [correctCount, wrongCount],
-        backgroundColor: ['#28a745', '#dc3545'],
-        borderWidth: 1
+        backgroundColor: [gradSuccess, gradError],
+        borderColor: '#ffffff',
+        borderWidth: 8,
+        hoverOffset: 30
       }]
     },
     options: {
+      cutout: '75%',    // سماكة الحلقة
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            color: '#fff'
+        legend: { display: false },
+        tooltip: { enabled: false },
+        datalabels: {
+          color: '#ffffff',
+          font: { weight: 'bold', size: 14 },
+          formatter: (value, ctx) => {
+            const label = ctx.chart.data.labels[ctx.dataIndex];
+            const pct   = ((value / total) * 100).toFixed(0) + '%';
+            return `${label}\n${value} (${pct})`;
           }
         }
       }
-    }
+    },
+    plugins: [{
+      // plugin لرسم النص المركزي
+      id: 'centerText',
+      beforeDraw(chart) {
+        const { width, height, ctx } = chart;
+        const text = percentage + '%';
+        ctx.restore();
+        ctx.font = 'bold 36px sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textBaseline = 'middle';
+        ctx.textAlign    = 'center';
+        const x = width / 2;
+        const y = height / 2;
+        ctx.fillText(text, x, y);
+        ctx.save();
+      }
+    }]
   });
 }
+
+
 
 // ✅ عرض النص المرفق
 function openTextScreen() {
@@ -332,17 +376,15 @@ window.addEventListener('popstate', () => {
     document.getElementById(prev).style.display = 'block';
   }
 });
+
+
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/serviceworker.js')
-      .then((registration) => {
-        console.log('✅ Service Worker مسجل عند:', registration.scope);
-      })
-      .catch((error) => {
-        console.error('❌ فشل تسجيل Service Worker:', error);
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register("{% static 'pwa/serviceworker.js' %}")
+          .then(reg => console.log('✅ Service Worker مسجل:', reg.scope))
+          .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
       });
-  });
-}
+    }
 
 function updateProgress(percent) {
   const progress = document.getElementById('progress');
@@ -350,3 +392,5 @@ function updateProgress(percent) {
   progress.style.width = percent + '%';
   progressText.textContent = percent + '%';
 }
+
+
