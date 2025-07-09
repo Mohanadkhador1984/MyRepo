@@ -20,11 +20,10 @@ body {
   justify-content: center;
   align-items: center;
   margin: 0 auto;
-  padding: 10px;
+  padding: 20px;
   box-sizing: border-box;
   /* ✅ الهوامش من اليمين واليسار */
-  margin-left: 20px;
-  margin-right: 20px;
+ 
 }
 
 /* ✅ النص المرفق داخل صفحة النصوص */
