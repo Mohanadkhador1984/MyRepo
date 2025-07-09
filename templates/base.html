@@ -5,87 +5,100 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>{% block title %}بكالوريا إنكليزي{% endblock %}</title>
+  <title>{% block title %}بكالوريا{% endblock %}</title>
 
-  <!-- أيقونة الموقع -->
+  <!-- الأيقونات -->
   <link rel="icon" href="{% static 'pwa/icons/icon-192x192.png' %}" />
   <link rel="apple-touch-icon" href="{% static 'pwa/icons/icon-192x192.png' %}" />
-  <meta name="theme-color" content="#4a90e2" />
+  <meta name="theme-color" content="#000">
 
-  <!-- Bootstrap + Icons -->
+  <!-- Bootstrap RTL + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
   <!-- CSS مخصص -->
   <link rel="stylesheet" href="{% static 'quiz/css/style.css' %}" />
 
-  <!-- Manifest -->
-  <link rel="manifest" href="{% static 'pwa/manifest.json' %}">
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-
-  <!-- تسجيل Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register("{% static 'pwa/serviceworker.js' %}")
-          .then(reg => console.log('✅ Service Worker مسجل:', reg.scope))
-          .catch(err => console.error('❌ فشل تسجيل Service Worker:', err));
-      });
-    }
-  </script>
-
-  
   {% block extra_head %}{% endblock %}
 </head>
-
 <body class="bg-light text-dark d-flex flex-column min-vh-100">
 
-<!-- زر القائمة الفاخر -->
-<button class="btn luxury-btn position-fixed" 
-        type="button"
-        data-bs-toggle="offcanvas" 
-        data-bs-target="#sideMenu" 
-        aria-controls="sideMenu"
-        aria-label="فتح القائمة">
-  ☰
-</button>
+<!-- ✅ نافبار فخم -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-black shadow-lg fixed-top custom-navbar py-2">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
 
+    <!-- زر القائمة -->
+    <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu">
+      <i class="bi bi-list fs-4"></i>
+    </button>
 
-<!-- القائمة الجانبية -->
-<div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="sideMenuLabel">القائمة</h5>
+    <!-- شعار التطبيق -->
+    <span class="navbar-brand mx-auto fw-bold fs-4 text-uppercase tracking-widest">بكالوريا</span>
+
+    <!-- إشعار بعداد -->
+    <div class="position-relative">
+      <i class="bi bi-bell-fill fs-4 text-white" title="الإشعارات" style="cursor: pointer;"></i>
+      {% if notifications_count and notifications_count > 0 %}
+      <span class="badge rounded-pill bg-danger position-absolute top-0 start-0 translate-middle">
+        {{ notifications_count }}
+      </span>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<!-- ✅ القائمة الجانبية الفخمة -->
+<div class="offcanvas offcanvas-end text-bg-dark custom-sidebar" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+  <div class="offcanvas-header border-bottom border-secondary">
+    <h5 class="offcanvas-title fw-bold text-white" id="sideMenuLabel">القائمة الرئيسية</h5>
     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="إغلاق"></button>
   </div>
   <div class="offcanvas-body">
-    <a href="/" class="nav-link text-white mb-2">🏠 الرئيسية</a>
-    <a href="{% url 'login' %}" class="nav-link text-white mb-2">🔐 تسجيل الدخول</a>
-    <a href="{% url 'signup' %}" class="nav-link text-white mb-2">📝 إنشاء حساب</a>
-    <hr class="bg-light" />
-    <a href="https://facebook.com" class="d-block text-white mb-1" target="_blank"><i class="bi bi-facebook"></i> فيسبوك</a>
-    <a href="https://wa.me/00963653447860" class="d-block text-white" target="_blank"><i class="bi bi-whatsapp"></i> واتساب</a>
+    <ul class="nav flex-column gap-3">
+
+      <li class="nav-item">
+        <a href="/" class="nav-link text-white"><i class="bi bi-house-door-fill me-2"></i>الرئيسية</a>
+      </li>
+
+      {% if user.is_authenticated %}
+      <li class="nav-item">
+        <a href="#" class="nav-link text-white"><i class="bi bi-person-fill me-2"></i>الملف الشخصي</a>
+      </li>
+     
+      {% else %}
+      <li class="nav-item">
+        <a href="{% url 'login' %}" class="nav-link text-white"><i class="bi bi-lock-fill me-2"></i>تسجيل الدخول</a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'signup' %}" class="nav-link text-white"><i class="bi bi-pencil-square me-2"></i>إنشاء حساب</a>
+      </li>
+      {% endif %}
+
+      <hr class="bg-secondary" />
+
+      <li>
+        <a href="https://facebook.com" target="_blank" class="nav-link text-white"><i class="bi bi-facebook me-2"></i>فيسبوك</a>
+      </li>
+      <li>
+        <a href="https://wa.me/00963653447860" target="_blank" class="nav-link text-white"><i class="bi bi-whatsapp me-2"></i>واتساب</a>
+      </li>
+
+    </ul>
   </div>
 </div>
 
-<!-- ✅ زر تثبيت التطبيق -->
-<div id="install-container">
-  <button id="install-btn" title="تثبيت التطبيق">⬇️</button>
-</div>
-
-<!-- ✅ المحتوى الرئيسي -->
-<main class="container-lg flex-fill py-4">
-  {% block content %}{% endblock %}
+<!-- ✅ محتوى الصفحة -->
+<main class="container py-5 mt-5">
+  {% block content %}
+  <div class="text-center mt-5">
+    <h2 class="fw-bold">مرحبًا بك في تطبيق بكالوريا</h2>
+    <p class="text-muted">واجهة فاخرة، تجربة احترافية.</p>
+  </div>
+  {% endblock %}
 </main>
 
 <!-- ✅ سكريبتات -->
-<script src="{% static 'quiz/js/app.js' %}" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-
-
- 
-
 {% block extra_scripts %}{% endblock %}
 </body>
 </html>

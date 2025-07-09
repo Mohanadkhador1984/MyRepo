@@ -22,6 +22,9 @@ body {
   margin: 0 auto;
   padding: 10px;
   box-sizing: border-box;
+  /* ✅ الهوامش من اليمين واليسار */
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 /* ✅ النص المرفق داخل صفحة النصوص */
@@ -300,7 +303,7 @@ canvas {
   border-radius: 12px;
   direction: rtl;
   margin-bottom: 15px;
-  
+
 }
 
 /* ✅ صفحة الدخول */
@@ -384,4 +387,51 @@ canvas {
   transform: scale(1.1);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
   background: linear-gradient(135deg, #FFE135, #FF8C00);
+}
+
+
+
+/* style.css */
+
+/* ✅ نافبار */
+.custom-navbar {
+  background-color: #000 !important;
+  border-bottom: 1px solid #222;
+  z-index: 1055;
+}
+
+/* ✅ الأيقونات */
+.navbar .bi {
+  transition: color 0.3s;
+}
+
+.navbar .bi:hover {
+  color: #ffc107;
+}
+
+/* ✅ عداد الإشعارات */
+.badge {
+  font-size: 0.65rem;
+  padding: 0.4em 0.5em;
+}
+
+/* ✅ القائمة الجانبية */
+.custom-sidebar {
+  background: linear-gradient(135deg, #111, #222);
+  color: #fff;
+}
+
+.custom-sidebar .nav-link {
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.custom-sidebar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  padding-inline: 10px;
+}
+
+.custom-sidebar .nav-link i {
+  font-size: 1.1rem;
 }
