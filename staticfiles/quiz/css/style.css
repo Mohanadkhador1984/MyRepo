@@ -19,11 +19,11 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 0 auto;
-  padding: 20px;
+  padding: 10px;
   box-sizing: border-box;
   /* ✅ الهوامش من اليمين واليسار */
- 
+  margin-left: 5px;
+  margin-right: 50px;
 }
 
 /* ✅ النص المرفق داخل صفحة النصوص */
