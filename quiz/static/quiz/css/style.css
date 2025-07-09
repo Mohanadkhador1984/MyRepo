@@ -53,9 +53,13 @@ body {
   letter-spacing: 1px;
 }
 
-/* ✅ تنسيق إضافي للنص المرفق إن وجد */
-/* ✅ تحسين النص المرفق */
-/* ✅ النص المرفق */
+ #text-screen .quiz-container {
+      background-color: rgba(0, 0, 0, 0.9);
+      overflow-x: hidden;
+    }
+
+    
+
 #text-screen .attached-text {
   padding: 20px;
   background: linear-gradient(to bottom, rgba(255,215,0,0.15), rgba(0,0,0,0.8));
