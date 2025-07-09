@@ -11,6 +11,7 @@ body {
   align-items: flex-start;
   flex-direction: column;
   box-sizing: border-box;
+  padding-top: 60px;
 }
 
 /* ✅ الحاويات العامة */
@@ -395,17 +396,25 @@ canvas {
 
 
 /* ✅ تنسيق الـ Navbar */
+/* ✅ Navbar ثابت بدون هامش علوي */
 .custom-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   background-color: #000 !important;
   border-bottom: 1px solid #222;
   z-index: 1055;
   padding-inline: clamp(15px, 5vw, 40px);
+  padding-block: 10px;
   box-sizing: border-box;
-  position: sticky;
-  top: 0;
 }
 
+
+/* ✅ إخفاء الـ Navbar عند النقر على زر معين */
+.hide-navbar {
+  display: none !important;
+}
 /* ✅ داخل Navbar */
 .navbar .bi {
   transition: color 0.3s;
