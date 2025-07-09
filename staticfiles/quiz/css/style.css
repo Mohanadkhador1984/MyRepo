@@ -14,33 +14,75 @@ body {
 }
 
 /* ✅ الحاويات العامة */
-.quiz-container, .auth-page, #text-screen .quiz-container {
+.quiz-container,
+.auth-page,
+#text-screen .quiz-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+
+  padding-inline: clamp(15px, 5vw, 40px); /* هوامش جانبية متجاوبة */
   box-sizing: border-box;
-  /* ✅ الهوامش من اليمين واليسار */
-  margin-left: 5px;
-  margin-right: 50px;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+/* ✅ حاوية الكويز المعدلة بحجم خط أصغر وعرض شبه كامل */
+/* ✅ حاوية الكويز */
+.quiz-container {
+  background: rgba(0, 0, 0, 0.92);
+  border: 4px solid #FFD700;
+  border-radius: 25px;
+  padding: 25px;
+  width: 100%;
+  max-width: 1200px;
+  box-shadow: 0 0 30px 5px rgba(255, 215, 0, 0.4);
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.7;
+  position: relative;
+  margin-block: 30px;
 }
 
-/* ✅ النص المرفق داخل صفحة النصوص */
+/* ✅ عنوان الكويز */
+.quiz-container h1 {
+  font-size: 22px;
+  color: #FFD700;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+/* ✅ تنسيق إضافي للنص المرفق إن وجد */
+/* ✅ تحسين النص المرفق */
+/* ✅ النص المرفق */
 #text-screen .attached-text {
-  display: block;
-  color: #fff;
-  font-size: 20px;
-  line-height: 2;
-  padding: 15px;
+  padding: 20px;
   background: linear-gradient(to bottom, rgba(255,215,0,0.15), rgba(0,0,0,0.8));
   border-radius: 20px;
-  text-align: justify;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
   max-width: 100%;
   border: 2px dashed #FFD700;
   box-shadow: 0 0 25px #FFD700;
+  color: #fff;
+  font-size: 20px;
+  line-height: 2;
+  text-align: justify;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+/* ✅ جمالية إضافية على الحواف */
+/* ✅ تأثير فخم حول الحاوية */
+.quiz-container::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 30px;
+  background: linear-gradient(125deg, #FFD70033, transparent, #FFD70022);
+  z-index: -1;
+  filter: blur(8px);
 }
 
 /* ✅ زر العودة إلى الصفحة الرئيسية */
@@ -65,28 +107,7 @@ body {
   transform: scale(1.1);
 }
 
-/* ✅ حاوية الكويز المعدلة بحجم خط أصغر وعرض شبه كامل */
-.quiz-container {
-  background: rgba(0, 0, 0, 0.92);
-  border: 4px solid #FFD700;
-  border-radius: 25px;
-  padding: 25px;
-  width: 98vw; /* توسعة شبه كاملة */
-  max-width: 1200px; /* أكبر من السابق */
-  box-shadow: 0 0 30px 5px rgba(255, 215, 0, 0.4);
-  text-align: center;
-  margin: 30px auto;
-  font-size: 16px;
-  line-height: 1.7;
-  position: relative;
-}
-/* ✅ عنوان الكويز */
-.quiz-container h1 {
-  font-size: 22px;
-  color: #FFD700;
-  margin-bottom: 20px;
-  letter-spacing: 1px;
-}
+
 
 /* ✅ المؤقت */
 .timer {
@@ -250,41 +271,7 @@ canvas {
   overflow-x: hidden;
 }
 
-/* ✅ تنسيق إضافي للنص المرفق إن وجد */
-/* ✅ تحسين النص المرفق */
-.attached-text,
-#text-screen .attached-text {
-  display: block;
-  color: #fff8dc;
-  font-size: 17px;
-  line-height: 2;
-  padding: 20px;
-  background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(0,0,0,0.8));
-  border-radius: 18px;
-  text-align: justify;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  max-width: 100%;
-  border: 2px dashed #FFD700;
-  box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.4);
-  direction: rtl;
-  backdrop-filter: blur(3px);
-}
 
-/* ✅ جمالية إضافية على الحواف */
-/* ✅ تأثير فخم حول الحاوية */
-.quiz-container::before {
-  content: "";
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  right: -8px;
-  bottom: -8px;
-  border-radius: 30px;
-  background: linear-gradient(125deg, #FFD70033, transparent, #FFD70022);
-  z-index: -1;
-  filter: blur(8px);
-}
 /* ✅ تنسيق السؤال */
 #question {
   word-wrap: break-word;
@@ -390,16 +377,19 @@ canvas {
 
 
 
-/* style.css */
-
-/* ✅ نافبار */
+/* ✅ تنسيق الـ Navbar */
 .custom-navbar {
+  width: 100%;
   background-color: #000 !important;
   border-bottom: 1px solid #222;
   z-index: 1055;
+  padding-inline: clamp(15px, 5vw, 40px);
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
 }
 
-/* ✅ الأيقونات */
+/* ✅ داخل Navbar */
 .navbar .bi {
   transition: color 0.3s;
 }
@@ -408,7 +398,6 @@ canvas {
   color: #ffc107;
 }
 
-/* ✅ عداد الإشعارات */
 .badge {
   font-size: 0.65rem;
   padding: 0.4em 0.5em;
