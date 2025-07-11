@@ -2,27 +2,24 @@
 {% load static %}
 
 {% block content %}
+
 <link rel="manifest" href="{% static 'pwa/manifest.json' %}">
-
-
-<!-- سكريبت التطبيق -->
 <script src="{% static 'quiz/js/app.js' %}" defer></script>
+
+
+
 <div class="container text-center py-4">
 
-  
- <!-- شاشات التطبيق -->
-  <div id="branch-screen" class="quiz-container">
-    <h1>اختر الفرع</h1>
-    <div class="year-selection">
-      <button onclick="selectBranch('A')">الفرع الأدبي (A)</button>
-      <button onclick="selectBranch('B')">الفرع العلمي (B)</button>
-    </div>
+<!-- شاشة اختيار الفرع -->
+<div id="branch-screen" class="quiz-container">
+  <h1>اختر الفرع</h1>
+  <div class="year-selection">
+    <button onclick="selectBranch('A')">الفرع الأدبي</button>
+    <button onclick="selectBranch('B')">الفرع العلمي</button>
   </div>
+</div>
 
-
-
-
-
+<!-- شاشة اختيار الاختبار -->
  <div id="year-screen" class="quiz-container" style="display:none;">
     <h1>اختر الاختبار</h1>
     <div class="year-selection">
@@ -41,43 +38,44 @@
     </div>
   </div>
 
-  <div id="quiz-screen" class="quiz-container" style="display:none;">
-    <div class="score-summary" id="score-summary">إجابات صحيحة: 0 | خاطئة: 0</div>
-    <div class="question-nav">
-      <select id="question-jump" class="form-select w-100" onchange="jumpToQuestion(this.value)"></select>
+<!-- شاشة الاختبار -->
+<div id="quiz-screen" class="quiz-container" style="display:none;">
+  <div class="score-summary" id="score-summary">إجابات صحيحة: 0 | خاطئة: 0</div>
 
-      <div class="timer" id="timer">00:90:00</div>
-      <!-- مثال على HTML -->
-      <div class="timer">
-        <i class="bi bi-clock-fill"></i>
-        <span id="time">00:90:00</span>
-      </div>
-
-      
+  <div class="question-nav">
+    <select id="question-jump" class="form-select w-100" onchange="jumpToQuestion(this.value)"></select>
+    <div class="timer">
+      <svg class="timer-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8v5l4 2M12 2a10 10 0 1 1-10 10A10 10 0 0 1 12 2z"/></svg>
+      <span id="time">00:30:00</span>
     </div>
-    <h1 id="question">جاري التحميل...</h1>
-    <div class="answers" id="answers"></div>
-    <div class="nav-btns">
-      <button onclick="prevQuestion()">السابق</button>
-      <button id="next-btn" onclick="nextQuestion()">التالي</button>
-    </div>
-    <div class="floating-info">
-      <button onclick="openTextScreen()" id="text-button" style="display: none;">📝</button>
-      <button onclick="toggleLanguage()">🌐</button>
-    </div>
-    <div id="result"></div>
   </div>
 
-  <div id="text-screen" class="quiz-container" style="display:none;">
-    <h1>النص المرفق</h1>
-    <div id="attached-text" class="attached-text"></div>
+  <h1 id="question">جاري التحميل...</h1>
+  <div class="answers" id="answers"></div>
+
+  <div class="nav-btns">
+    <button onclick="prevQuestion()">السابق</button>
+    <button id="next-btn" onclick="nextQuestion()">التالي</button>
   </div>
 
+  <div class="floating-info">
+    <button onclick="openTextScreen()" id="text-button" style="display: none;">📝</button>
+    <button onclick="toggleLanguage()">🌐</button>
+  </div>
 
-  <div id="quiz-screen" class="text-center p-4" style="background: #1c1c2e; color: #fff;">
-  <h1 class="mb-4" style="font-weight: 700; letter-spacing: 1px;">تقرير الأداء النهائي</h1>
+  <div id="result"></div>
+</div>
 
-  <!-- بطاقات النتائج -->
+<!-- شاشة النص -->
+<div id="text-screen" class="quiz-container" style="display:none;">
+  <h1>النص المرفق</h1>
+  <div id="attached-text" class="attached-text"></div>
+</div>
+
+<!-- شاشة التقرير النهائي -->
+<div id="report-screen" class="quiz-container" style="display:none; background:#1c1c2e; color:#fff;">
+  <h1 class="mb-4" style="font-weight: 700;">تقرير الأداء النهائي</h1>
+
   <div class="row mb-5">
     <div class="col-sm-4 mb-3">
       <div class="card result-card">
@@ -105,26 +103,20 @@
     </div>
   </div>
 
-  <!-- الرسم البياني -->
-  <div class="chart-container mx-auto" style="max-width: 360px; position: relative;">
+  <div class="chart-container mx-auto" style="max-width: 360px;">
     <canvas id="resultChart"></canvas>
   </div>
 
-  <!-- زر الإعادة -->
-  <button class="btn btn-outline-light btn-lg mt-4" onclick="location.reload()">
-    إعادة المحاولة
-  </button>
+  <a id="whatsapp-share" class="btn btn-success btn-lg mt-4" target="_blank">📤 إرسال النتيجة عبر واتساب</a>
+
+  <button class="btn btn-outline-light btn-lg mt-3" onclick="location.reload()">🔄 إعادة المحاولة</button>
 </div>
 
+<!-- زر الرجوع للرئيسية -->
+<button id="home-button" onclick="goHome()" title="العودة للرئيسية">🏠</button>
 
 
 
-  <!-- زر الرجوع للرئيسية -->
-  <button id="home-button" onclick="goHome()" title="العودة للرئيسية">🏠</button>
+</div>
 
-
-  <!-- الكود الخاص بزر التثبيت ووحدة التثبيت يعمل من خلال app.js -->
-
-<!-- تسجيل Service Worker -->
-<script src="{% static 'quiz/js/app.js' %}" defer></script>
 {% endblock %}

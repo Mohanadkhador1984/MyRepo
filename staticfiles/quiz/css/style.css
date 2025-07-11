@@ -523,3 +523,31 @@ canvas {
   padding: 20px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
 }
+
+
+
+
+  .timer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.2rem;
+    background-color: #f1f1f1;
+    padding: 8px 16px;
+    border-radius: 25px;
+    box-shadow: 0 0 10px #ccc;
+    margin-top: 10px;
+  }
+
+  .timer-icon {
+    width: 24px;
+    height: 24px;
+    fill: #ff5722;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
