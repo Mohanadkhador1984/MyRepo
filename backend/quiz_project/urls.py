@@ -1,28 +1,65 @@
-# project/urls.py
-from django.contrib import admin
-from django.urls import path, include, re_path
-from django.views.static import serve as static_serve
+# backend/quiz_project/urls.py
+
+import os
 from pathlib import Path
 
+from django.contrib import admin
+from django.urls import path, re_path, include
+from django.views.generic import TemplateView
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-DIST_DIR = BASE_DIR / 'frontend_build' / 'dist'
+DIST_DIR = BASE_DIR / "frontend_build" / "dist"
+
+# تأكد من أن settings.py يحوي:
+# TEMPLATES[0]["DIRS"] = [ str(DIST_DIR), … ]
+# STATICFILES_DIRS = [ str(DIST_DIR), … ]
+# و WhiteNoise مُفعّل لخدمة الملفات الثابتة.
 
 urlpatterns = [
     # 1) لوحة الإدارة
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 
     # 2) API التطبيق
-    path('api/quiz/', include(('quiz.urls', 'quiz'), namespace='quiz')),
+    path("api/quiz/", include(("quiz.urls", "quiz"), namespace="quiz")),
 
-    # 3) service-worker.js و offline.html
-    re_path(r'^(service-worker\.js|offline\.html)$', static_serve, {
-        'document_root': DIST_DIR,
-        'path': lambda m: m.group(1)
-    }),
+    # 3) ملفات PWA الرئيسيّة (يُخدَم كلٌّ منها من مجلد dist)
+    path(
+        "service-worker.js",
+        TemplateView.as_view(
+            template_name="service-worker.js",
+            content_type="application/javascript",
+        ),
+        name="service-worker",
+    ),
+    path(
+        "offline.html",
+        TemplateView.as_view(
+            template_name="offline.html",
+            content_type="text/html",
+        ),
+        name="offline",
+    ),
+    path(
+        "manifest.json",
+        TemplateView.as_view(
+            template_name="manifest.json",
+            content_type="application/json",
+        ),
+        name="manifest",
+    ),
+    path(
+        "favicon.ico",
+        TemplateView.as_view(
+            template_name="favicon.ico",
+            content_type="image/x-icon",
+        ),
+        name="favicon",
+    ),
 
-    # 4) كل شيء آخر → يقدم index.html من مجلد الـ SPA
-    re_path(r'^(?:.*)/?$', static_serve, {
-        'document_root': DIST_DIR,
-        'path': 'index.html'
-    }),
+    # 4) كل مسار آخر → index.html لتطبيق الـ SPA
+    re_path(
+        r"^.*$",
+        TemplateView.as_view(template_name="index.html"),
+        name="spa",
+    ),
 ]
