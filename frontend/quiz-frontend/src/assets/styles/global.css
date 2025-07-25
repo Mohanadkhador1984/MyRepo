@@ -1,0 +1,52 @@
+/* src/assets/css/global.css */
+.go-back {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.4),
+    0 10px 20px rgba(0,0,0,0.2);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  transition: transform .3s ease,
+              box-shadow .3s ease,
+              background .3s ease;
+}
+
+.go-back .icon-arrow {
+  width: 24px;
+  height: 24px;
+  color: #fff;
+}
+
+.go-back:hover {
+  transform: translateX(-50%) translateY(-5px) scale(1.1);
+  background: rgba(255,255,255,0.25);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.5),
+    0 14px 28px rgba(0,0,0,0.25);
+}
+
+.go-back:focus {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.6),
+    0 0 0 4px rgba(255,255,255,0.4),
+    0 14px 28px rgba(0,0,0,0.25);
+}
+
+

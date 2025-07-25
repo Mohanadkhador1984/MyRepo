@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <!-- manifest -->
+  <link rel="manifest" href="<%= BASE_URL %>manifest.json">
+
+  <!-- theme color -->
+  <meta name="theme-color" content="#1976D2">
+
+  <!-- apple touch icon -->
+  <link rel="apple-touch-icon" href="<%= BASE_URL %>img/icons/icon-192x192.png">
+
+  <!-- favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="<%= BASE_URL %>img/icons/favicon-32x32.png">
+
+  <!-- CSS (Vue ستضيف publicPath تلقائياً) -->
+  <link rel="stylesheet" href="<%= BASE_URL %>css/app.css">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+
+     <div id="app"></div>
+
+  <!-- JS bundles -->
+  <script src="<%= BASE_URL %>js/chunk-vendors.js"></script>
+  <script src="<%= BASE_URL %>js/app.js"></script>
+
+  <!-- Service Worker registration -->
+  <script>
+   if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    console.log('⏳ Registering SW…');
+    navigator.serviceWorker
+      .register('/service-worker.js')
+      .then(reg => console.log('✅ SW registered, scope=', reg.scope))
+      .catch(err => console.error('❌ SW registration failed:', err));
+  });
+}
+
+
+  </script>
+
+    
+  </body>
+</html>
