@@ -1,59 +1,29 @@
-
-
 import os
 from pathlib import Path
-
 import environ
 
-from pathlib import Path
-
+# ─── 1. المسارات الأساسية ─────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
-DIST_DIR = BASE_DIR / "frontend_build" / "dist"   # مسار مجلد الـ SPA النهائي
+DIST_DIR = BASE_DIR / "frontend_build" / "dist"  # مجلد SPA النهائي (مثل Vue/React)
 
-# ---------------- Static files (CSS, JavaScript, Images) ----------------
-
-# 1) URL الأساس لعرض الملفات الثابتة
-STATIC_URL = "/static/"
-
-# 2) المجلد الذي تُفرَغ فيه collectstatic
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# 3) مجلدات إضافية للبحث عن الملفات الثابتة (وهنا نخدم dist للـ SPA)
-STATICFILES_DIRS = [
-    DIST_DIR,  # تضم مجلد dist للبحث عن index.html وملفات JS/CSS
-]
-
-# 4) استخدام تخزين WhiteNoise المضغوط مع Manifest للمراقبة الأفضل للـ cache
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-
-
+# ─── 2. تحميل إعدادات البيئة من ملف .env ──────────────────────────────────────
 env = environ.Env(
-    # cast vars
     DJANGO_DEBUG=(bool, False),
     USE_REMOTE_DB=(bool, False),
 )
 
-# read .env file at BASE_DIR/.env
 environ.Env.read_env(BASE_DIR / ".env")
 
-# ─── 3. SECURITY & DEBUG ──────────────────────────────────────────────────────
+# ─── 3. الأمان والتصحيح ───────────────────────────────────────────────────────
 SECRET_KEY = env("DJANGO_SECRET_KEY")
-DEBUG = env("DJANGO_DEBUG")
+DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
-ALLOWED_HOSTS = env.list(
-    "ALLOWED_HOSTS",
-    default=["localhost", "127.0.0.1"]
-)
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 
-CSRF_TRUSTED_ORIGINS = env.list(
-    "CSRF_TRUSTED_ORIGINS",
-    default=[]
-)
-
-# ─── 4. INSTALLED APPS ─────────────────────────────────────────────────────────
+# ─── 4. التطبيقات المثبتة ─────────────────────────────────────────────────────
 INSTALLED_APPS = [
-    # Django core
+    # تطبيقات Django الأساسية
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -61,20 +31,20 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Your apps
+    # تطبيقاتك
     "quiz",
     "accounts",
 
-    # Third-party
+    # تطبيقات خارجية
     "rest_framework",
     "corsheaders",
 ]
 
-# ─── 5. MIDDLEWARE ─────────────────────────────────────────────────────────────
+# ─── 5. الوسيطات (Middleware) ─────────────────────────────────────────────────
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",           # handle CORS
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",      # serve static files
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # لخدمة الملفات الثابتة
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -83,18 +53,19 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# ─── 6. URLS & WSGI ───────────────────────────────────────────────────────────
+# ─── 6. عنوان التوجيه وملف WSGI ───────────────────────────────────────────────
 ROOT_URLCONF = "quiz_project.urls"
 WSGI_APPLICATION = "quiz_project.wsgi.application"
 
-# ─── 7. TEMPLATES ─────────────────────────────────────────────────────────────
+# ─── 7. إعدادات القوالب (Templates) ───────────────────────────────────────────
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [DIST_DIR],  # serve Vue's index.html
+        "DIRS": [DIST_DIR],  # لخدمة index.html الخاص بـ SPA
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -103,11 +74,9 @@ TEMPLATES = [
     },
 ]
 
-# ─── 8. DATABASE CONFIGURATION ────────────────────────────────────────────────
-# Flag to switch between local and remote DB
+# ─── 8. إعداد قاعدة البيانات ─────────────────────────────────────────────────
 USE_REMOTE_DB = env.bool("USE_REMOTE_DB", default=False)
 
-# ─── إعداد قاعدة البيانات ─────────────────────────────────────────────────
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -122,9 +91,10 @@ DATABASES = {
     }
 }
 
-# ─── 9. AUTHENTICATION & VALIDATION ────────────────────────────────────────────
+# ─── 9. نموذج المستخدم المخصص ────────────────────────────────────────────────
 AUTH_USER_MODEL = "accounts.CustomUser"
 
+# ─── 10. التحقق من كلمات المرور ──────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
@@ -134,22 +104,27 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# ─── 10. INTERNATIONALIZATION ──────────────────────────────────────────────────
+# ─── 11. اللغة والتوقيت ──────────────────────────────────────────────────────
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# ─── 12. الملفات الثابتة (Static Files) ───────────────────────────────────────
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
+STATICFILES_DIRS = [
+    DIST_DIR,  # يحتوي على ملفات JS/CSS الخاصة بالـ SPA
+]
 
-# ─── 12. CORS SETTINGS ────────────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = env.list(
-    "CORS_ALLOWED_ORIGINS",
-    default=["http://localhost:8080"]
-)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# ─── 13. DJANGO REST FRAMEWORK ────────────────────────────────────────────────
+# ─── 13. إعدادات CORS ────────────────────────────────────────────────────────
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost:8080"])
+
+# ─── 14. إعدادات Django REST Framework ───────────────────────────────────────
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -159,5 +134,5 @@ REST_FRAMEWORK = {
     ],
 }
 
-# ─── 14. DEFAULT AUTO FIELD ───────────────────────────────────────────────────
+# ─── 15. الإعداد الافتراضي لحقل المفتاح الأساسي ─────────────────────────────
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

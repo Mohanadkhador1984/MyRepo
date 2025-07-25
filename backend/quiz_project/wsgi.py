@@ -31,3 +31,5 @@ application = WhiteNoise(
 
 # إضافة ملفات ثابتة إضافية إن لزم
 # application.add_files(str(DIST_DIR / 'static'), prefix='static/')
+
+
