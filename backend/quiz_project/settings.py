@@ -7,19 +7,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DIST_DIR = BASE_DIR / "frontend_build" / "dist"  # مجلد SPA النهائي (مثل Vue/React)
 
 # ─── 2. تحميل إعدادات البيئة من ملف .env ──────────────────────────────────────
-env = environ.Env(
-    DJANGO_DEBUG=(bool, False),
-    USE_REMOTE_DB=(bool, False),
-)
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+DEBUG = os.getenv("DJANGO_DEBUG") == "True"
+
 
 environ.Env.read_env(BASE_DIR / ".env")
 
 # ─── 3. الأمان والتصحيح ───────────────────────────────────────────────────────
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env.bool("DJANGO_DEBUG", default=False)
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+
 
 # ─── 4. التطبيقات المثبتة ─────────────────────────────────────────────────────
 INSTALLED_APPS = [
@@ -133,3 +134,16 @@ REST_FRAMEWORK = {
 
 # ─── 15. الإعداد الافتراضي لحقل المفتاح الأساسي ─────────────────────────────
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# في settings.py أسفل التعريفات
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "ERROR",
+    },
+}
