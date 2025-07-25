@@ -27,3 +27,9 @@ application = WhiteNoise(
     prefix='',
     autorefresh=True  # يفيد في التطوير
 )
+
+
+
+
+
+
