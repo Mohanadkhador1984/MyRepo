@@ -1,14 +1,4 @@
-"""
-Django settings for quiz_project (backend).
 
-This configuration supports:
-  - Local PostgreSQL DB (development)
-  - Remote PostgreSQL DB on Render (production)
-  - Serving a Vue PWA build (dist/) via WhiteNoise
-  - CORS for Vue dev server and production domain
-  - JWT authentication for the REST API
-  - All secrets and flags driven by a single .env file
-"""
 
 import os
 from pathlib import Path
@@ -85,10 +75,7 @@ WSGI_APPLICATION = "quiz_project.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            BASE_DIR / "frontend_build" / "dist",   # هنا
-            # ... قوالب Django الأخرى
-        ],  # serve Vue's index.html
+        "DIRS": [DIST_DIR],  # serve Vue's index.html
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -138,17 +125,14 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# ─── 11. STATIC FILES & WHITENOISE ────────────────────────────────────────────
+# 2) STATIC FILES (للـ PWA و JS/CSS)
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "staticfiles"         # collectstatic يفرغ هنا
+STATICFILES_DIRS = [                            # يضمّ dist كـ static source
+    DIST_DIR,
+]
 
-# include Vue build dir in static search
-STATICFILES_DIRS = [DIST_DIR]
-
-# serve root PWA files (service-worker.js, manifest.json, offline.html)
-WHITENOISE_ROOT = str(DIST_DIR)
-
-# long-term cache headers + versioned filenames
+# 3) WhiteNoise storage (اختياري لكن موصى به)
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ─── 12. CORS SETTINGS ────────────────────────────────────────────────────────
