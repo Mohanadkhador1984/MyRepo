@@ -114,12 +114,9 @@ USE_TZ = True
 # ─── 12. الملفات الثابتة (Static Files) ───────────────────────────────────────
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-STATICFILES_DIRS = [
-    DIST_DIR,  # يحتوي على ملفات JS/CSS الخاصة بالـ SPA
-]
-
+STATICFILES_DIRS = [ BASE_DIR / "frontend_build" / "dist" ]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 # ─── 13. إعدادات CORS ────────────────────────────────────────────────────────
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["http://localhost:8080"])

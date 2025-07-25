@@ -62,4 +62,14 @@ urlpatterns = [
         TemplateView.as_view(template_name="index.html"),
         name="spa",
     ),
+    # ملفات PWA
+    re_path(
+        r"^(?P<path>service-worker\.js|offline\.html|manifest\.json|favicon\.ico)$",
+        TemplateView.as_view(template_name=r"%(path)s"),
+        name="pwa-static",
+    ),
+
+    # كل شيء آخر → index.html لتطبيق الـ SPA
+    re_path(r"^.*$", TemplateView.as_view(template_name="index.html"), name="spa"),
 ]
+
