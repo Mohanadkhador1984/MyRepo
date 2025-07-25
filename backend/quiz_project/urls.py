@@ -71,5 +71,7 @@ urlpatterns = [
 
     # كل شيء آخر → index.html لتطبيق الـ SPA
     re_path(r"^.*$", TemplateView.as_view(template_name="index.html"), name="spa"),
+
+    
 ]
 

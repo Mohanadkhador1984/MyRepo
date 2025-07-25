@@ -15,12 +15,21 @@ env = environ.Env(
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # ─── 3. المفاتيح الأساسية والأمان ────────────────────────────────────────────
-SECRET_KEY = env("DJANGO_SECRET_KEY")
-DEBUG = env("DJANGO_DEBUG")
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("Missing DJANGO_SECRET_KEY in environment")
 
-CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() in ("true", "1", "yes")
+
+ALLOWED_HOSTS = [
+    h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    uri.strip()
+    for uri in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if uri.strip()
+]
 
 # ─── 4. التطبيقات المثبتة ─────────────────────────────────────────────────────
 INSTALLED_APPS = [
@@ -72,23 +81,37 @@ TEMPLATES = [
     },
 ]
 
-# ─── 8. إعداد قاعدة البيانات ─────────────────────────────────────────────────
-USE_REMOTE_DB = env("USE_REMOTE_DB")
+def get_env_or_raise(key: str) -> str:
+    value = os.getenv(key)
+    if not value:
+        raise RuntimeError(f"Missing required environment variable: {key}")
+    return value
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("DB_NAME") if USE_REMOTE_DB else env("DB_NAME_LOCAL"),
-        "USER": env("DB_USER") if USE_REMOTE_DB else env("DB_USER_LOCAL"),
-        "PASSWORD": env("DB_PASSWORD") if USE_REMOTE_DB else env("DB_PASSWORD_LOCAL"),
-        "HOST": env("DB_HOST_EXTERNAL") if USE_REMOTE_DB else env("DB_HOST_LOCAL"),
-        "PORT": env.int("DB_PORT", default=5432) if USE_REMOTE_DB else env.int("DB_PORT_LOCAL", default=5432),
-        "OPTIONS": {
-            "sslmode": "require" if USE_REMOTE_DB else "disable",
-        },
+USE_REMOTE_DB = os.getenv("USE_REMOTE_DB", "False").lower() in ("true", "1", "yes")
+
+if USE_REMOTE_DB:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": get_env_or_raise("DB_NAME"),
+            "USER": get_env_or_raise("DB_USER"),
+            "PASSWORD": get_env_or_raise("DB_PASSWORD"),
+            "HOST": get_env_or_raise("DB_HOST_EXTERNAL"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+            "OPTIONS": {"sslmode": "require"},
+        }
+    }
+else:
+    DATABASES = {
+    'default': {
+        'ENGINE':   'django.db.backends.postgresql',
+        'NAME':     'quizdb',
+        'USER':     'postgres',
+        'PASSWORD': '123456',
+        'HOST':     'localhost',
+        'PORT':     '5432',
     }
 }
-
 # ─── 9. نموذج المستخدم المخصص ────────────────────────────────────────────────
 AUTH_USER_MODEL = "accounts.CustomUser"
 
