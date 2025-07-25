@@ -85,7 +85,10 @@ WSGI_APPLICATION = "quiz_project.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [DIST_DIR],  # serve Vue's index.html
+        "DIRS": [
+            BASE_DIR / "frontend_build" / "dist",   # هنا
+            # ... قوالب Django الأخرى
+        ],  # serve Vue's index.html
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
