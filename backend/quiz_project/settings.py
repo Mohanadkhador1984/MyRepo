@@ -5,13 +5,29 @@ from pathlib import Path
 
 import environ
 
-# ─── 1. BASE DIRECTORIES ─────────────────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent.parent
-# Folder where Vue's production build (npm run build) outputs index.html, service-worker.js, etc.
-DIST_DIR = BASE_DIR / "frontend_build" / "dist"
+from pathlib import Path
 
-# ─── 2. LOAD ENVIRONMENT VARIABLES ───────────────────────────────────────────
-# Initialize django-environ
+BASE_DIR = Path(__file__).resolve().parent.parent
+DIST_DIR = BASE_DIR / "frontend_build" / "dist"   # مسار مجلد الـ SPA النهائي
+
+# ---------------- Static files (CSS, JavaScript, Images) ----------------
+
+# 1) URL الأساس لعرض الملفات الثابتة
+STATIC_URL = "/static/"
+
+# 2) المجلد الذي تُفرَغ فيه collectstatic
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# 3) مجلدات إضافية للبحث عن الملفات الثابتة (وهنا نخدم dist للـ SPA)
+STATICFILES_DIRS = [
+    DIST_DIR,  # تضم مجلد dist للبحث عن index.html وملفات JS/CSS
+]
+
+# 4) استخدام تخزين WhiteNoise المضغوط مع Manifest للمراقبة الأفضل للـ cache
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
+
 env = environ.Env(
     # cast vars
     DJANGO_DEBUG=(bool, False),
@@ -125,15 +141,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# 2) STATIC FILES (للـ PWA و JS/CSS)
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"         # collectstatic يفرغ هنا
-STATICFILES_DIRS = [                            # يضمّ dist كـ static source
-    DIST_DIR,
-]
 
-# 3) WhiteNoise storage (اختياري لكن موصى به)
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ─── 12. CORS SETTINGS ────────────────────────────────────────────────────────
 CORS_ALLOWED_ORIGINS = env.list(
