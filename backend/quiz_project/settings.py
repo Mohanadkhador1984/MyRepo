@@ -1,11 +1,34 @@
-import os
 from pathlib import Path
-
 import environ
+from pathlib import Path
+import environ, os
 
-# ─── 1. المسارات الأساسية ─────────────────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent.parent
-DIST_DIR = BASE_DIR /"backend"/ "frontend_build" / "dist"  # مجلد SPA النهائي
+# ─── 1. جذر الـ Django (مجلد backend/) ───────────────────────────────────────
+BASE_DIR = Path(__file__).resolve().parent.parent  
+# مثال: C:\Users\Mohanad\Desktop\quiz_project\backend
+
+# ─── 2. مجلد الـ SPA المبني داخل backend ───────────────────────────────────
+DIST_DIR = BASE_DIR / "frontend_build" / "dist"   
+# يؤدي إلى:
+# C:\Users\Mohanad\Desktop\quiz_project\backend\frontend_build\dist
+
+# ─── 12. إعدادات staticfiles ─────────────────────────────────────────────────
+STATIC_URL = "/static/"
+
+# المكان الذي يجمع فيه collectstatic كل الملفات الثابتة
+STATIC_ROOT = BASE_DIR / "staticfiles"  
+# مثلاً: C:\Users\Mohanad\Desktop\quiz_project\backend\staticfiles
+
+# أضف الـ dist كـ dir إضافي ليخدمه WhiteNoise
+STATICFILES_DIRS = [
+    str(DIST_DIR),
+]
+
+# استخدم التخزين المضغوط مع Manifest
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
+
 
 # ─── 2. تهيئة django-environ وقراءة .env ──────────────────────────────────────
 env = environ.Env(
@@ -68,7 +91,7 @@ WSGI_APPLICATION = "quiz_project.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [DIST_DIR],
+        "DIRS": [ str(DIST_DIR) ],  # ← هنا
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -130,11 +153,6 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# ─── 12. الملفات الثابتة (Static Files) ───────────────────────────────────────
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [DIST_DIR]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ─── 13. إعدادات CORS ────────────────────────────────────────────────────────
 # (تمت قراءتها أعلاه من env)
