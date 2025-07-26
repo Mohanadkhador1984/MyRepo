@@ -3,28 +3,46 @@ import environ
 from pathlib import Path
 import environ, os
 
-# ─── 1. جذر الـ Django (مجلد backend/) ───────────────────────────────────────
+from pathlib import Path
+import environ, os
+
+# ─── 1. جذر تطبيق Django (backend/) ────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent  
-# مثال: C:\Users\Mohanad\Desktop\quiz_project\backend
+#        …/src/backend
 
-# ─── 2. مجلد الـ SPA المبني داخل backend ───────────────────────────────────
-DIST_DIR = BASE_DIR / "frontend_build" / "dist"   
-# يؤدي إلى:
-# C:\Users\Mohanad\Desktop\quiz_project\backend\frontend_build\dist
+# ─── 2. جذر الريبو (parent لــ backend) ───────────────────────────────────
+REPO_ROOT = BASE_DIR.parent  
+#        …/src
 
-# ─── 12. إعدادات staticfiles ─────────────────────────────────────────────────
-STATIC_URL = "/static/"
+# ─── 3. مسار مجلد البناء النهائي للواجهة الأمامية ─────────────────────────
+DIST_DIR = REPO_ROOT / "frontend_build" / "dist"
+#        …/src/frontend_build/dist
 
-# المكان الذي يجمع فيه collectstatic كل الملفات الثابتة
-STATIC_ROOT = BASE_DIR / "staticfiles"  
-# مثلاً: C:\Users\Mohanad\Desktop\quiz_project\backend\staticfiles
+# ─── … بقية الإعدادات …
 
-# أضف الـ dist كـ dir إضافي ليخدمه WhiteNoise
-STATICFILES_DIRS = [
-    str(DIST_DIR),
+# ─── قالب Django ليجد index.html هنا ─────────────────────────────────────
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [ str(DIST_DIR) ],       # ← مهم جداً
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
 ]
 
-# استخدم التخزين المضغوط مع Manifest
+# ─── إعداد staticfiles لـ WhiteNoise ──────────────────────────────────────
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [
+    str(DIST_DIR),  # كي يخدم WhiteNoise ملفات الواجهة المبنية
+]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
@@ -87,22 +105,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "quiz_project.urls"
 WSGI_APPLICATION = "quiz_project.wsgi.application"
 
-# ─── 7. إعدادات القوالب (Templates) ───────────────────────────────────────────
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [ str(DIST_DIR) ],  # ← هنا
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
+
 
 def get_env_or_raise(key: str) -> str:
     value = os.getenv(key)
@@ -128,7 +131,7 @@ else:
     DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     'quizdb',
+        'NAME':     'quizdb1',
         'USER':     'postgres',
         'PASSWORD': '123456',
         'HOST':     'localhost',
