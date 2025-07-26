@@ -6,9 +6,8 @@ from pathlib import Path
 from django.contrib import admin
 from django.urls import path, re_path, include
 from django.views.generic import TemplateView
+from quiz.views import FrontendAppView
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-DIST_DIR = BASE_DIR / "frontend_build" / "dist"
 
 # تأكد من أن settings.py يحوي:
 # TEMPLATES[0]["DIRS"] = [ str(DIST_DIR), … ]
@@ -18,6 +17,7 @@ DIST_DIR = BASE_DIR / "frontend_build" / "dist"
 urlpatterns = [
     # 1) لوحة الإدارة
     path("admin/", admin.site.urls),
+     path('', FrontendAppView.as_view()),
 
     # 2) API التطبيق
     path("api/quiz/", include(("quiz.urls", "quiz"), namespace="quiz")),

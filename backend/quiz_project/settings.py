@@ -5,7 +5,7 @@ import environ
 
 # ─── 1. المسارات الأساسية ─────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
-DIST_DIR = BASE_DIR / "frontend_build" / "dist"  # مجلد SPA النهائي
+DIST_DIR = BASE_DIR /"backend"/ "frontend_build" / "dist"  # مجلد SPA النهائي
 
 # ─── 2. تهيئة django-environ وقراءة .env ──────────────────────────────────────
 env = environ.Env(

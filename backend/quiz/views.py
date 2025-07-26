@@ -8,6 +8,7 @@ from rest_framework import status
 from .models import Question, Book
 from .serializers import QuestionSerializer, BookSerializer
 
+
 # مسارات ملفات Excel
 EXCEL_Q = r'C:\Users\Mohanad\Desktop\1.xlsx'
 EXCEL_B = r'C:\Users\Mohanad\Desktop\books.xlsx'
@@ -132,3 +133,9 @@ def import_books(request):
         {'imported_books': imported},
         status=status.HTTP_201_CREATED
     )
+# backend/core/views.py
+
+from django.views.generic import TemplateView
+
+class FrontendAppView(TemplateView):
+    template_name = 'index.html'
