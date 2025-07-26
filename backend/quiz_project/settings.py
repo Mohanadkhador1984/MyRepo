@@ -1,52 +1,11 @@
+import os
 from pathlib import Path
+
 import environ
-from pathlib import Path
-import environ, os
 
-from pathlib import Path
-import environ, os
-
-# ─── 1. جذر تطبيق Django (backend/) ────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent.parent  
-#        …/src/backend
-
-# ─── 2. جذر الريبو (parent لــ backend) ───────────────────────────────────
-REPO_ROOT = BASE_DIR.parent  
-#        …/src
-
-# ─── 3. مسار مجلد البناء النهائي للواجهة الأمامية ─────────────────────────
-DIST_DIR = REPO_ROOT / "frontend_build" / "dist"
-#        …/src/frontend_build/dist
-
-# ─── … بقية الإعدادات …
-
-# ─── قالب Django ليجد index.html هنا ─────────────────────────────────────
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [ str(DIST_DIR) ],       # ← مهم جداً
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
-
-# ─── إعداد staticfiles لـ WhiteNoise ──────────────────────────────────────
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [
-    str(DIST_DIR),  # كي يخدم WhiteNoise ملفات الواجهة المبنية
-]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-
-
+# ─── 1. المسارات الأساسية ─────────────────────────────────────────────────────
+BASE_DIR = Path(__file__).resolve().parent.parent
+DIST_DIR = BASE_DIR / "frontend_build" / "dist"  # مجلد SPA النهائي
 
 # ─── 2. تهيئة django-environ وقراءة .env ──────────────────────────────────────
 env = environ.Env(
@@ -105,7 +64,22 @@ MIDDLEWARE = [
 ROOT_URLCONF = "quiz_project.urls"
 WSGI_APPLICATION = "quiz_project.wsgi.application"
 
-
+# ─── 7. إعدادات القوالب (Templates) ───────────────────────────────────────────
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [DIST_DIR],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
 
 def get_env_or_raise(key: str) -> str:
     value = os.getenv(key)
@@ -156,6 +130,11 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# ─── 12. الملفات الثابتة (Static Files) ───────────────────────────────────────
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [DIST_DIR]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ─── 13. إعدادات CORS ────────────────────────────────────────────────────────
 # (تمت قراءتها أعلاه من env)
