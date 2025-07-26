@@ -4,25 +4,25 @@ services:
   - type: web
     name: quiz_project
     env: python
-    rootDirectory: .
+    rootDirectory: backend  # لأن manage.py موجود هنا
 
-    # 1) Build: بنّ الواجهة ثم ثبّت وجمع static
     buildCommand: |
-      cd frontend
-      npm ci
+      # 1. بناء React
+      cd ../frontend/quiz-frontend
+      npm install
       npm run build
-
-      cd ../backend
+      
+      # 2. إعداد Django
+      cd ../../backend
       pip install --upgrade setuptools
       pip install -r requirements.txt
       python manage.py collectstatic --no-input
 
-    # 2) Start: migrate، superuser، ثم Gunicorn
     startCommand: |
-      cd backend
-
+      # 1. عمل migrate
       python manage.py migrate --noinput
 
+      # 2. إنشاء superuser إن لم يكن موجودًا
       python - << 'PYCODE'
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -34,9 +34,9 @@ if not User.objects.filter(username="admin").exists():
     )
 PYCODE
 
+      # 3. تشغيل السيرفر
       gunicorn quiz_project.wsgi:application --bind 0.0.0.0:$PORT --log-file -
 
-    # 3) متغيرات البيئة
     envVars:
       - key: DJANGO_SECRET_KEY
         value: "b06aa0d36bfd9e1e7c039d37e6fc28"

@@ -3,9 +3,38 @@ from pathlib import Path
 
 import environ
 
-# ─── 1. المسارات الأساسية ─────────────────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parent.parent
-DIST_DIR = BASE_DIR / "frontend_build" / "dist"  # مجلد SPA النهائي
+from pathlib import Path
+
+# ─── 1. تحديد المسارات ────────────────────────────────────────────────────
+BASE_DIR  = Path(__file__).resolve().parent.parent
+REPO_ROOT = BASE_DIR.parent
+
+# مسار مجلّد الخروج من React
+DIST_DIR  = REPO_ROOT / "frontend" / "quiz-frontend" / "dist"
+
+# ─── 2. إعداد TEMPLATES لخدمة index.html ─────────────────────────────────
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [ str(DIST_DIR) ],           # ابحث عن index.html هنا
+        "APP_DIRS": True,
+        "OPTIONS": { "context_processors": [
+            "django.template.context_processors.debug",
+            "django.template.context_processors.request",
+            "django.contrib.auth.context_processors.auth",
+            "django.contrib.messages.context_processors.messages",
+        ]},
+    },
+]
+
+STATIC_URL        = "/static/"
+STATICFILES_DIRS  = [ str(DIST_DIR) ]
+STATIC_ROOT       = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
+
+
 
 # ─── 2. تهيئة django-environ وقراءة .env ──────────────────────────────────────
 env = environ.Env(
@@ -64,22 +93,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "quiz_project.urls"
 WSGI_APPLICATION = "quiz_project.wsgi.application"
 
-# ─── 7. إعدادات القوالب (Templates) ───────────────────────────────────────────
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [DIST_DIR],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
+
 
 def get_env_or_raise(key: str) -> str:
     value = os.getenv(key)
@@ -105,7 +119,7 @@ else:
     DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     'quizdb1',
+        'NAME':     'quizdb',
         'USER':     'postgres',
         'PASSWORD': '123456',
         'HOST':     'localhost',
@@ -131,10 +145,6 @@ USE_L10N = True
 USE_TZ = True
 
 # ─── 12. الملفات الثابتة (Static Files) ───────────────────────────────────────
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [DIST_DIR]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ─── 13. إعدادات CORS ────────────────────────────────────────────────────────
 # (تمت قراءتها أعلاه من env)
