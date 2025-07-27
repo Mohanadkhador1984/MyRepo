@@ -3,13 +3,12 @@
 const path = require('path');
 
 module.exports = {
-  // 1) publicPath يختلف بين التطوير والإنتاج
-  publicPath: process.env.NODE_ENV === 'production'
-    ? '/static/'      // ملفات الإنتاج تُخدم تحت /static/
-    : '/',
-
-  // 2) إخراج build إلى مجلد Django
+    // 2) إخراج build إلى مجلد Django
   outputDir: path.resolve(__dirname, '../../backend/frontend_build/dist'),
+  assetsDir: "static",
+ publicPath: process.env.NODE_ENV === 'production'
+    ? '/static/vue/'    // في الإنتاج تُروّج الملفات تحت هذا المسار (Django static)
+    : '/',               // في التطوير تُخدم جذرياً
 
   // 3) أثناء التطوير: وجّه كل /api/* إلى Django على الـ port 8000
   devServer: {
