@@ -1,27 +1,27 @@
 services:
   - type: web
-    name: quiz-app
+    name: myrepo-29
     env: python
     plan: free
-     rootDir: backend
+    rootDir: backend  # هذا مهم جداً لتحديد مجلد Django
 
     buildCommand: |
-      # 1) بناء الواجهة الأمامية
+      # 1) بناء React
       cd ../frontend/quiz-frontend
       npm ci
       npm run build
 
-      # 2) نسخ مخرجات الواجهة إلى مجلد frontend-build
+      # 2) نسخ build إلى Django
       cp -R dist ../../backend/frontend-build
 
-      # 3) تثبيت مُتطلبات بايثون وجمع الملفات الثابتة
+      # 3) إعداد Django
       cd ../../backend
       pip install -r requirements.txt
       python manage.py collectstatic --no-input
 
     startCommand: |
       python manage.py migrate --no-input
-      exec gunicorn quiz_project.wsgi:application --bind 0.0.0.0:$PORT --workers=3
+      gunicorn quiz_project.wsgi:application --bind 0.0.0.0:$PORT --workers=3
 
     envVars:
       - key: DJANGO_SECRET_KEY
