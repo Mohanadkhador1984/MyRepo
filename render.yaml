@@ -16,12 +16,18 @@ services:
 
       # 3) إعداد Django
       cd ../../backend
+      pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
       python manage.py collectstatic --no-input
 
-    startCommand: |
-      python manage.py migrate --no-input
-      gunicorn quiz_project.wsgi:application --bind 0.0.0.0:$PORT --workers=3
+    startCommand: |               # أمر بدء الخدمة
+      # ترحيل الميجريشنات
+      python manage.py migrate --noinput && \
+      # إطلاق Gunicorn
+      exec gunicorn quiz_project.wsgi:application \
+        --bind 0.0.0.0:$PORT \
+        --workers=3 \
+        --log-level=info
 
     envVars:
       - key: DJANGO_SECRET_KEY
