@@ -1,23 +1,36 @@
 services:
   - type: web
-    name: myrepo-29
-    env: python
-    buildCommand: |
-      # 1. بناء الواجهة الأمامية
-      cd ../frontend/quiz-frontend
-      npm ci
-      npm run build
+    name: myrepo-29                # اسم الخدمة في لوحة تحكم Render
+    env: python                    # البيئة: Python (Django)
 
-      # 2. تثبيت بايثون وجمع static
+    buildCommand: |               # أوامر البناء تُنفّذ خطوة خطوة
+      # 1) الانتقال إلى مجلد الواجهة الأمامية
+      cd frontend/quiz-frontend
+
+      # 2) تثبيت الحزم وبناء الواجهة
+      npm ci                        # يقرأ package-lock.json ويثبت
+      npm run build                # يولّد مجلد dist
+
+      # 3) العودة إلى مجلد backend
       cd ../../backend
+
+      # 4) تثبيت متطلبات Python
       pip install --upgrade pip setuptools
       pip install -r requirements.txt
+
+      # 5) جمع كل الملفات الثابتة (Django + مجلد dist)
       python manage.py collectstatic --no-input
 
-    startCommand: |
+    startCommand: |               # أمر تشغيل الخدمة
+      # ترحيل قواعد البيانات إن وجدت
       python manage.py migrate --noinput && \
-      gunicorn quiz_project.wsgi:application --bind 0.0.0.0:$PORT --workers=3 --log-level=info
+      # إطلاق واجهة WSGI عبر Gunicorn
+      gunicorn quiz_project.wsgi:application \
+        --bind 0.0.0.0:$PORT \
+        --workers=3 \
+        --log-level=info
 
+    
     envVars:
       - key: DJANGO_SECRET_KEY
         value: b06aa0d36bfd9e1f1e7c039d37e6fc28

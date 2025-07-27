@@ -1,28 +1,28 @@
+import environ
+
 import os
 from pathlib import Path
 
-import environ
-
+# مسار جذر Django (المجلد الذي يحتوي manage.py)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# مسار مجلد البناء الخاص بالواجهة
-FRONTEND_DIST = BASE_DIR / 'frontend_build' / 'dist'
+# مسار مجلد الـbuild الخاص بالواجهة
+FRONTEND_BUILD_DIR = BASE_DIR.parent / 'frontend' / 'quiz-frontend' / 'dist'
 
+# إعدادات التجميع للـ static files
 STATIC_URL = '/static/'
-
-# حيث سينقل Django كل ملفات static بعد collectstatic
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ليجد Django ملفات الـ CSS/JS من مجلد dist مباشرة
+# أخبر Django أن يبحث عن الملفات الثابتة داخل مجلد dist
 STATICFILES_DIRS = [
-    FRONTEND_DIST,
+    FRONTEND_BUILD_DIR,
 ]
 
+# إعداد القوالب لعرض index.html من مجلد dist
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # يبحث هنا عن index.html داخل dist
-        'DIRS': [FRONTEND_DIST],
+        'DIRS': [FRONTEND_BUILD_DIR],  # هنا نضع المسار إلى dist
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -36,7 +36,9 @@ TEMPLATES = [
 ]
 
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 
