@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: quiz-backend
+    name: myrepo-29
     env: python
     buildCommand: |
       # 1. بناء الواجهة الأمامية
