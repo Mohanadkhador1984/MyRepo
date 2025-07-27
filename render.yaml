@@ -1,41 +1,42 @@
 services:
   - type: web
-    name: myrepo-29                # اسم الخدمة في لوحة تحكم Render
-    env: python                    # البيئة: Python (Django)
+    name: quiz-app
+    env: python
+    plan: free
+    rootDir: quiz_project
 
-    buildCommand: |               # أوامر البناء تُنفّذ خطوة خطوة
-      # 1) الانتقال إلى مجلد الواجهة الأمامية
+    buildCommand: |
+      # 1) اذهب إلى مجلد الواجهة
       cd frontend/quiz-frontend
 
-      # 2) تثبيت الحزم وبناء الواجهة
-      npm ci                        # يقرأ package-lock.json ويثبت
-      npm run build                # يولّد مجلد dist
+      # 2) ثبت حزم Node وعمِل build
+      npm ci
+      npm run build
 
-      # 3) العودة إلى مجلد backend
+      # 3) ارجع إلى جذر المشروع ثم إلى مجلد backend
       cd ../../backend
 
-      # 4) تثبيت متطلبات Python
-      pip install --upgrade pip setuptools
+      # 4) ثبت متطلبات Python وجمع static
+      pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
-
-      # 5) جمع كل الملفات الثابتة (Django + مجلد dist)
       python manage.py collectstatic --no-input
 
-    startCommand: |               # أمر تشغيل الخدمة
-      # ترحيل قواعد البيانات إن وجدت
+    startCommand: |
+      # 1) انتقل إلى مجلد backend
+      cd backend
+
+      # 2) ترحيل القاعدة وتشغيل Gunicorn
       python manage.py migrate --noinput && \
-      # إطلاق واجهة WSGI عبر Gunicorn
-      gunicorn quiz_project.wsgi:application \
+      exec gunicorn quiz_project.wsgi:application \
         --bind 0.0.0.0:$PORT \
         --workers=3 \
         --log-level=info
 
-    
     envVars:
       - key: DJANGO_SECRET_KEY
-        value: b06aa0d36bfd9e1f1e7c039d37e6fc28
-      - key: DJANGO_DEBUG
-        value: true
+        value: "b06aa0d36bfd9e1f1e7c039d37e6fc28"
+      - key: DEBUG
+        value: "False"
       - key: USE_REMOTE_DB
         value: true
       - key: ALLOWED_HOSTS
