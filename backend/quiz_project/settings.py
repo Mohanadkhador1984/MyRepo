@@ -3,33 +3,39 @@ from pathlib import Path
 
 import environ
 
-from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ─── 1. تحديد المسارات ────────────────────────────────────────────────────
-BASE_DIR  = Path(__file__).resolve().parent.parent
-REPO_ROOT = BASE_DIR.parent
+# مسار مجلد البناء الخاص بالواجهة
+FRONTEND_DIST = BASE_DIR / 'frontend_build' / 'dist'
 
-# مسار مجلّد الخروج من React
-DIST_DIR  = REPO_ROOT / "frontend" / "quiz-frontend" / "dist"
+STATIC_URL = '/static/'
 
-# ─── 2. إعداد TEMPLATES لخدمة index.html ─────────────────────────────────
+# حيث سينقل Django كل ملفات static بعد collectstatic
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# ليجد Django ملفات الـ CSS/JS من مجلد dist مباشرة
+STATICFILES_DIRS = [
+    FRONTEND_DIST,
+]
+
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [ str(DIST_DIR) ],           # ابحث عن index.html هنا
-        "APP_DIRS": True,
-        "OPTIONS": { "context_processors": [
-            "django.template.context_processors.debug",
-            "django.template.context_processors.request",
-            "django.contrib.auth.context_processors.auth",
-            "django.contrib.messages.context_processors.messages",
-        ]},
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # يبحث هنا عن index.html داخل dist
+        'DIRS': [FRONTEND_DIST],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
     },
 ]
 
-STATIC_URL        = "/static/"
-STATICFILES_DIRS  = [ str(DIST_DIR) ]
-STATIC_ROOT       = BASE_DIR / "staticfiles"
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
