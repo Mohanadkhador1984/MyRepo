@@ -3,34 +3,25 @@ services:
     name: quiz-app
     env: python
     plan: free
-    rootDir: quiz_project
+     rootDir: backend
 
     buildCommand: |
-      # 1) اذهب إلى مجلد الواجهة
-      cd frontend/quiz-frontend
-
-      # 2) ثبت حزم Node وعمِل build
+      # 1) بناء الواجهة الأمامية
+      cd ../frontend/quiz-frontend
       npm ci
       npm run build
 
-      # 3) ارجع إلى جذر المشروع ثم إلى مجلد backend
-      cd ../../backend
+      # 2) نسخ مخرجات الواجهة إلى مجلد frontend-build
+      cp -R dist ../../backend/frontend-build
 
-      # 4) ثبت متطلبات Python وجمع static
-      pip install --upgrade pip setuptools wheel
+      # 3) تثبيت مُتطلبات بايثون وجمع الملفات الثابتة
+      cd ../../backend
       pip install -r requirements.txt
       python manage.py collectstatic --no-input
 
     startCommand: |
-      # 1) انتقل إلى مجلد backend
-      cd backend
-
-      # 2) ترحيل القاعدة وتشغيل Gunicorn
-      python manage.py migrate --noinput && \
-      exec gunicorn quiz_project.wsgi:application \
-        --bind 0.0.0.0:$PORT \
-        --workers=3 \
-        --log-level=info
+      python manage.py migrate --no-input
+      exec gunicorn quiz_project.wsgi:application --bind 0.0.0.0:$PORT --workers=3
 
     envVars:
       - key: DJANGO_SECRET_KEY
