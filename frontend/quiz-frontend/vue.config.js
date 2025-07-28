@@ -4,20 +4,8 @@ const path = require('path');
 
 module.exports = {
   // 1) إخراج build إلى مجلد Django
- 
-  // 1) ضع مجلد الإخراج مباشرةً داخل باكيدند Django
-  
-  outputDir: path.resolve(__dirname, '../..', 'backend', 'frontend_dist', 'dist'),
-  // توضع ملفات CSS/JS/images في المجلد static ضمن dist
-  assetsDir: 'static',
-  // روابط الأصول في index.html تبدأ بـ /static/
-  publicPath: process.env.NODE_ENV === 'production'
-    ? '/static/'
-    : '/',
-  // اسم ملف القالب
-  indexPath: 'index.html',
-
-
+   outputDir: path.resolve(__dirname, '../..', 'backend', 'frontend_dist', 'dist'),
+  publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
 
   // 4) proxy لتوجيه طلبات /api أثناء التطوير إلى Django على المنفذ 8000
   devServer: {
