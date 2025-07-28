@@ -3,11 +3,19 @@
 const path = require('path');
 
 module.exports = {
-  // 1) إخراج build إلى مجلد Django
-  outputDir: path.resolve(__dirname, 'dist'), // Ensure this outputs to 'dist'
-  publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
+  // 1) مجلد الخرج: داخل Django (frontend_dist/dist)
+  outputDir: path.resolve(__dirname, '..', '..', 'backend', 'frontend_dist', 'dist'),
 
-  // 4) proxy لتوجيه طلبات /api أثناء التطوير إلى Django على المنفذ 8000
+  // 2) دليل الأصول الثابتة داخل مجلد الخرج
+  assetsDir: 'static',
+
+  // 3) ضبط مسار تحميل الأصول عند الإنتاج (متوافق مع STATIC_URL في Django)
+  publicPath: process.env.NODE_ENV === 'production' ? '/static/' : '/',
+
+  // 4) اسم ملف HTML الرئيسي في مجلد الخرج
+  indexPath: 'index.html',
+
+  // 5) إعداد خادم التطوير وتوجيه /api إلى Django
   devServer: {
     proxy: {
       '^/api': {
@@ -19,7 +27,7 @@ module.exports = {
     }
   },
 
-  // 5) إعدادات PWA
+  // 6) إعداد PWA
   pwa: {
     name: 'Quiz App',
     themeColor: '#42b983',
@@ -46,9 +54,7 @@ module.exports = {
           options: {
             cacheName: 'api-cache',
             networkTimeoutSeconds: 5,
-            cacheableResponse: {
-              statuses: [0, 200]
-            }
+            cacheableResponse: { statuses: [0, 200] }
           }
         },
         {
@@ -57,9 +63,7 @@ module.exports = {
           options: {
             cacheName: 'import-cache',
             networkTimeoutSeconds: 5,
-            cacheableResponse: {
-              statuses: [0, 200]
-            }
+            cacheableResponse: { statuses: [0, 200] }
           }
         },
         {
@@ -67,19 +71,17 @@ module.exports = {
           handler: 'CacheFirst',
           options: {
             cacheName: 'static-resources',
-            cacheableResponse: {
-              statuses: [0, 200]
-            }
+            cacheableResponse: { statuses: [0, 200] }
           }
         }
       ]
     }
   },
 
-  // 6) إنتاج source maps لتسهيل التصحيح بعد النشر
+  // 7) إنشاء خرائط Source Maps للإنتاج للتسهيل عند التصحيح
   productionSourceMap: true,
 
-  // 7) إعداد Webpack لتوليد source maps
+  // 8) ضبط Webpack لإنتاج Source Maps
   configureWebpack: {
     devtool: 'source-map'
   }

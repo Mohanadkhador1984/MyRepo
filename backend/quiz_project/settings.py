@@ -1,32 +1,48 @@
 import environ
-from pathlib import Path
+# settings.py (مُصحَّح لدمج Vue build مع Django وWhiteNoise)
 import os
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# مسار مجلد dist الناتج
-FRONTEND_DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
+# المجلد الناتج عن npm run build (Vue)
+DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
 
-# URL prefix للثوابت
+# ——————————————————————————————————————————————
+# ملفات الـ Static
+# ——————————————————————————————————————————————
 STATIC_URL = '/static/'
 
-# يجمع ملفات الثوابت من dist/static
-STATICFILES_DIRS = [
-    FRONTEND_DIST_DIR / 'static',
-]
-
-# (للـ collectstatic)
+# مكان جمع كل ملفات الستاتيك (django collectstatic)
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# يتيح لـ Django قراءة index.html كقالب
+# أماكن البحث عن ملفات الستاتيك قبل الجمع
+# (Vue assets مقدمة ضمن dist/static)
+STATICFILES_DIRS = [
+    DIST_DIR / 'static',
+]
+
+# استخدم WhiteNoise لضغط وخدمة الستاتيك
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# أضف WhiteNoiseMiddleware بعد SecurityMiddleware
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # ... بقية الـ middleware
+]
+
+# ——————————————————————————————————————————————
+# Templates (قراءة index.html من dist)
+# ——————————————————————————————————————————————
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [FRONTEND_DIST_DIR],
+        # دمج Vue index.html كـ template رئيسي
+        'DIRS': [DIST_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                # المعالجات الافتراضية...
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -36,9 +52,8 @@ TEMPLATES = [
     },
 ]
 
+# (إذا كنت تحتاج إعادة تعيين DIRS لاحقًا، ليس هناك حاجة لذلك بعد التهيئة أعلاه)
 
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 
