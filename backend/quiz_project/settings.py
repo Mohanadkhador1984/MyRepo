@@ -1,7 +1,10 @@
 import environ
-# settings.py (مُصحَّح لدمج Vue build مع Django وWhiteNoise)
+
 import os
 from pathlib import Path
+
+DEBUG = True
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
