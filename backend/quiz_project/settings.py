@@ -1,26 +1,32 @@
 import environ
-import os
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# dist الخاص بالواجهة بعد نسخه إلى backend
-FRONTEND_BUILD_DIR = BASE_DIR / 'frontend_dist'
+# مسار مجلد dist الناتج
+FRONTEND_DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
 
+# URL prefix للثوابت
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# يجمع ملفات الثوابت من dist/static
 STATICFILES_DIRS = [
-    FRONTEND_BUILD_DIR,
+    FRONTEND_DIST_DIR / 'static',
 ]
 
+# (للـ collectstatic)
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# يتيح لـ Django قراءة index.html كقالب
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [FRONTEND_BUILD_DIR],  # لقراءة index.html
+        'DIRS': [FRONTEND_DIST_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                # المعالجات الافتراضية...
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
@@ -29,6 +35,12 @@ TEMPLATES = [
         },
     },
 ]
+
+
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
 
 # تأكد من وجود هذا
 ALLOWED_HOSTS = ['*']

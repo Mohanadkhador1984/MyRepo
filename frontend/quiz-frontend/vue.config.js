@@ -7,9 +7,14 @@ module.exports = {
  
   // 1) ضع مجلد الإخراج مباشرةً داخل باكيدند Django
   
-  outputDir: 'dist',            // يبني هنا: frontend/quiz-frontend/dist
+  outputDir: path.resolve(__dirname, '../..', 'backend', 'frontend_dist', 'dist'),
+  // توضع ملفات CSS/JS/images في المجلد static ضمن dist
   assetsDir: 'static',
-  publicPath: process.env.NODE_ENV === 'production' ? '/static/' : '/',
+  // روابط الأصول في index.html تبدأ بـ /static/
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/static/'
+    : '/',
+  // اسم ملف القالب
   indexPath: 'index.html',
 
 
