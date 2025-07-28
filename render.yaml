@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: django-vue-app
+    env: python
+    plan: free
+    buildCommand: >
+      cd frontend/quiz-frontend &&
+      npm ci &&
+      npm run build &&
+      mv dist ../../backend/frontend_dist &&
+      cd ../../backend &&
+      pip install --upgrade pip setuptools &&
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --no-input
+    startCommand: >
+      cd backend &&
+      python manage.py migrate --noinput &&
+      exec gunicorn quiz_project.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --log-level info
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: quiz_project.settings
+      - key: PYTHON_VERSION
+        value: 3.11

@@ -1,28 +1,23 @@
 import environ
-
 import os
 from pathlib import Path
 
-# مسار جذر Django (المجلد الذي يحتوي manage.py)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# مسار مجلد الـbuild الخاص بالواجهة
-FRONTEND_BUILD_DIR = BASE_DIR.parent / 'frontend' / 'quiz-frontend' / 'dist'
+# dist الخاص بالواجهة بعد نسخه إلى backend
+FRONTEND_BUILD_DIR = BASE_DIR / 'frontend_dist'
 
-# إعدادات التجميع للـ static files
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# أخبر Django أن يبحث عن الملفات الثابتة داخل مجلد dist
 STATICFILES_DIRS = [
     FRONTEND_BUILD_DIR,
 ]
 
-# إعداد القوالب لعرض index.html من مجلد dist
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [FRONTEND_BUILD_DIR],  # هنا نضع المسار إلى dist
+        'DIRS': [FRONTEND_BUILD_DIR],  # لقراءة index.html
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -35,12 +30,11 @@ TEMPLATES = [
     },
 ]
 
+# تأكد من وجود هذا
+ALLOWED_HOSTS = ['*']
 
-
-
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-
+# لتشغيل static على render
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 
