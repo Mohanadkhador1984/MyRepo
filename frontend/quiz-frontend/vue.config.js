@@ -4,13 +4,23 @@ const path = require('path');
 
 module.exports = {
   // 1) إخراج build إلى مجلد Django
-   // Drop all build output into your Django static directory
-  outputDir: path.resolve(__dirname, '../../backend/frontend_dist'),
-  // Inside that folder, put JS/CSS under "static" (or whatever you configured)
+ 
+  // 1) ضع مجلد الإخراج مباشرةً داخل باكيدند Django
+  outputDir: path.resolve(__dirname, '../..', 'backend', 'frontend_dist'),
+
+  // 2) اجعل ملفات الأصول في مجلد فرعي "static"
   assetsDir: 'static',
-  // Set publicPath so asset URLs match Django’s STATIC_URL
-  // If your Django STATIC_URL = '/static/', then:
-  publicPath: '/static/',
+
+  // 3) مسار تحميل الأصول:
+  //    - في الإنتاج تُحمّل من STATIC_URL='/static/'
+  //    - في التطوير من '/'
+  publicPath: process.env.NODE_ENV === 'production' ? '/static/' : '/',
+
+  // (اختياري) اسم ملف الـ index داخل المجلد الناتج
+  indexPath: 'index.html',
+
+
+
 
   // 4) proxy لتوجيه طلبات /api أثناء التطوير إلى Django على المنفذ 8000
   devServer: {
