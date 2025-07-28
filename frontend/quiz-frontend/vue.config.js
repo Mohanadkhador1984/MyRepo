@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = {
   // 1) إخراج build إلى مجلد Django
-   outputDir: path.resolve(__dirname, '../..', 'backend', 'frontend_dist', 'dist'),
+  outputDir: path.resolve(__dirname, 'dist'), // Ensure this outputs to 'dist'
   publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
 
   // 4) proxy لتوجيه طلبات /api أثناء التطوير إلى Django على المنفذ 8000
