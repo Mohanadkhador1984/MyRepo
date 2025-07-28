@@ -3,9 +3,23 @@
 const path = require('path');
 
 module.exports = {
-  outputDir: '../../backend/frontend_dist/dist', // ← نقل الخرج إلى Django مباشرة
+  outputDir: path.resolve(
+    __dirname,
+    '..',
+    '..',
+    'backend',
+    'frontend_dist',
+    'dist'
+  ),
+
+  // ننقل CSS/JS/images إلى dist/static
   assetsDir: 'static',
-  publicPath: process.env.NODE_ENV === 'production' ? '/static/' : '/',
+
+  // روابط الأصول تبدأ بـ /static/ في الإنتاج
+  publicPath:
+    process.env.NODE_ENV === 'production' ? '/static/' : '/',
+
+  // اسم ملف HTML الرئيسي
   indexPath: 'index.html',
 
   // 5) إعداد خادم التطوير وتوجيه /api إلى Django
