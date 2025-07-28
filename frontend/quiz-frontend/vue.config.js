@@ -6,19 +6,11 @@ module.exports = {
   // 1) إخراج build إلى مجلد Django
  
   // 1) ضع مجلد الإخراج مباشرةً داخل باكيدند Django
-  outputDir: path.resolve(__dirname, '../..', 'backend', 'frontend_dist/dist'),
-
-  // 2) اجعل ملفات الأصول في مجلد فرعي "static"
+  
+  outputDir: 'dist',            // يبني هنا: frontend/quiz-frontend/dist
   assetsDir: 'static',
-
-  // 3) مسار تحميل الأصول:
-  //    - في الإنتاج تُحمّل من STATIC_URL='/static/'
-  //    - في التطوير من '/'
   publicPath: process.env.NODE_ENV === 'production' ? '/static/' : '/',
-
-  // (اختياري) اسم ملف الـ index داخل المجلد الناتج
   indexPath: 'index.html',
-
 
 
 
