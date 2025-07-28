@@ -4,8 +4,13 @@ const path = require('path');
 
 module.exports = {
   // 1) إخراج build إلى مجلد Django
-  outputDir: path.resolve(__dirname, 'dist'), // Ensure this outputs to 'dist'
-  publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
+   // Drop all build output into your Django static directory
+  outputDir: path.resolve(__dirname, '../../backend/frontend_dist'),
+  // Inside that folder, put JS/CSS under "static" (or whatever you configured)
+  assetsDir: 'static',
+  // Set publicPath so asset URLs match Django’s STATIC_URL
+  // If your Django STATIC_URL = '/static/', then:
+  publicPath: '/static/',
 
   // 4) proxy لتوجيه طلبات /api أثناء التطوير إلى Django على المنفذ 8000
   devServer: {
