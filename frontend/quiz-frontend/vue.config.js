@@ -3,16 +3,9 @@
 const path = require('path');
 
 module.exports = {
-  // 1) مجلد الخرج: داخل Django (frontend_dist/dist)
-  outputDir: 'dist',
-
-  // 2) دليل الأصول الثابتة داخل مجلد الخرج
+  outputDir: '../../backend/frontend_dist/dist', // ← نقل الخرج إلى Django مباشرة
   assetsDir: 'static',
-
-  // 3) ضبط مسار تحميل الأصول عند الإنتاج (متوافق مع STATIC_URL في Django)
   publicPath: process.env.NODE_ENV === 'production' ? '/static/' : '/',
-
-  // 4) اسم ملف HTML الرئيسي في مجلد الخرج
   indexPath: 'index.html',
 
   // 5) إعداد خادم التطوير وتوجيه /api إلى Django

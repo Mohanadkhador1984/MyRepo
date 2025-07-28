@@ -3,41 +3,30 @@ import environ
 import os
 from pathlib import Path
 
-DEBUG = True
-
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# المجلد الناتج عن npm run build (Vue)
 DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
 
-# ——————————————————————————————————————————————
-# ملفات الـ Static
-# ——————————————————————————————————————————————
-STATIC_URL = '/static/'
+DEBUG = False  # ← اجعله False في الإنتاج
 
-# مكان جمع كل ملفات الستاتيك (django collectstatic)
+ALLOWED_HOSTS = ['*']  # أو ['.onrender.com']
+
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# أماكن البحث عن ملفات الستاتيك قبل الجمع
-# (Vue assets مقدمة ضمن dist/static)
 STATICFILES_DIRS = [
-    DIST_DIR / 'static',
+    DIST_DIR / 'static',  # ← ملفات Vue
 ]
 
-# استخدم WhiteNoise لضغط وخدمة الستاتيك
+# WhiteNoise إعداد
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# أضف WhiteNoiseMiddleware بعد SecurityMiddleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    # ... بقية الـ middleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← هام
+    # باقي middleware
 ]
 
-# ——————————————————————————————————————————————
-# Templates (قراءة index.html من dist)
-# ——————————————————————————————————————————————
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

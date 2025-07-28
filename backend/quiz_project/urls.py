@@ -56,12 +56,7 @@ urlpatterns = [
         name="favicon",
     ),
 
-    # 4) كل مسار آخر → index.html لتطبيق الـ SPA
-    re_path(
-        r"^.*$",
-        TemplateView.as_view(template_name="index.html"),
-        name="spa",
-    ),
+    
     # ملفات PWA
     re_path(
         r"^(?P<path>service-worker\.js|offline\.html|manifest\.json|favicon\.ico)$",
@@ -69,15 +64,8 @@ urlpatterns = [
         name="pwa-static",
     ),
 
-    # كل شيء آخر → index.html لتطبيق الـ SPA
-    re_path(r"^.*$", TemplateView.as_view(template_name="index.html"), name="spa"),
+   
 
-    
+    re_path(r'^(?!api|admin|static|media).*$', TemplateView.as_view(template_name="index.html")),
 ]
-
-from django.conf import settings
-from django.conf.urls.static import static
-
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 
