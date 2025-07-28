@@ -6,7 +6,7 @@ module.exports = {
   // 1) إخراج build إلى مجلد Django
  
   // 1) ضع مجلد الإخراج مباشرةً داخل باكيدند Django
-  outputDir: path.resolve(__dirname, '../..', 'backend', 'frontend_dist'),
+  outputDir: path.resolve(__dirname, '../..', 'backend', 'frontend_dist/dist'),
 
   // 2) اجعل ملفات الأصول في مجلد فرعي "static"
   assetsDir: 'static',
