@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = {
   // 1) مجلد الخرج: داخل Django (frontend_dist/dist)
-  outputDir: path.resolve(__dirname, '..', '..', 'backend', 'frontend_dist', 'dist'),
+  outputDir: 'dist',
 
   // 2) دليل الأصول الثابتة داخل مجلد الخرج
   assetsDir: 'static',
