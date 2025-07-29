@@ -4,34 +4,29 @@ import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
 
-DEBUG = False  # ← اجعله False في الإنتاج
+DEBUG = False  # ← True فقط محلياً
 
 ALLOWED_HOSTS = ['*']  # أو ['.onrender.com']
+
+# ملفات Vue المبنية
+DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STATICFILES_DIRS = [
-    DIST_DIR / 'static',  # ← ملفات Vue
+    DIST_DIR / 'static',  # ← مجلد static بداخل Vue
 ]
 
-# WhiteNoise إعداد
+# WhiteNoise لتقديم static في الإنتاج
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← هام
-    # باقي middleware
-]
-
-
+# دمج index.html كـ template
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # دمج Vue index.html كـ template رئيسي
-        'DIRS': [DIST_DIR],
+        'DIRS': [DIST_DIR],  # ← مسار index.html
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -48,9 +43,6 @@ TEMPLATES = [
 
 
 
-
-# تأكد من وجود هذا
-ALLOWED_HOSTS = ['*']
 
 # لتشغيل static على render
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

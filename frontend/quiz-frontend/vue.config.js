@@ -3,24 +3,16 @@
 const path = require('path');
 
 module.exports = {
-  outputDir: path.resolve(
-    __dirname,
-    '..',
-    '..',
-    'backend',
-    'frontend_dist',
-    'dist'
-  ),
+  outputDir: path.resolve(__dirname, '..', '..', 'backend', 'frontend_dist', 'dist'),
 
-  // ننقل CSS/JS/images إلى dist/static
-  assetsDir: 'static',
+  assetsDir: 'static', // ← ينقل كل CSS/JS/IMG إلى dist/static
 
-  // روابط الأصول تبدأ بـ /static/ في الإنتاج
-  publicPath:
-    process.env.NODE_ENV === 'production' ? '/static/' : '/',
-
-  // اسم ملف HTML الرئيسي
-  indexPath: 'index.html',
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/static/' // ← مهم جداً: يجعل الروابط تبدأ بـ /static/ في الإنتاج
+    : '/',
+    
+  indexPath: 'index.html', // ← أي اسم آخر يسبب مشاكل في Django
+  filenameHashing: false, // ← يساعد في التعرف على الملفات بسهولة
 
   // 5) إعداد خادم التطوير وتوجيه /api إلى Django
   devServer: {

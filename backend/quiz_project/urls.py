@@ -59,14 +59,10 @@ urlpatterns = [
         FrontendAppView.as_view(),
         name="spa-entry"
     ),
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 ]
 
-# 5) أثناء التطوير: خدمة ملفات static/media عبر Django مباشرةً
+
+# أثناء التطوير فقط
 if settings.DEBUG:
-    urlpatterns += static(
-        settings.STATIC_URL, document_root=settings.STATIC_ROOT
-    )
-    # إذا كان لديك MEDIA_URL/ROOT:
-    urlpatterns += static(
-        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-    )
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
