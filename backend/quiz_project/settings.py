@@ -16,8 +16,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STATICFILES_DIRS = [
-    DIST_DIR / 'static',
-    os.path.join(BASE_DIR, 'frontend_dist', 'dist', 'quiz', 'sounds'),  # ← مجلد static بداخل Vue
+    DIST_DIR / 'static',  # ← مجلد static بداخل Vue
 ]
 
 # WhiteNoise لتقديم static في الإنتاج
