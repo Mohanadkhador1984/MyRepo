@@ -5,7 +5,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = False  # ← True فقط محلياً
+DEBUG = True  # ← True فقط محلياً
 
 ALLOWED_HOSTS = ['*']  # أو ['.onrender.com']
 
