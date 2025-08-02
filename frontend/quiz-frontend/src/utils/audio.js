@@ -1,11 +1,14 @@
 // src/utils/audio.js
+const base = process.env.BASE_URL; // "/" أو "/static/" حسب البيئة
 
-// يحصل BASE_URL على القيمة "/" في التطوير و"/static/" في الإنتاج
-const base = process.env.BASE_URL;
+const makeAudio = (path) => {
+  const audio = new Audio(`${base}quiz/sounds/${path}`);
+  audio.load();
+  return audio;
+};
 
-export const clickSound   = new Audio(`${base}quiz/sounds/click.mp3`);
-export const correctSound = new Audio(`${base}quiz/sounds/correct.mp3`);
-export const wrongSound   = new Audio(`${base}quiz/sounds/wrong.mp3`);
-
-export const bgMusic = new Audio(`${base}quiz/sounds/bg-music.mp3`);
+export const clickSound   = makeAudio('click.mp3');
+export const correctSound = makeAudio('correct.mp3');
+export const wrongSound   = makeAudio('wrong.mp3');
+export const bgMusic      = makeAudio('bg-music.mp3');
 bgMusic.loop = true;
