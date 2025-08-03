@@ -7,7 +7,9 @@ module.exports = {
 
   assetsDir: 'static', // ← ينقل كل CSS/JS/IMG إلى dist/static
 
-  publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/static/' // ← مهم جداً: يجعل الروابط تبدأ بـ /static/ في الإنتاج
+    : '/',
     
   indexPath: 'index.html', // ← أي اسم آخر يسبب مشاكل في Django
   filenameHashing: false, // ← يساعد في التعرف على الملفات بسهولة
