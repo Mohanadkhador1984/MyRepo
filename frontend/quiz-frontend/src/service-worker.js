@@ -47,5 +47,5 @@ registerRoute(
 );
 
 // Install & activate
-self.addEventListener('install', e => self.skipWaiting());
-self.addEventListener('activate', e => self.clientsClaim());
+self.addEventListener('install', event => self.skipWaiting());
+self.addEventListener('activate', event => self.clientsClaim());

@@ -1,6 +1,15 @@
 <template>
-  <router-view/>
+  <div id="app">
+    <router-view/>
+    <InstallPrompt/>
+  </div>
 </template>
+
 <script>
-export default { name: 'App' }
+import InstallPrompt from './components/InstallPrompt.vue';
+
+export default {
+  name: 'App',
+  components: { InstallPrompt }
+}
 </script>

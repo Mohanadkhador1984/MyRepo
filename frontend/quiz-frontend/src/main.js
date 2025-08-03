@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import './assets/styles/quiz.css'
 import './assets/styles/global.css'
+import './registerServiceWorker'
 
 const app = createApp(App)
 app.use(router).mount('#app')
