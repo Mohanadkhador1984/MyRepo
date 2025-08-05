@@ -1,30 +1,29 @@
 <template>
   <div class="relative min-h-screen p-4">
-
-    <!-- شاشة اختيار الفرع -->
+    <!-- branch selector -->
     <BranchSelector
       v-if="screen === 'branch'"
       @select="goYear"
     />
 
-    <!-- شاشة اختيار السنة -->
+    <!-- year selector -->
     <YearSelector
       v-else-if="screen === 'year'"
       :options="years"
       @select="startQuiz"
     />
 
-    <!-- عند التحميل (قبل عرض أي شيء) -->
+    <!-- loading -->
     <div v-else-if="loadingQuestions" class="text-center mt-10">
       جاري تحميل الأسئلة…
     </div>
 
-    <!-- خطأ في التحميل -->
+    <!-- load error -->
     <div v-else-if="loadError" class="text-red-600 text-center mt-10">
       {{ loadError }}
     </div>
 
-    <!-- صفحة الأسئلة -->
+    <!-- quiz -->
     <QuestionCard
       v-else-if="screen === 'quiz' && questions.length"
       :questions="questions"
@@ -43,12 +42,12 @@
       @open-text="openTextScreen"
     />
 
-    <!-- إذا لا توجد أسئلة بعد الاختيار -->
+    <!-- no questions -->
     <div v-else-if="screen === 'quiz' && !questions.length" class="text-center mt-10">
       لا توجد أسئلة لهذا الاختبار. الرجوع للاختيار.
     </div>
 
-    <!-- مودال النص المرفق -->
+    <!-- attached text modal -->
     <div
       v-else-if="screen === 'text'"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -70,7 +69,7 @@
       </div>
     </div>
 
-    <!-- تقرير النتائج -->
+    <!-- results -->
     <ResultsChart
       v-else-if="screen === 'report'"
       :correct="correct"
@@ -79,18 +78,15 @@
       @reset="resetQuiz"
     />
 
-    <!-- زر الرجوع العائم -->
-    <BackButton
-      v-if="screen !== 'branch'"
-      @click="goBack"
-    />
+    <!-- back button -->
+    <BackButton v-if="screen !== 'branch'" @click="goBack" />
   </div>
 </template>
 
 <script>
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
-import { fetchQuestions } from '@/services/quizService'
-import { correctSound, wrongSound } from '@/utils/audio'
+import { fetchWithTimeout } from '@/utils/fetchWithTimeout'
+import { fetchQuestions, loadQuestionsFromJSON } from '@/services/quizService'
 
 import BranchSelector from '@/components/BranchSelector.vue'
 import YearSelector   from '@/components/YearSelector.vue'
@@ -101,32 +97,40 @@ import BackButton     from '@/components/BackButton.vue'
 export default {
   name: 'QuizPage',
   components: {
-    BranchSelector, YearSelector,
-    QuestionCard, ResultsChart, BackButton
+    BranchSelector,
+    YearSelector,
+    QuestionCard,
+    ResultsChart,
+    BackButton
   },
-
   setup() {
-    const screen           = ref('branch')
-    const branch           = ref(null)
-    const years            = [
+    // screens: branch → year → quiz → report/text
+    const screen = ref('branch')
+    const branch = ref(null)
+    const years  = [
       'الاختبار الأول','الاختبار الثاني','الاختبار الثالث',
       'الاختبار الرابع','الاختبار الخامس','الاختبار السادس',
       'الاختبار السابع','الاختبار الثامن','الاختبار التاسع',
       2022, 2023, 2024
     ]
-    const allQ             = ref([])
-    const questions        = ref([])
-    const current          = ref(0)
-    const answered         = reactive({})
-    const correct          = ref(0)
-    const lang             = ref('en')
-    const totalSec         = ref(90 * 60)
-    const attachedText     = ref('')
 
-    // حالات التحميل
+    // all questions loaded from API or JSON
+    const allQ = ref([])
+    // filtered questions for the chosen year/branch
+    const questions = ref([])
+
+    const current  = ref(0)
+    const answered = reactive({})
+    const correct  = ref(0)
+    const lang     = ref('en')
+    const attachedText = ref('')
+
+    // loading/error state
     const loadingQuestions = ref(false)
     const loadError        = ref(null)
 
+    // timer
+    const totalSec = ref(90 * 60)
     let timer = null
 
     const wrong = computed(() =>
@@ -145,65 +149,81 @@ export default {
     })
 
     const formattedAttachedText = computed(() => {
-      const raw   = attachedText.value || ''
-      const lines = raw.split('\n').filter(l => l.trim())
-      return lines.reduce((html, line, idx) => {
-        if (idx % 2 === 0) {
-          return html + `<p style="direction:ltr;text-align:left"><strong>${line}</strong></p>`
-        } else {
-          return html + `<p style="direction:rtl;text-align:right;margin-bottom:1rem">${line}</p>`
-        }
-      }, '')
+      const raw = attachedText.value || ''
+      return raw
+        .split('\n')
+        .filter(l => l.trim())
+        .map((line, i) =>
+          i % 2 === 0
+            ? `<p style="direction:ltr;text-align:left"><strong>${line}</strong></p>`
+            : `<p style="direction:rtl;text-align:right;margin-bottom:1rem">${line}</p>`
+        )
+        .join('')
     })
 
-    // 1) تحميل الأسئلة من API عند التركيب
+    // ---------------------------------------------------------
+    // 1) load questions: API race JSON fallback
+    // ---------------------------------------------------------
     async function init() {
       loadingQuestions.value = true
       loadError.value = null
 
+      let data = null
       try {
-        const data = await fetchQuestions()
-        allQ.value = data
-      } catch (err) {
-        console.error('QuizPage.init error:', err)
-        loadError.value = err.message
+        // try API with timeout
+        data = await fetchWithTimeout(fetchQuestions(), 2500)
+      } catch (apiErr) {
+        console.warn('API failed or slow, falling back to JSON:', apiErr)
+        try {
+          data = await loadQuestionsFromJSON()
+        } catch (jsonErr) {
+          console.error('JSON fallback also failed:', jsonErr)
+          loadError.value = 'تعذّر تحميل الأسئلة من API وJSON'
+          return
+        }
       } finally {
         loadingQuestions.value = false
       }
+
+      // normalize shape
+      allQ.value = Array.isArray(data) ? data : data.questions || data
     }
 
-    // 2) الانتقال لشاشة السنة
-    function goYear(br) {
-      branch.value = br
+    // ---------------------------------------------------------
+    // 2) choose branch → year → quiz flow
+    // ---------------------------------------------------------
+    function goYear(selectedBranch) {
+      branch.value = selectedBranch
       screen.value = 'year'
     }
 
-    // 3) بدء الاختبار بعد اختيار السنة
     function startQuiz(y) {
+      // filter by year & branch
       questions.value = allQ.value
-      .filter(q => q.year === y && q.type === branch.value)
-      .sort((a, b) => a.id - b.id)
+        .filter(q => q.year === y && q.type === branch.value)
+        .sort((a, b) => a.id - b.id)
 
-        
-      current.value = 0
-      correct.value = 0
-      Object.keys(answered).forEach(k => delete answered[k])
-
-      // إذا لا توجد أسئلة لهذا الاختبار
       if (!questions.value.length) {
         loadError.value = 'لا توجد أسئلة لهذا الاختبار.'
         screen.value = 'year'
         return
       }
 
+      // reset state
+      current.value = 0
+      correct.value = 0
+      Object.keys(answered).forEach(k => delete answered[k])
+      totalSec.value = 90 * 60
+
       screen.value = 'quiz'
       startTimer()
     }
 
-    // 4) عداد الوقت
+    // ---------------------------------------------------------
+    // 3) timer
+    // ---------------------------------------------------------
     function startTimer() {
       clearInterval(timer)
-      totalSec.value = 90 * 60
       timer = setInterval(() => {
         if (totalSec.value-- <= 0) {
           clearInterval(timer)
@@ -212,22 +232,23 @@ export default {
       }, 1000)
     }
 
-    // 5) اختيار الإجابة
+    // ---------------------------------------------------------
+    // 4) answer handling
+    // ---------------------------------------------------------
     function selectAnswer(idx) {
-      const q  = questions.value[current.value]
-      const id = q.id
-      if (answered[id] != null) return
-      answered[id] = idx
+      const q = questions.value[current.value]
+      if (answered[q.id] != null) return
+
+      answered[q.id] = idx
       const correctIdx = q.correct_answer - 1
       if (idx === correctIdx) {
-        correctSound.play()
         correct.value++
-      } else {
-        wrongSound.play()
       }
     }
 
-    // 6) تنقل بين الأسئلة
+    // ---------------------------------------------------------
+    // 5) navigation
+    // ---------------------------------------------------------
     function nextQuestion() {
       if (current.value < questions.value.length - 1) {
         current.value++
@@ -238,11 +259,13 @@ export default {
     function prevQuestion() {
       if (current.value > 0) current.value--
     }
-    function jumpToQuestion(idx) {
-      current.value = idx
+    function jumpToQuestion(i) {
+      current.value = i
     }
 
-    // 7) تبديل اللغة وعرض النص
+    // ---------------------------------------------------------
+    // 6) attached text & language toggle
+    // ---------------------------------------------------------
     function toggleLanguage() {
       lang.value = lang.value === 'ar' ? 'en' : 'ar'
     }
@@ -258,31 +281,51 @@ export default {
       screen.value = 'quiz'
     }
 
-    // 8) زر الرجوع
+    // ---------------------------------------------------------
+    // 7) back & reset
+    // ---------------------------------------------------------
     function goBack() {
       if (screen.value === 'text') backToQuiz()
       else if (screen.value === 'quiz') screen.value = 'year'
       else if (screen.value === 'year') screen.value = 'branch'
     }
-
-    // 9) إعادة الاختبار
     function resetQuiz() {
       clearInterval(timer)
       screen.value = 'branch'
     }
 
+    // ----------------------------------------------------------------
+    // LIFECYCLE
+    // ----------------------------------------------------------------
     onMounted(init)
     onBeforeUnmount(() => clearInterval(timer))
 
     return {
-      screen, years, questions, current, answered,
-      correct, wrong, lang, formattedTime, percentage,
-      attachedText, formattedAttachedText,
-      loadingQuestions, loadError,
-      goYear, startQuiz, selectAnswer,
-      nextQuestion, prevQuestion, jumpToQuestion,
-      toggleLanguage, openTextScreen, backToQuiz,
-      goBack, resetQuiz
+      screen,
+      years,
+      questions,
+      current,
+      answered,
+      correct,
+      wrong,
+      lang,
+      formattedTime,
+      percentage,
+      attachedText,
+      formattedAttachedText,
+      loadingQuestions,
+      loadError,
+      goYear,
+      startQuiz,
+      selectAnswer,
+      nextQuestion,
+      prevQuestion,
+      jumpToQuestion,
+      toggleLanguage,
+      openTextScreen,
+      backToQuiz,
+      goBack,
+      resetQuiz
     }
   }
 }

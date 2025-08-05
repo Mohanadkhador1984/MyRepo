@@ -18,6 +18,16 @@ export async function fetchQuestions() {
 }
 
 
+// تحميل JSON ثابت
+export async function loadQuestionsFromJSON() {
+  const res = await fetch('/static/data/questions.json');
+  if (!res.ok) throw new Error('JSON load failed');
+  return res.json();
+}
+
+
+
+
 
 /**
  * جلب الكتب من قاعدة البيانات عبر API

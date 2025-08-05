@@ -20,7 +20,9 @@ STATICFILES_DIRS = [
 ]
 
 # WhiteNoise لتقديم static في الإنتاج
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
 
 # دمج index.html كـ template
 TEMPLATES = [
