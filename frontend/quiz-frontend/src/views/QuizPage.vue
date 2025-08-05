@@ -87,6 +87,7 @@
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import { fetchWithTimeout } from '@/utils/fetchWithTimeout'
 import { fetchQuestions, loadQuestionsFromJSON } from '@/services/quizService'
+import { correctSound, wrongSound } from '@/utils/audio'
 
 import BranchSelector from '@/components/BranchSelector.vue'
 import YearSelector   from '@/components/YearSelector.vue'
@@ -119,10 +120,10 @@ export default {
     // filtered questions for the chosen year/branch
     const questions = ref([])
 
-    const current  = ref(0)
-    const answered = reactive({})
-    const correct  = ref(0)
-    const lang     = ref('en')
+    const current      = ref(0)
+    const answered     = reactive({})
+    const correct      = ref(0)
+    const lang         = ref('en')
     const attachedText = ref('')
 
     // loading/error state
@@ -170,7 +171,6 @@ export default {
 
       let data = null
       try {
-        // try API with timeout
         data = await fetchWithTimeout(fetchQuestions(), 2500)
       } catch (apiErr) {
         console.warn('API failed or slow, falling back to JSON:', apiErr)
@@ -185,7 +185,6 @@ export default {
         loadingQuestions.value = false
       }
 
-      // normalize shape
       allQ.value = Array.isArray(data) ? data : data.questions || data
     }
 
@@ -198,7 +197,6 @@ export default {
     }
 
     function startQuiz(y) {
-      // filter by year & branch
       questions.value = allQ.value
         .filter(q => q.year === y && q.type === branch.value)
         .sort((a, b) => a.id - b.id)
@@ -209,7 +207,6 @@ export default {
         return
       }
 
-      // reset state
       current.value = 0
       correct.value = 0
       Object.keys(answered).forEach(k => delete answered[k])
@@ -242,7 +239,12 @@ export default {
       answered[q.id] = idx
       const correctIdx = q.correct_answer - 1
       if (idx === correctIdx) {
+        correctSound.currentTime = 0
+        correctSound.play()
         correct.value++
+      } else {
+        wrongSound.currentTime = 0
+        wrongSound.play()
       }
     }
 
@@ -294,9 +296,6 @@ export default {
       screen.value = 'branch'
     }
 
-    // ----------------------------------------------------------------
-    // LIFECYCLE
-    // ----------------------------------------------------------------
     onMounted(init)
     onBeforeUnmount(() => clearInterval(timer))
 
