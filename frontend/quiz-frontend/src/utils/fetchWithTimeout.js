@@ -1,6 +1,14 @@
-export function fetchWithTimeout(promise, ms = 3000) {
-  const timeout = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('Timeout')), ms)
-  );
-  return Promise.race([promise, timeout]);
+// src/utils/fetchWithTimeout.js
+export async function fetchWithTimeout(fetchPromise, timeout = 3000) {
+  let timeoutHandle;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutHandle = setTimeout(() => {
+      reject(new Error('Timeout exceeded'));
+    }, timeout);
+  });
+
+  return Promise.race([
+    fetchPromise,
+    timeoutPromise
+  ]).finally(() => clearTimeout(timeoutHandle));
 }

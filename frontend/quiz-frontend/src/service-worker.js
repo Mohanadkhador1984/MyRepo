@@ -1,51 +1,90 @@
-// src/service-worker.js
+/// <reference lib="webworker" />
 import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { NetworkFirst, CacheFirst } from 'workbox-strategies';
+import { NetworkFirst, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
+import { ExpirationPlugin } from 'workbox-expiration';
 
-// تنظيف الكاش القديم
+// 🧹 تنظيف الكاشات القديمة
 cleanupOutdatedCaches();
 
-// حقن قائمة الأصول
-precacheAndRoute(self.__WB_MANIFEST);
+// 📦 تهيئة الكاش الأساسي من Webpack (precache)
+precacheAndRoute(self.__WB_MANIFEST || []);
 
-// navigation fallback
+// 🌐 صفحات SPA - fallback للتنقل
 registerRoute(
   ({ request }) => request.mode === 'navigate',
-  new NetworkFirst({ cacheName: 'pages-cache' })
+  new NetworkFirst({
+    cacheName: 'pages-cache',
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+    ],
+  })
 );
 
-// API Questions & Books
+// 📡 API - أسئلة وكتب (GET)
 registerRoute(
-  ({ url }) => url.pathname.match(/^\/api\/quiz\/(questions|books)\/$/),
+  ({ url }) => /^\/api\/quiz\/(questions|books)\/$/.test(url.pathname),
   new NetworkFirst({
     cacheName: 'api-cache',
     networkTimeoutSeconds: 5,
-    plugins: [ new CacheableResponsePlugin({ statuses: [0,200] }) ]
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      new ExpirationPlugin({ maxAgeSeconds: 60 * 60, maxEntries: 20 }), // 1 ساعة
+    ],
   })
 );
 
-// Import endpoints (POST)
+// 📤 API - استيراد أسئلة وكتب (POST)
 registerRoute(
-  ({ url }) => url.pathname.match(/^\/api\/quiz\/import-(questions|books)\/$/),
+  ({ url, request }) =>
+    request.method === 'POST' &&
+    /^\/api\/quiz\/import-(questions|books)\/$/.test(url.pathname),
   new NetworkFirst({
     cacheName: 'import-cache',
     networkTimeoutSeconds: 5,
-    plugins: [ new CacheableResponsePlugin({ statuses: [0,200] }) ]
-  }),
-  'POST'
-);
-
-// Static assets
-registerRoute(
-  /\.(?:js|css|png|jpg|jpeg|svg|gif)$/,
-  new CacheFirst({
-    cacheName: 'static-resources',
-    plugins: [ new CacheableResponsePlugin({ statuses: [0,200] }) ]
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+    ],
   })
 );
 
-// Install & activate
-self.addEventListener('install', event => self.skipWaiting());
-self.addEventListener('activate', event => self.clientsClaim());
+// 📁 JSON محلي (backup عند ضعف الإنترنت)
+registerRoute(
+  ({ url }) => url.pathname === '/static/data/questions.json',
+  new StaleWhileRevalidate({
+    cacheName: 'quiz-json-cache',
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      new ExpirationPlugin({
+        maxEntries: 1,
+        maxAgeSeconds: 24 * 60 * 60, // يوم واحد
+      }),
+    ],
+  })
+);
+
+// 🧱 ملفات ثابتة: JS, CSS, صور
+registerRoute(
+  ({ request }) =>
+    ['style', 'script', 'image'].includes(request.destination),
+  new CacheFirst({
+    cacheName: 'static-assets',
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      new ExpirationPlugin({
+        maxEntries: 50,
+        maxAgeSeconds: 7 * 24 * 60 * 60, // أسبوع
+      }),
+    ],
+  })
+);
+
+// ⚙️ أحداث التثبيت والتفعيل
+self.addEventListener('install', event => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  self.clients.claim();
+});

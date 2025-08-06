@@ -166,28 +166,31 @@ export default {
     // 1) load questions: API race JSON fallback
     // ---------------------------------------------------------
     async function init() {
-      loadingQuestions.value = true
-      loadError.value = null
+  loadingQuestions.value = true
+  loadError.value = null
 
-      let data = null
-      try {
-        data = await fetchWithTimeout(fetchQuestions(), 2500)
-      } catch (apiErr) {
-        console.warn('API failed or slow, falling back to JSON:', apiErr)
-        try {
-          data = await loadQuestionsFromJSON()
-        } catch (jsonErr) {
-          console.error('JSON fallback also failed:', jsonErr)
-          loadError.value = 'تعذّر تحميل الأسئلة من API وJSON'
-          return
-        }
-      } finally {
-        loadingQuestions.value = false
-      }
+  let data = null
 
-      allQ.value = Array.isArray(data) ? data : data.questions || data
+  try {
+    console.log('🟢 محاولة الاتصال بـ API...')
+    data = await fetchWithTimeout(fetchQuestions(), 2500)
+    console.log('✅ تم التحميل من API')
+  } catch (apiErr) {
+    console.warn('⚠️ فشل API أو بطيء، التبديل إلى JSON:', apiErr)
+    try {
+      data = await loadQuestionsFromJSON()
+      console.log('✅ تم التحميل من JSON المحلي')
+    } catch (jsonErr) {
+      console.error('❌ فشل تحميل JSON المحلي أيضًا:', jsonErr)
+      loadError.value = 'تعذّر تحميل الأسئلة من API وJSON'
+      return
     }
+  } finally {
+    loadingQuestions.value = false
+  }
 
+  allQ.value = Array.isArray(data) ? data : data.questions || data
+}
     // ---------------------------------------------------------
     // 2) choose branch → year → quiz flow
     // ---------------------------------------------------------
@@ -216,6 +219,8 @@ export default {
       startTimer()
     }
 
+
+
     // ---------------------------------------------------------
     // 3) timer
     // ---------------------------------------------------------
@@ -228,6 +233,9 @@ export default {
         }
       }, 1000)
     }
+
+
+
 
     // ---------------------------------------------------------
     // 4) answer handling
