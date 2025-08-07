@@ -4,25 +4,23 @@
  * جلب الأسئلة من قاعدة البيانات عبر API
  */
 // src/services/quizService.js
-export async function fetchQuestions() {
-  const res = await fetch('/api/quiz/questions/');
-  console.log('Fetch /api/quiz/questions/ status:', res.status);
-  const text = await res.text();
-  console.log('Fetch response text:', text);
-  if (!res.ok) {
-    throw new Error(`فشل جلب الأسئلة: ${res.status}`);
-  }
-  const data = JSON.parse(text);
-  console.log('Parsed JSON data:', data);
-  return data;
+
+// 1) استيراد JSON مضمّن داخل Bundle
+import questionsData from '@/assets/data/questions.json';
+
+// 2) دالة لإرجاع الأسئلة من JSON
+export async function loadQuestionsFromJSON() {
+  return questionsData;
 }
 
-
-// تحميل JSON ثابت
-export async function loadQuestionsFromJSON() {
-  const res = await fetch('/static/data/questions.json');
-  if (!res.ok) throw new Error('JSON load failed');
-  return res.json();
+// 3) دالة اتصال API (اختياري)
+export async function fetchQuestionsFromAPI() {
+  const response = await fetch('/api/quiz/questions/');
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status}`);
+  }
+  const data = await response.json();
+  return Array.isArray(data) ? data : data.questions || data;
 }
 
 

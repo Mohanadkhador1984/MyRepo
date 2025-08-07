@@ -9,15 +9,13 @@ module.exports = {
   assetsDir: 'static',
 
   // 3) مسار عام يبدأ بـ /static/ في الإنتاج، و/ في التطوير
-  publicPath: process.env.NODE_ENV === 'production'
-    ? '/static/'
-    : '/',
+  publicPath: process.env.NODE_ENV === 'production' ? '/static/' : '/',
 
-  // 4) اسم ملف index لا يتغير
+  // 4) اسم ملف index ثابت وبدون هاش
   indexPath: 'index.html',
   filenameHashing: false,
 
-  // 5) خادم التطوير يوجّه طلبات /api إلى Django
+  // 5) توجيه /api إلى خادم Django في مرحلة التطوير
   devServer: {
     proxy: {
       '^/api': {
@@ -47,46 +45,28 @@ module.exports = {
         /\.png$/,
         /\.svg$/,
         /manifest\.json$/,
-        /offline\.html$/
+        /offline\.html$/,
+        /\/static\/data\/questions\.json$/    // ← تحميل مسبق لملف الأسئلة
       ],
       runtimeCaching: [
         {
-          // ملف JSON الثابت
-          urlPattern: /\/static\/data\/questions\.json/,
-          handler: 'StaleWhileRevalidate',
-          options: {
-            cacheName: 'quiz-data-cache',
-            expiration: {
-              maxEntries: 50,
-              maxAgeSeconds: 24 * 60 * 60
-            },
-            cacheableResponse: {
-              statuses: [0, 200]
-            }
-          }
-        },
-        {
-          // استدعاؤات API الخاصة بالأسئلة والكتب
+          // API: أسئلة وكتب
           urlPattern: /^\/api\/quiz\/(?:questions|books)(?:\/|$)/,
           handler: 'NetworkFirst',
           options: {
             cacheName: 'api-cache',
             networkTimeoutSeconds: 5,
-            cacheableResponse: {
-              statuses: [0, 200]
-            }
+            cacheableResponse: { statuses: [0, 200] }
           }
         },
         {
-          // استدعاءات استيراد الأسئلة أو الكتب
+          // استيراد الأسئلة أو الكتب
           urlPattern: /^\/api\/quiz\/import-(?:questions|books)(?:\/|$)/,
           handler: 'NetworkFirst',
           options: {
             cacheName: 'import-cache',
             networkTimeoutSeconds: 5,
-            cacheableResponse: {
-              statuses: [0, 200]
-            }
+            cacheableResponse: { statuses: [0, 200] }
           }
         },
         {
@@ -95,9 +75,7 @@ module.exports = {
           handler: 'CacheFirst',
           options: {
             cacheName: 'static-resources',
-            cacheableResponse: {
-              statuses: [0, 200]
-            }
+            cacheableResponse: { statuses: [0, 200] }
           }
         }
       ]
@@ -108,7 +86,5 @@ module.exports = {
   productionSourceMap: true,
 
   // 8) ضبط Webpack لإضافة source maps
-  configureWebpack: {
-    devtool: 'source-map'
-  }
+  configureWebpack: { devtool: 'source-map' }
 };
