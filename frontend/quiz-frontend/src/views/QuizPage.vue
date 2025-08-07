@@ -1,29 +1,15 @@
 <template>
   <div class="relative min-h-screen p-4">
-    <!-- branch selector -->
-    <BranchSelector
-      v-if="screen === 'branch'"
-      @select="goYear"
-    />
+    <BranchSelector v-if="screen === 'branch'" @select="goYear" />
 
-    <!-- year selector -->
-    <YearSelector
-      v-else-if="screen === 'year'"
-      :options="years"
-      @select="startQuiz"
-    />
+    <YearSelector v-else-if="screen === 'year'" :options="years" @select="startQuiz" />
 
-    <!-- loading -->
-    <div v-else-if="loadingQuestions" class="text-center mt-10">
-      جاري تحميل الأسئلة…
-    </div>
+    <div v-else-if="loadingQuestions" class="text-center mt-10">جاري تحميل الأسئلة…</div>
 
-    <!-- load error -->
     <div v-else-if="loadError" class="text-red-600 text-center mt-10">
       {{ loadError }}
     </div>
 
-    <!-- quiz -->
     <QuestionCard
       v-else-if="screen === 'quiz' && questions.length"
       :questions="questions"
@@ -42,12 +28,10 @@
       @open-text="openTextScreen"
     />
 
-    <!-- no questions -->
     <div v-else-if="screen === 'quiz' && !questions.length" class="text-center mt-10">
       لا توجد أسئلة لهذا الاختبار. الرجوع للاختيار.
     </div>
 
-    <!-- attached text modal -->
     <div
       v-else-if="screen === 'text'"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -69,7 +53,6 @@
       </div>
     </div>
 
-    <!-- results -->
     <ResultsChart
       v-else-if="screen === 'report'"
       :correct="correct"
@@ -78,14 +61,12 @@
       @reset="resetQuiz"
     />
 
-    <!-- back button -->
     <BackButton v-if="screen !== 'branch'" @click="goBack" />
   </div>
 </template>
 
 <script>
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
-import { fetchWithTimeout } from '@/utils/fetchWithTimeout'
 import { fetchQuestions, loadQuestionsFromJSON } from '@/services/quizService'
 import { correctSound, wrongSound } from '@/utils/audio'
 
@@ -105,7 +86,6 @@ export default {
     BackButton
   },
   setup() {
-    // screens: branch → year → quiz → report/text
     const screen = ref('branch')
     const branch = ref(null)
     const years  = [
@@ -115,28 +95,22 @@ export default {
       2022, 2023, 2024
     ]
 
-    // all questions loaded from API or JSON
     const allQ = ref([])
-    // filtered questions for the chosen year/branch
     const questions = ref([])
 
-    const current      = ref(0)
-    const answered     = reactive({})
-    const correct      = ref(0)
-    const lang         = ref('en')
+    const current = ref(0)
+    const answered = reactive({})
+    const correct = ref(0)
+    const lang = ref('en')
     const attachedText = ref('')
 
-    // loading/error state
     const loadingQuestions = ref(false)
-    const loadError        = ref(null)
+    const loadError = ref(null)
 
-    // timer
     const totalSec = ref(90 * 60)
     let timer = null
 
-    const wrong = computed(() =>
-      Object.keys(answered).length - correct.value
-    )
+    const wrong = computed(() => Object.keys(answered).length - correct.value)
 
     const formattedTime = computed(() => {
       const m = String(Math.floor(totalSec.value / 60)).padStart(2, '0')
@@ -162,38 +136,28 @@ export default {
         .join('')
     })
 
-    // ---------------------------------------------------------
-    // 1) load questions: API race JSON fallback
-    // ---------------------------------------------------------
     async function init() {
-  loadingQuestions.value = true
-  loadError.value = null
+      loadingQuestions.value = true
+      loadError.value = null
 
-  let data = null
+      try {
+        const apiPromise = fetchQuestions()
+        const jsonPromise = loadQuestionsFromJSON()
 
-  try {
-    console.log('🟢 محاولة الاتصال بـ API...')
-    data = await fetchWithTimeout(fetchQuestions(), 2500)
-    console.log('✅ تم التحميل من API')
-  } catch (apiErr) {
-    console.warn('⚠️ فشل API أو بطيء، التبديل إلى JSON:', apiErr)
-    try {
-      data = await loadQuestionsFromJSON()
-      console.log('✅ تم التحميل من JSON المحلي')
-    } catch (jsonErr) {
-      console.error('❌ فشل تحميل JSON المحلي أيضًا:', jsonErr)
-      loadError.value = 'تعذّر تحميل الأسئلة من API وJSON'
-      return
+        const data = await Promise.race([
+          apiPromise,
+          jsonPromise
+        ])
+
+        allQ.value = Array.isArray(data) ? data : data.questions || data
+      } catch (err) {
+        console.error('❌ فشل تحميل الأسئلة:', err)
+        loadError.value = 'تعذّر تحميل الأسئلة.'
+      } finally {
+        loadingQuestions.value = false
+      }
     }
-  } finally {
-    loadingQuestions.value = false
-  }
 
-  allQ.value = Array.isArray(data) ? data : data.questions || data
-}
-    // ---------------------------------------------------------
-    // 2) choose branch → year → quiz flow
-    // ---------------------------------------------------------
     function goYear(selectedBranch) {
       branch.value = selectedBranch
       screen.value = 'year'
@@ -219,11 +183,6 @@ export default {
       startTimer()
     }
 
-
-
-    // ---------------------------------------------------------
-    // 3) timer
-    // ---------------------------------------------------------
     function startTimer() {
       clearInterval(timer)
       timer = setInterval(() => {
@@ -234,12 +193,6 @@ export default {
       }, 1000)
     }
 
-
-
-
-    // ---------------------------------------------------------
-    // 4) answer handling
-    // ---------------------------------------------------------
     function selectAnswer(idx) {
       const q = questions.value[current.value]
       if (answered[q.id] != null) return
@@ -256,9 +209,6 @@ export default {
       }
     }
 
-    // ---------------------------------------------------------
-    // 5) navigation
-    // ---------------------------------------------------------
     function nextQuestion() {
       if (current.value < questions.value.length - 1) {
         current.value++
@@ -266,39 +216,35 @@ export default {
         screen.value = 'report'
       }
     }
+
     function prevQuestion() {
       if (current.value > 0) current.value--
     }
+
     function jumpToQuestion(i) {
       current.value = i
     }
 
-    // ---------------------------------------------------------
-    // 6) attached text & language toggle
-    // ---------------------------------------------------------
     function toggleLanguage() {
       lang.value = lang.value === 'ar' ? 'en' : 'ar'
     }
+
     function openTextScreen() {
       const q = questions.value[current.value]
-      attachedText.value =
-        q[`attached_text_${lang.value}`] ||
-        q.attached_text ||
-        'لا يوجد نص مرفق'
+      attachedText.value = q[`attached_text_${lang.value}`] || q.attached_text || 'لا يوجد نص مرفق'
       screen.value = 'text'
     }
+
     function backToQuiz() {
       screen.value = 'quiz'
     }
 
-    // ---------------------------------------------------------
-    // 7) back & reset
-    // ---------------------------------------------------------
     function goBack() {
       if (screen.value === 'text') backToQuiz()
       else if (screen.value === 'quiz') screen.value = 'year'
       else if (screen.value === 'year') screen.value = 'branch'
     }
+
     function resetQuiz() {
       clearInterval(timer)
       screen.value = 'branch'
