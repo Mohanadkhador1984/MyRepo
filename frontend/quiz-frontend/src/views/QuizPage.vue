@@ -67,7 +67,7 @@
 
 <script>
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
-import { fetchQuestions, loadQuestionsFromJSON } from '@/services/quizService'
+import { loadQuestionsFromJSON, fetchQuestionsFromAPI } from '@/services/quizService.js';
 import { correctSound, wrongSound } from '@/utils/audio'
 
 import BranchSelector from '@/components/BranchSelector.vue'
@@ -141,7 +141,7 @@ export default {
       loadError.value = null
 
       try {
-        const apiPromise = fetchQuestions()
+        const apiPromise = fetchQuestionsFromAPI ()
         const jsonPromise = loadQuestionsFromJSON()
 
         const data = await Promise.race([
