@@ -5,6 +5,10 @@ from pathlib import Path
 from django.core.wsgi import get_wsgi_application
 from whitenoise import WhiteNoise
 
+import os, sys
+sys.path.insert(0, os.path.dirname(__file__))  # يضيف مجلد backend
+
+
 # 1) تعريف BASE_DIR (المجلد الذي يحتوي على manage.py)
 BASE_DIR = Path(__file__).resolve().parent.parent
 

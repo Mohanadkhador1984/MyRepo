@@ -1,68 +1,22 @@
-# backend/quiz_project/urls.py
-
+from django.contrib import admin
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib import admin
-from django.urls import path, re_path, include
-from django.views.generic import TemplateView
-
-from quiz.views import FrontendAppView
-
 
 urlpatterns = [
-    # 1) لوحة إدارة Django
     path("admin/", admin.site.urls),
+    path("api/auth/", include(("accounts.urls", "accounts"), namespace="accounts")),
+    path("api/quiz/", include(("quiz.urls", "quiz"), namespace="quiz")),
 
-    # 2) API أسئلة المسابقة
-    path(
-        "api/quiz/",
-        include(("quiz.urls", "quiz"), namespace="quiz")
-    ),
-
-    # 3) ملفات PWA ثابتة (تُخدَم من مجلد dist تحت STATICFILES_DIRS)
-    path(
-        "service-worker.js",
-        TemplateView.as_view(
-            template_name="service-worker.js",
-            content_type="application/javascript",
-        ),
-        name="service-worker",
-    ),
-    path(
-        "offline.html",
-        TemplateView.as_view(
-            template_name="offline.html",
-            content_type="text/html",
-        ),
-        name="offline",
-    ),
-    path(
-        "manifest.json",
-        TemplateView.as_view(
-            template_name="manifest.json",
-            content_type="application/json",
-        ),
-        name="manifest",
-    ),
-    path(
-        "favicon.ico",
-        TemplateView.as_view(
-            template_name="favicon.ico",
-            content_type="image/x-icon",
-        ),
-        name="favicon",
-    ),
-
-    # 4) جميع المسارات الأخرى (غير admin، api، static، media) → تُوجَّه إلى Vue
+    # أي مسار آخر يُعيد index.html من dist
     re_path(
-        r"^(?!static/|media/|api/|admin/).*$",
-        FrontendAppView.as_view(),
-        name="spa-entry"
+        r"^(?!static/|media/|api/|admin/).*",
+        TemplateView.as_view(template_name="index.html"),
+        name="spa-entry",
     ),
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 ]
 
-
-# أثناء التطوير فقط
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

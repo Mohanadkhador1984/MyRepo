@@ -1,21 +1,32 @@
-// frontend/quiz-frontend/vue.config.js
-const path = require('path');
+// quiz-frontend/vue.config.js
+const path = require('path')
 
 module.exports = {
-  // 1) إخراج البناء إلى مجلد Django frontend_dist/dist
+  // 1) دمج alias و devtool
+  configureWebpack: {
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src')
+      }
+    },
+    // إنتاج source maps للتصحيح
+    devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'eval-source-map'
+  },
+
+  // 2) إخراج البناء إلى مجلد Django frontend_dist/dist
   outputDir: path.resolve(__dirname, '..', '..', 'backend', 'frontend_dist', 'dist'),
 
-  // 2) جميع الموارد (CSS/JS/IMG) توضع في dist/static
+  // 3) جميع الموارد (CSS/JS/IMG) توضع في dist/static
   assetsDir: 'static',
 
-  // 3) مسار عام يبدأ بـ /static/ في الإنتاج، و/ في التطوير
+  // 4) publicPath يطابق STATIC_URL في Django
   publicPath: process.env.NODE_ENV === 'production' ? '/static/' : '/',
 
-  // 4) اسم ملف index ثابت وبدون هاش
+  // 5) index.html ثابت بدون هاش
   indexPath: 'index.html',
   filenameHashing: false,
 
-  // 5) توجيه /api إلى خادم Django في مرحلة التطوير
+  // 6) proxy لطلبات /api في طور التطوير
   devServer: {
     proxy: {
       '^/api': {
@@ -27,7 +38,7 @@ module.exports = {
     }
   },
 
-  // 6) إعداد PWA وWorkbox
+  // 7) PWA و Workbox (اختياري حسب حاجتك)
   pwa: {
     name: 'Quiz App',
     themeColor: '#42b983',
@@ -38,20 +49,10 @@ module.exports = {
       clientsClaim: true,
       skipWaiting: true,
       navigateFallback: '/offline.html',
-      include: [
-        /\.html$/,
-        /\.js$/,
-        /\.css$/,
-        /\.png$/,
-        /\.svg$/,
-        /manifest\.json$/,
-        /offline\.html$/,
-        /\/static\/data\/questions\.json$/    // ← تحميل مسبق لملف الأسئلة
-      ],
+      include: [ /\.html$/, /\.js$/, /\.css$/, /\.png$/, /\.svg$/, /manifest\.json$/, /offline\.html$/ ],
       runtimeCaching: [
         {
-          // API: أسئلة وكتب
-          urlPattern: /^\/api\/quiz\/(?:questions|books)(?:\/|$)/,
+          urlPattern: /^\/api\/quiz\//,
           handler: 'NetworkFirst',
           options: {
             cacheName: 'api-cache',
@@ -60,17 +61,6 @@ module.exports = {
           }
         },
         {
-          // استيراد الأسئلة أو الكتب
-          urlPattern: /^\/api\/quiz\/import-(?:questions|books)(?:\/|$)/,
-          handler: 'NetworkFirst',
-          options: {
-            cacheName: 'import-cache',
-            networkTimeoutSeconds: 5,
-            cacheableResponse: { statuses: [0, 200] }
-          }
-        },
-        {
-          // الموارد الثابتة (JS, CSS, صور)
           urlPattern: /\.(?:js|css|png|jpg|jpeg|svg|gif)$/,
           handler: 'CacheFirst',
           options: {
@@ -82,9 +72,6 @@ module.exports = {
     }
   },
 
-  // 7) إنشاء source maps للإنتاج لتسهيل التصحيح
-  productionSourceMap: true,
-
-  // 8) ضبط Webpack لإضافة source maps
-  configureWebpack: { devtool: 'source-map' }
-};
+  // 8) تمكين source maps في الإنتاج
+  productionSourceMap: true
+}

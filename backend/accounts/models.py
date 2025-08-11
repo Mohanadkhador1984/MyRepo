@@ -2,8 +2,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class CustomUser(AbstractUser):
-    # احذف هذا السطر نهائياً:
-    # password = models.CharField(max_length=128),
+    phone = models.CharField('رقم الهاتف', max_length=20, unique=True)
 
-    # احتفظ فقط بالحقل الإضافي الذي تريده
-    is_verified = models.BooleanField(default=False)
+    # نعتمد رقم الهاتف لحقل المصادقة بدلاً من username
+    USERNAME_FIELD = 'phone'
+    REQUIRED_FIELDS = []  # لإنشاء superuser دون طلب حقول إضافية
+
+    def __str__(self):
+        return str(self.phone)

@@ -1,3 +1,5 @@
+
+// import axios from 'axios'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -20,5 +22,10 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.error('❌ SW registration failed:', err));
   });
 }
+
+
+
+
+
 
 

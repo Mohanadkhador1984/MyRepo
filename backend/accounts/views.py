@@ -1,18 +1,20 @@
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework import permissions, generics
-from django.contrib.auth.models import User
-from rest_framework.serializers import ModelSerializer
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework import permissions
+from django.contrib.auth import get_user_model
+from .serializers import RegisterSerializer
+from .jwt_serializers import PhoneTokenObtainPairSerializer
 
-class RegisterSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['username', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
+User = get_user_model()
 
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
-
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
+@method_decorator(csrf_exempt, name="dispatch")
+class PhoneTokenObtainView(TokenObtainPairView):
+    serializer_class = PhoneTokenObtainPairSerializer
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+@method_decorator(csrf_exempt, name="dispatch")
+class PhoneTokenRefreshView(TokenRefreshView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
