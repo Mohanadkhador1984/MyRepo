@@ -55,17 +55,29 @@ MIDDLEWARE = [
 ]
 
 # ─── 5. إعدادات Vue وملفات static ────────────────────────────────────
-VUE_DIST_DIR = BASE_DIR / "frontend_dist" / "dist"
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [VUE_DIST_DIR / "static"]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+DEBUG = False  # ← True فقط محلياً
+
+ALLOWED_HOSTS = ['*']  # أو ['.onrender.com']
+
+# ملفات Vue المبنية
+DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_DIRS = [
+    DIST_DIR ,  # ← مجلد static بداخل Vue
+]
+
+# WhiteNoise لتقديم static في الإنتاج
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [VUE_DIST_DIR],  # index.html من Vue
+        "DIRS": [DIST_DIR],  # index.html من Vue
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
