@@ -1,11 +1,10 @@
-<!-- src/views/LoginScreen.vue -->
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h2>مرحباً بعودتك</h2>
+      <h2>👋 مرحباً بعودتك</h2>
 
       <form ref="loginForm" @submit.prevent="doLogin">
-        <!-- رقم الجوال مع Floating Label -->
+        <!-- رقم الجوال -->
         <div class="form-group">
           <input
             id="phone"
@@ -15,10 +14,10 @@
             autocomplete="tel"
             required
           />
-          <label for="phone">05XXXXXXXX</label>
+          <label for="phone">📱 05XXXXXXXX</label>
         </div>
 
-        <!-- كلمة المرور مع Floating Label + أيقونة الإظهار -->
+        <!-- كلمة المرور -->
         <div class="form-group password-wrapper">
           <input
             :type="showPassword ? 'text' : 'password'"
@@ -28,7 +27,7 @@
             autocomplete="current-password"
             required
           />
-          <label for="password">كلمة السر</label>
+          <label for="password">🔒 كلمة السر</label>
           <button
             type="button"
             class="toggle-visibility"
@@ -41,22 +40,17 @@
 
         <!-- تذكرني -->
         <div class="form-remember">
-          <input
-            id="remember"
-            v-model="rememberMe"
-            type="checkbox"
-          />
-          <label for="remember">تذكرني</label>
+          <input id="remember" v-model="rememberMe" type="checkbox" />
+          <label for="remember">💡 تذكرني</label>
         </div>
 
-        <!-- زر الدخول مع Spinner -->
+        <!-- زر الدخول -->
         <button type="submit" :disabled="loading">
-          <span v-if="!loading">دخول</span>
+          <span v-if="!loading">🚪 دخول</span>
           <span v-else><i class="spinner"></i> جاري المعالجة...</span>
         </button>
 
-        <!-- رسالة الخطأ -->
-        <p v-if="error" class="error">{{ error }}</p>
+        <p v-if="error" class="error">⚠️ {{ error }}</p>
       </form>
     </div>
   </div>
@@ -87,13 +81,15 @@ export default {
           this.password = cred.password || ''
           this.rememberMe = true
         }
-      } catch { /* رفض المستخدم أو غير مدعوم */ }
+      } catch {
+        // المستخدم رفض أو Credential API غير مدعوم
+      }
     }
 
     // 2) LocalStorage احتياطي
     if (!this.phone && localStorage.remember_phone) {
-      this.phone      = localStorage.remember_phone
-      this.password   = localStorage.remember_pass
+      this.phone = localStorage.remember_phone
+      this.password = localStorage.remember_pass
       this.rememberMe = true
     }
   },
@@ -102,31 +98,32 @@ export default {
       this.showPassword = !this.showPassword
     },
     async doLogin() {
-      this.error   = null
+      this.error = null
       this.loading = true
-
       try {
-        const resp  = await login(this.phone, this.password)
-        const data  = resp.data ?? resp
+        const resp = await login(this.phone, this.password)
+        const data = resp.data ?? resp
         const token = data.access || data.access_token || data.token
-
-        if (!token) {
-          throw new Error('استجابة غير متوقعة من السيرفر')
-        }
-
+        if (!token) throw new Error('استجابة غير متوقعة من السيرفر')
         localStorage.setItem('access_token', token)
 
-        // تذكير Credential Management API
+        // Credential Management API
         if (navigator.credentials?.store && this.rememberMe) {
           try {
             const cred = await navigator.credentials.create({
-              password: { id: this.phone, password: this.password, name: 'MyApp' }
+              password: {
+                id: this.phone,
+                password: this.password,
+                name: 'MyApp'
+              }
             })
             await navigator.credentials.store(cred)
-          } catch { /* فشل تخزين */ }
+          } catch {
+            // فشل تخزين凭据
+          }
         }
 
-        // تخزين احتياطي
+        // Local storage احتياطي
         if (this.rememberMe) {
           localStorage.setItem('remember_phone', this.phone)
           localStorage.setItem('remember_pass', this.password)
@@ -152,40 +149,51 @@ export default {
 
 <style scoped>
 .login-page {
-  max-width: 360px;
-  margin: 2rem auto;
-  padding: 1.5rem;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  text-align: center;
+  min-height: 100vh;
+  background-color: #0f0f0f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-family: 'Inter', sans-serif;
-  background: #fff;
+  padding: 1rem;
+}
+
+.login-card {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+  color: #ffd700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+  text-align: center;
 }
 
 .login-card h2 {
-  margin-bottom: 1.5rem;
-  color: #4f46e5;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #ffd700;
 }
 
 .form-group {
   position: relative;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: none;
-  border-bottom: 2px solid #ccc;
   background: transparent;
-  box-sizing: border-box;
-  transition: border-color 0.3s;
+  border: none;
+  border-bottom: 2px solid #555;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #4f46e5;
+  border-color: #ffd700;
 }
 
 .form-group label {
@@ -193,16 +201,16 @@ export default {
   top: 50%;
   left: 0.75rem;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: #aaa;
+  transition: 0.3s ease;
   pointer-events: none;
-  transition: transform 0.2s, font-size 0.2s;
 }
 
 .form-group input:focus + label,
 .form-group input:not(:placeholder-shown) + label {
-  transform: translateY(-150%) scale(0.85);
+  transform: translateY(-160%) scale(0.85);
   font-size: 0.85rem;
-  color: #4f46e5;
+  color: #ffd700;
 }
 
 .password-wrapper .toggle-visibility {
@@ -212,37 +220,41 @@ export default {
   transform: translateY(-50%);
   background: none;
   border: none;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  color: #ffd700;
   cursor: pointer;
 }
 
 .form-remember {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
   margin: 1rem 0;
+  font-size: 0.9rem;
+  color: #ccc;
 }
 
 .form-remember input {
   margin-right: 0.5rem;
 }
 
-button[type="submit"] {
+button[type='submit'] {
   width: 100%;
   padding: 0.75rem;
-  background: #4f46e5;
-  color: #fff;
+  background: #ffd700;
+  color: #0f0f0f;
+  font-weight: bold;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s;
 }
 
-button[type="submit"]:hover:not(:disabled) {
-  background: #4338ca;
+button[type='submit']:hover:not(:disabled) {
+  background: #e6c200;
 }
 
-button[type="submit"]:disabled {
+button[type='submit']:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -251,18 +263,21 @@ button[type="submit"]:disabled {
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid #fff;
-  border-top: 2px solid rgba(255,255,255,0.4);
+  border: 2px solid #0f0f0f;
+  border-top: 2px solid rgba(0, 0, 0, 0.4);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+  margin-right: 8px;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .error {
-  color: #dc2626;
+  color: #f87171;
   margin-top: 1rem;
   font-size: 0.95rem;
 }
