@@ -1,32 +1,52 @@
-// quiz-frontend/vue.config.js
+// project-root/vue.config.js
+const { defineConfig } = require('@vue/cli-service')
 const path = require('path')
 
-module.exports = {
-  // 1) دمج alias و devtool
+module.exports = defineConfig({
+  // 1) المسار العام: /static/ في الإنتاج، / في التطوير
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/static/'
+    : '/',
+
+  // 2) مجلد الخرج ليتوافق مع Django
+  outputDir: path.resolve(__dirname, 'backend', 'frontend_dist', 'dist'),
+
+  // 3) مجلد الأصول الثابتة داخل dist
+  assetsDir: 'static',
+
+  // 4) index.html ثابت بدون هاش
+  indexPath: 'index.html',
+  filenameHashing: false,
+
+  // 5) احتفظ بالـ source maps حتى في الإنتاج للتصحيح
+  productionSourceMap: true,
+
+  // 6) إعدادات Webpack العامة
   configureWebpack: {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src')
       }
     },
-    // إنتاج source maps للتصحيح
-    devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'eval-source-map'
+    // اختيار نوع الـ devtool لكل بيئة
+    devtool: process.env.NODE_ENV === 'production'
+      ? 'source-map'
+      : 'eval-source-map'
   },
 
-  // 2) إخراج البناء إلى مجلد Django frontend_dist/dist
-  outputDir: path.resolve(__dirname, '..', '..', 'backend', 'frontend_dist', 'dist'),
+  // 7) تعديل سلسلة Webpack (chainWebpack) لتحسين Prefetch/Preload
+  chainWebpack: config => {
+    // احذف prefetch الافتراضي إن لم تكن بحاجة له
+    config.plugins.delete('prefetch')
 
-  // 3) جميع الموارد (CSS/JS/IMG) توضع في dist/static
-  assetsDir: 'static',
+    // فعّل preload لجميع الشظايا
+    config.plugin('preload').tap(options => {
+      options[0].include = 'allChunks'
+      return options
+    })
+  },
 
-  // 4) publicPath يطابق STATIC_URL في Django
-  publicPath: process.env.NODE_ENV === 'production' ? '/static/' : '/',
-
-  // 5) index.html ثابت بدون هاش
-  indexPath: 'index.html',
-  filenameHashing: false,
-
-  // 6) proxy لطلبات /api في طور التطوير
+  // 8) proxy لطلبات API في طور التطوير
   devServer: {
     proxy: {
       '^/api': {
@@ -38,40 +58,22 @@ module.exports = {
     }
   },
 
-  // 7) PWA و Workbox (اختياري حسب حاجتك)
+  // 9) إعداد PWA مع InjectManifest لاستخدام service-worker.js المخصص
   pwa: {
     name: 'Quiz App',
     themeColor: '#42b983',
     msTileColor: '#000000',
-    workboxPluginMode: 'GenerateSW',
-    workboxOptions: {
-      swDest: 'service-worker.js',
-      clientsClaim: true,
-      skipWaiting: true,
-      navigateFallback: '/offline.html',
-      include: [ /\.html$/, /\.js$/, /\.css$/, /\.png$/, /\.svg$/, /manifest\.json$/, /offline\.html$/ ],
-      runtimeCaching: [
-        {
-          urlPattern: /^\/api\/quiz\//,
-          handler: 'NetworkFirst',
-          options: {
-            cacheName: 'api-cache',
-            networkTimeoutSeconds: 5,
-            cacheableResponse: { statuses: [0, 200] }
-          }
-        },
-        {
-          urlPattern: /\.(?:js|css|png|jpg|jpeg|svg|gif)$/,
-          handler: 'CacheFirst',
-          options: {
-            cacheName: 'static-resources',
-            cacheableResponse: { statuses: [0, 200] }
-          }
-        }
-      ]
-    }
-  },
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
 
-  // 8) تمكين source maps في الإنتاج
-  productionSourceMap: true
-}
+    workboxPluginMode: 'InjectManifest',
+    workboxOptions: {
+      // مسار ملف الـ SW المخصص داخل src/
+      swSrc: path.resolve(__dirname, 'src', 'service-worker.js'),
+      // اسم الملف النهائي ضمن dist/
+      swDest: 'service-worker.js',
+      // استثناء ملفات خارجة عن الحاجة
+      exclude: [ /\.map$/, /manifest\.json$/ ]
+    }
+  }
+})
