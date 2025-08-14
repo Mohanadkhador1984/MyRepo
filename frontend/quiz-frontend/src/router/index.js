@@ -1,57 +1,30 @@
-// src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
-
-// استيراد المكونات حسب مكان وجودها
-import StartScreen   from '@/components/StartScreen.vue'
-import SignupScreen  from '@/components/SignupScreen.vue'
-import LoginScreen   from '@/views/LoginScreen.vue'
-import QuizPage      from '@/views/QuizPage.vue'
+import StartPage from '../views/StartPage.vue'
+import QuizPage from '../views/QuizPage.vue'
+import DevPage from '../views/DevPage.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'Start',
-    component: StartScreen
-  },
-  {
-    path: '/signup',
-    name: 'Signup',
-    component: SignupScreen
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: LoginScreen
+    name: 'StartPage',
+    component: StartPage,
   },
   {
     path: '/quiz',
-    name: 'Quiz',
+    name: 'QuizPage',
     component: QuizPage,
-    meta: { requiresAuth: true }
+    props: route => ({ activated: route.query.activated === 'true' }),
+  },
+  {
+    path: '/dev',
+    name: 'DevPage',
+    component: DevPage,
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
-})
-
-// حماية المسارات التي تتطلب تسجيل دخول
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('access_token')
-
-  // الصفحات التي لا تحتاج مصادقة
-  if (['Start', 'Login', 'Signup'].includes(to.name)) {
-    return next()
-  }
-
-  // إذا لم يوجد توكن انتقل إلى صفحة البداية
-  if (!token) {
-    return next({ name: 'Start' })
-  }
-
-  // خلاف ذلك، تابع الانتقال
-  next()
+  routes,
 })
 
 export default router

@@ -1,32 +1,22 @@
-import { createStore } from 'vuex'
-import axios from 'axios'
+import { createRouter, createWebHistory } from 'vue-router'
+import StartScreen  from '@/views/StartScreen.vue'
+import SignupScreen from '@/views/SignupScreen.vue'
+import QuizPage     from '@/views/QuizPage.vue'
 
-export default createStore({
-  state: {
-    token: localStorage.getItem('token') || '',
-    user: {},
-  },
-  mutations: {
-    setToken(state, token) {
-      state.token = token
-      localStorage.setItem('token', token)
-    },
-    setUser(state, user) {
-      state.user = user
-    },
-    logout(state) {
-      state.token = ''
-      state.user = {}
-      localStorage.removeItem('token')
-    }
-  },
-  actions: {
-    async login({ commit }, credentials) {
-      const res = await axios.post('/api/token/', credentials)
-      commit('setToken', res.data.access)
-    },
-    async register(_, credentials) {
-      await axios.post('/api/register/', credentials)
-    }
+const routes = [
+  { path:'/',       name:'Start',  component:StartScreen },
+  { path:'/signup', name:'Signup', component:SignupScreen },
+  { path:'/quiz',   name:'Quiz',   component:QuizPage, meta:{ requiresAuth:true } }
+]
+
+const router = createRouter({ history:createWebHistory(), routes })
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('access_token')
+  if (to.meta.requiresAuth && !token) {
+    return next({ name:'Start' })
   }
+  next()
 })
+
+export default router

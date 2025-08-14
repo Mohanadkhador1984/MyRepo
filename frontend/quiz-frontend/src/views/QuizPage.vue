@@ -1,10 +1,20 @@
+<!-- src/views/QuizPage.vue -->
 <template>
   <div class="relative min-h-screen p-4">
-    <BranchSelector v-if="screen === 'branch'" @select="goYear" />
+    <BranchSelector
+      v-if="screen === 'branch'"
+      @select="goYear"
+    />
 
-    <YearSelector v-else-if="screen === 'year'" :options="years" @select="startQuiz" />
+    <YearSelector
+      v-else-if="screen === 'year'"
+      :options="years"
+      @select="startQuiz"
+    />
 
-    <div v-else-if="loadingQuestions" class="text-center mt-10">جاري تحميل الأسئلة…</div>
+    <div v-else-if="loadingQuestions" class="text-center mt-10">
+      جاري تحميل الأسئلة…
+    </div>
 
     <div v-else-if="loadError" class="text-red-600 text-center mt-10">
       {{ loadError }}
@@ -28,7 +38,10 @@
       @open-text="openTextScreen"
     />
 
-    <div v-else-if="screen === 'quiz' && !questions.length" class="text-center mt-10">
+    <div
+      v-else-if="screen === 'quiz' && !questions.length"
+      class="text-center mt-10"
+    >
       لا توجد أسئلة لهذا الاختبار. الرجوع للاختيار.
     </div>
 
@@ -61,20 +74,23 @@
       @reset="resetQuiz"
     />
 
-    <BackButton v-if="screen !== 'branch'" @click="goBack" />
+    <BackButton
+      v-if="screen !== 'branch'"
+      @click="goBack"
+    />
   </div>
 </template>
 
 <script>
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
-import { loadQuestionsFromJSON, fetchQuestionsFromAPI } from '@/services/quizService.js';
+import { loadQuestionsFromJSON, fetchQuestionsFromAPI } from '@/services/quizService.js'
 import { correctSound, wrongSound } from '@/utils/audio'
 
 import BranchSelector from '@/components/BranchSelector.vue'
-import YearSelector   from '@/components/YearSelector.vue'
-import QuestionCard   from '@/components/QuestionCard.vue'
-import ResultsChart   from '@/components/ResultsChart.vue'
-import BackButton     from '@/components/BackButton.vue'
+import YearSelector from '@/components/YearSelector.vue'
+import QuestionCard from '@/components/QuestionCard.vue'
+import ResultsChart from '@/components/ResultsChart.vue'
+import BackButton from '@/components/BackButton.vue'
 
 export default {
   name: 'QuizPage',
@@ -87,17 +103,21 @@ export default {
   },
   setup() {
     const screen = ref('branch')
-    const branch = ref(null)
-    const years  = [
+
+    // نقرأ حالة التفعيل من localStorage بشكلٍ صحيح
+    const isActivated = ref(localStorage.getItem('activated') === 'true')
+
+    const years = [
       'الاختبار الأول','الاختبار الثاني','الاختبار الثالث',
       'الاختبار الرابع','الاختبار الخامس','الاختبار السادس',
       'الاختبار السابع','الاختبار الثامن','الاختبار التاسع',
       2022, 2023, 2024
     ]
+    const lockedYears = [2022]
 
+    const branch = ref(null)
     const allQ = ref([])
     const questions = ref([])
-
     const current = ref(0)
     const answered = reactive({})
     const correct = ref(0)
@@ -110,7 +130,9 @@ export default {
     const totalSec = ref(90 * 60)
     let timer = null
 
-    const wrong = computed(() => Object.keys(answered).length - correct.value)
+    const wrong = computed(() =>
+      Object.keys(answered).length - correct.value
+    )
 
     const formattedTime = computed(() => {
       const m = String(Math.floor(totalSec.value / 60)).padStart(2, '0')
@@ -124,8 +146,7 @@ export default {
     })
 
     const formattedAttachedText = computed(() => {
-      const raw = attachedText.value || ''
-      return raw
+      return (attachedText.value || '')
         .split('\n')
         .filter(l => l.trim())
         .map((line, i) =>
@@ -139,17 +160,16 @@ export default {
     async function init() {
       loadingQuestions.value = true
       loadError.value = null
-
       try {
-        const apiPromise = fetchQuestionsFromAPI ()
-        const jsonPromise = loadQuestionsFromJSON()
-
-        const data = await Promise.race([
-          apiPromise,
-          jsonPromise
+        const response = await Promise.race([
+          fetchQuestionsFromAPI(),
+          loadQuestionsFromJSON()
         ])
-
-        allQ.value = Array.isArray(data) ? data : data.questions || data
+        let data = response.data ?? response
+        if (Array.isArray(data.questions)) {
+          data = data.questions
+        }
+        allQ.value = Array.isArray(data) ? data : []
       } catch (err) {
         console.error('❌ فشل تحميل الأسئلة:', err)
         loadError.value = 'تعذّر تحميل الأسئلة.'
@@ -164,8 +184,17 @@ export default {
     }
 
     function startQuiz(y) {
+      const yearNum = Number(y)
+
+      // بعد التفعيل سيسمح بـ2022
+      if (lockedYears.includes(yearNum) && !isActivated.value) {
+        loadError.value = 'هذه السنة مقفلة. الرجاء التفعيل للوصول.'
+        screen.value = 'year'
+        return
+      }
+
       questions.value = allQ.value
-        .filter(q => q.year === y && q.type === branch.value)
+        .filter(q => q.year === yearNum && q.type === branch.value)
         .sort((a, b) => a.id - b.id)
 
       if (!questions.value.length) {
@@ -178,7 +207,6 @@ export default {
       correct.value = 0
       Object.keys(answered).forEach(k => delete answered[k])
       totalSec.value = 90 * 60
-
       screen.value = 'quiz'
       startTimer()
     }
@@ -231,7 +259,8 @@ export default {
 
     function openTextScreen() {
       const q = questions.value[current.value]
-      attachedText.value = q[`attached_text_${lang.value}`] || q.attached_text || 'لا يوجد نص مرفق'
+      attachedText.value =
+        q[`attached_text_${lang.value}`] || q.attached_text || 'لا يوجد نص مرفق'
       screen.value = 'text'
     }
 
@@ -264,7 +293,6 @@ export default {
       lang,
       formattedTime,
       percentage,
-      attachedText,
       formattedAttachedText,
       loadingQuestions,
       loadError,

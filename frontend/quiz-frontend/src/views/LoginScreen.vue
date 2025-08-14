@@ -50,6 +50,11 @@
           <span v-else><i class="spinner"></i> جاري المعالجة...</span>
         </button>
 
+<!-- زر التفعيل -->
+     <button class="link-btn" @click="$router.push({ name: 'Activate' })">
+       🔑 تفعيل جهازك
+     </button>
+
         <p v-if="error" class="error">⚠️ {{ error }}</p>
       </form>
     </div>
@@ -71,6 +76,35 @@ export default {
       error: null
     }
   },
+
+
+  async doLogin() {
+  console.log('🔍 doLogin()', { phone: this.phone, rememberMe: this.rememberMe })
+  this.error   = null
+  this.loading = true
+
+  try {
+    const resp = await login(this.phone, this.password)
+    console.log('✅ login response:', resp)
+    const token = resp.data.access || resp.data.access_token || resp.data.token
+    console.log('🔑 extracted token:', token)
+    if (!token) throw new Error('لم يصل توكن')
+    localStorage.setItem('access_token', token)
+
+    console.log('➡️ Redirecting to Quiz')
+    this.$router.push({ name: 'Quiz' })
+  } catch (err) {
+    console.error('❌ login error:', err)
+    if (!err.response) {
+      this.error = 'تعذّر الاتصال بالخادم'
+    } else {
+      this.error = err.response.data.detail || err.response.data.message || 'فشل تسجيل الدخول'
+    }
+  } finally {
+    this.loading = false
+  }
+},
+
   async mounted() {
     // 1) Credential Management API
     if (navigator.credentials?.get) {
