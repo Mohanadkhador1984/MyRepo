@@ -28,10 +28,10 @@
       </div>
     </div>
 
-    <!-- نص مرفق -->
+    <!-- نص مرفق يومض فقط إذا فيه نص صريح -->
     <button
       v-if="hasText"
-      class="open-text-btn"
+      class="open-text-btn blinking"
       @click="$emit('open-text')"
       title="عرض النص المرفق"
     >📝</button>
@@ -90,12 +90,14 @@ export default {
     wrong() {
       return Object.keys(this.answered).length - this.score.correct
     },
-    // هل يوجد نص مرفق؟
+    // هل يوجد نص مرفق صريح؟ (أكثر من رموز أو مسافات)
     hasText() {
-      return Boolean(
+      const txt = (
         this.current[`attached_text_${this.lang}`] ||
-        this.current.attached_text
-      )
+        this.current.attached_text ||
+        ''
+      ).trim()
+      return txt.length > 0 && !/^[*_-\s]+$/.test(txt)
     },
     // هل أُجيب على هذا السؤال؟
     isAnswered() {
@@ -113,7 +115,7 @@ export default {
         return ans === (q.correct_answer - 1) ? '✅' : '❌'
       })
     },
-    // v-model للـ select مع استخدام val في setter
+    // v-model للـ select مع setter للقفز مباشرة
     selectedIndex: {
       get() {
         return this.currentIndex
@@ -130,11 +132,17 @@ export default {
     getAnswerClass(idx) {
       if (!this.isAnswered) return 'option'
       if (idx === this.correctIndex) return 'option correct'
-      if (idx === this.answered[this.current.id] && idx !== this.correctIndex)
+      if (
+        idx === this.answered[this.current.id] &&
+        idx !== this.correctIndex
+      ) {
         return 'option wrong'
+      }
       return 'option'
     }
   }
 }
 </script>
+
+
 
