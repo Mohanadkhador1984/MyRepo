@@ -12,11 +12,17 @@
       @select="startQuiz"
     />
 
-    <div v-else-if="loadingQuestions" class="text-center mt-10">
+    <div
+      v-else-if="loadingQuestions"
+      class="text-center mt-10"
+    >
       جاري تحميل الأسئلة…
     </div>
 
-    <div v-else-if="loadError" class="text-red-600 text-center mt-10">
+    <div
+      v-else-if="loadError"
+      class="text-red-600 text-center mt-10"
+    >
       {{ loadError }}
     </div>
 
@@ -103,9 +109,7 @@ export default {
   },
   setup() {
     const screen = ref('branch')
-
-    // نقرأ حالة التفعيل من localStorage بشكلٍ صحيح
-    const isActivated = ref(localStorage.getItem('activated') === 'true')
+    const isActivated = ref(!!localStorage.getItem('device_code'))
 
     const years = [
       'الاختبار الأول','الاختبار الثاني','الاختبار الثالث',
@@ -161,14 +165,18 @@ export default {
       loadingQuestions.value = true
       loadError.value = null
       try {
+        // أول استجابة من API أو JSON
         const response = await Promise.race([
           fetchQuestionsFromAPI(),
           loadQuestionsFromJSON()
         ])
+        // فك تغليف data إذا وُجد
         let data = response.data ?? response
+        // إذا وجدنا حقل questions كمصفوفة، نستخرجها
         if (Array.isArray(data.questions)) {
           data = data.questions
         }
+        // نضمن أن allQ.value ستكون مصفوفة
         allQ.value = Array.isArray(data) ? data : []
       } catch (err) {
         console.error('❌ فشل تحميل الأسئلة:', err)
@@ -185,8 +193,6 @@ export default {
 
     function startQuiz(y) {
       const yearNum = Number(y)
-
-      // بعد التفعيل سيسمح بـ2022
       if (lockedYears.includes(yearNum) && !isActivated.value) {
         loadError.value = 'هذه السنة مقفلة. الرجاء التفعيل للوصول.'
         screen.value = 'year'
@@ -319,4 +325,3 @@ export default {
   margin: 1rem 0;
 }
 </style>
-

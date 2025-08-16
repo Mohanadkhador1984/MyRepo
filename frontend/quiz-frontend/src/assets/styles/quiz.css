@@ -180,32 +180,6 @@ body {
   }
 }
 
-/* 🧭 أزرار التنقل */
-.nav-btns {
-  margin-top: 25px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 1rem;
-}
-
-.nav-btns button {
-  background: var(--primary);
-  border: none;
-  border-radius: 30px;
-  color: #001f3f;
-  font-size: 16px;
-  font-weight: bold;
-  padding: 10px 24px;
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.nav-btns button:hover {
-  background: #ffc107;
-  transform: scale(1.05);
-}
 
 /* 📅 اختيار السنة */
 .year-selection {
@@ -361,3 +335,87 @@ body {
 }
 
 
+
+
+/* —————————— الفوتر بار الأساسي —————————— */
+.footer-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  height: 48px;
+  background: #000;
+  border-top: 2px solid #D4AF37;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+/* —————————— أزرار الفوتر —————————— */
+.footer-bar button {
+  flex: 1;
+  margin: 0 6px;
+  background: transparent;
+  border: none;
+  color: #D4AF37;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.footer-bar button i {
+  font-size: 1.2rem;
+}
+
+.footer-bar button span {
+  font-size: 0.65rem;
+  margin-top: 2px;
+  line-height: 1;
+}
+
+/* ———— Hover & Disabled ———— */
+.footer-bar button:hover:not(:disabled) {
+  background: rgba(212, 175, 55, 0.1);
+  color: #FFF;
+}
+
+.footer-bar button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* —————————— تخصيص أحجام الأيقونات —————————— */
+/* ضع على أزرار السابق والتالي الصنف .prev و .next */
+/* ضع على زر النتيجة الصنف .result */
+
+.footer-bar button.prev i,
+.footer-bar button.next i {
+  font-size: 1rem;      /* أيقونات أصغر للسابق والتالي */
+}
+
+.footer-bar button.result i {
+  font-size: 1.4rem;    /* أيقونة أكبر للنتيجة */
+}
+
+/* —————————— تمييز نص النتيجة —————————— */
+.footer-bar button.result span {
+  font-weight: 700;     /* خط أثقل للنص */
+  letter-spacing: 0.5px;
+}
+
+/* —————————— حركة الوميض للنتيجة —————————— */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+
+/* يطبق الوميض على زر النتيجة فقط */
+.footer-bar button.result i,
+.footer-bar button.result span {
+  animation: blink 1.2s infinite ease-in-out;
+}
