@@ -1,23 +1,13 @@
 <!-- src/components/BackButton.vue -->
 <template>
   <button
-    class="go-back"
+    class="floating-back-btn"
     @click="goBack"
     aria-label="رجوع"
     title="رجوع"
   >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      class="icon-arrow"
-    >
-      <path
-        fill-rule="evenodd"
-        d="M12.293 16.293a1 1 0 010 1.414l-6-6a1 1 0 010-1.414l6-6a1 1 0 111.414 1.414L8.414 10l5.293 5.293a1 1 0 010 1.414z"
-        clip-rule="evenodd"
-      />
-    </svg>
+    <i class="fas fa-arrow-left"></i>
+    <span class="back-text">رجوع</span>
   </button>
 </template>
 
@@ -32,3 +22,41 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+
+.floating-back-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  background: #8b5cf6;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-family: 'Cairo', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  z-index: 1001;
+}
+
+.floating-back-btn:hover {
+  background: #7c3aed;
+  transform: scale(1.05);
+}
+
+.floating-back-btn i {
+  font-size: 1.25rem;
+}
+
+.back-text {
+  margin-left: 0.5rem;
+}
+</style>
