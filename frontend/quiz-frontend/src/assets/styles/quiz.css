@@ -361,3 +361,34 @@ body {
 }
 
 
+.lang-toggle-btn {
+  position: relative;
+  margin: 20px 0; /* مسافة فوق وتحت */
+  padding: 10px 16px;
+  font-size: 20px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.lang-toggle-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.tooltip {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0.9;
+}

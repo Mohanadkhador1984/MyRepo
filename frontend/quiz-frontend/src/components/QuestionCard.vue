@@ -39,6 +39,17 @@
     <!-- السؤال -->
     <h2 id="question">{{ current[`question_${lang}`] }}</h2>
 
+    <!-- زر تبديل اللغة مع Tooltip -->
+    <button
+      class="lang-toggle-btn"
+      @click="$emit('toggle-lang')"
+      @mouseenter="showTooltip = true"
+      @mouseleave="showTooltip = false"
+    >
+      🌐
+      <span v-if="showTooltip" class="tooltip">ترجمة</span>
+    </button>
+
     <!-- خيارات الإجابة -->
     <div class="answers">
       <button
@@ -52,12 +63,11 @@
       </button>
     </div>
 
-    <!-- أزرار التنقل والأدوات -->
+    <!-- أزرار التنقل -->
     <div class="nav-btns controls">
       <button @click="$emit('next')">
         {{ currentIndex === questions.length - 1 ? 'إظهار النتيجة' : 'التالي' }}
       </button>
-      <button @click="$emit('toggle-lang')">🌐</button>
       <button
         @click="$emit('prev')"
         :disabled="currentIndex === 0"
@@ -79,6 +89,13 @@ export default {
     lang:          { type: String, required: true },
     formattedTime: { type: String, required: true }
   },
+
+  data() {
+    return {
+      showTooltip: false
+    }
+  },
+
   computed: {
     // بناء خيارات الإجابة
     answerOpts() {
@@ -86,26 +103,33 @@ export default {
         this.current[`answer${i}_${this.lang}`]
       )
     },
-    // عدد الأسئلة الخاطئة
+
+    // عدد الأخطاء
     wrong() {
       return Object.keys(this.answered).length - this.score.correct
     },
-    // هل يوجد نص مرفق؟
+
+    // هل يوجد نص مرفق واضح؟
     hasText() {
-      return Boolean(
+      const txt = (
         this.current[`attached_text_${this.lang}`] ||
-        this.current.attached_text
-      )
+        this.current.attached_text ||
+        ''
+      ).trim()
+      return txt.length > 0 && !/^[*_-\s]+$/.test(txt)
     },
+
     // هل أُجيب على هذا السؤال؟
     isAnswered() {
       return this.answered[this.current.id] !== undefined
     },
+
     // فهرس الإجابة الصحيحة
     correctIndex() {
       return this.current.correct_answer - 1
     },
-    // مصفوفة حالات الأسئلة: ✅ أو ❌ أو '' إذا لم يُجب بعد
+
+    // حالات الأسئلة
     statuses() {
       return this.questions.map(q => {
         const ans = this.answered[q.id]
@@ -113,7 +137,8 @@ export default {
         return ans === (q.correct_answer - 1) ? '✅' : '❌'
       })
     },
-    // v-model للـ select مع استخدام val في setter
+
+    // ربط select بالـ currentIndex
     selectedIndex: {
       get() {
         return this.currentIndex
@@ -123,15 +148,19 @@ export default {
       }
     }
   },
+
   methods: {
     selectAnswer(idx) {
       this.$emit('answer', idx)
     },
+
     getAnswerClass(idx) {
       if (!this.isAnswered) return 'option'
       if (idx === this.correctIndex) return 'option correct'
-      if (idx === this.answered[this.current.id] && idx !== this.correctIndex)
-        return 'option wrong'
+      if (
+        idx === this.answered[this.current.id] &&
+        idx !== this.correctIndex
+      ) return 'option wrong'
       return 'option'
     }
   }
