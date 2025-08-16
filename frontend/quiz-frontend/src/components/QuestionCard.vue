@@ -52,42 +52,17 @@
       </button>
     </div>
 
-    
-
-     <!-- Footer Bar -->
- <!-- داخل <template> -->
-<footer class="footer-bar">
-  <button
-    @click="$emit('prev')"
-    :disabled="currentIndex === 0"
-    title="السؤال السابق"
-  >
-    <i class="fas fa-arrow-left"></i>
-    <span>السابق</span>
-  </button>
-
-  <button
-    @click="$emit('toggle-lang')"
-    title="تبديل اللغة"
-  >
-    <i class="fas fa-globe-europe"></i>
-    <span>اللغة</span>
-  </button>
-
-  <button
-    @click="$emit('next')"
-    title="التالي / إظهار النتيجة"
-  >
-    <i :class="currentIndex === questions.length - 1 
-               ? 'fas fa-trophy' 
-               : 'fas fa-arrow-right'">
-    </i>
-    <span>
-      {{ currentIndex === questions.length - 1 ? 'النتيجة' : 'التالي' }}
-    </span>
-  </button>
-</footer>
-
+    <!-- أزرار التنقل والأدوات -->
+    <div class="nav-btns controls">
+      <button @click="$emit('next')">
+        {{ currentIndex === questions.length - 1 ? 'إظهار النتيجة' : 'التالي' }}
+      </button>
+      <button @click="$emit('toggle-lang')">🌐</button>
+      <button
+        @click="$emit('prev')"
+        :disabled="currentIndex === 0"
+      >السابق</button>
+    </div>
 
   </div>
 </template>
