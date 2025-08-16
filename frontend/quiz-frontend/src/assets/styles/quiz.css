@@ -1,5 +1,3 @@
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
-
 :root {
   --primary: #FFD700;
   --secondary: #004e92;
@@ -182,6 +180,7 @@ body {
   }
 }
 
+/* 🧭 أزرار التنقل */
 .nav-btns {
   margin-top: 25px;
   display: flex;
@@ -191,89 +190,22 @@ body {
   padding: 1rem;
 }
 
-/* قاعدة عامة للأزرار */
 .nav-btns button {
-  flex: 1;
-  max-width: 140px;
-  background: transparent;
-  border: 2px solid #D4AF37;           /* إطار ذهبي */
+  background: var(--primary);
+  border: none;
   border-radius: 30px;
-  color: #D4AF37;                      /* لون ذهبي */
-  font-size: 1rem;                     /* خط أعرض */
-  font-weight: 600;
+  color: #001f3f;
+  font-size: 16px;
+  font-weight: bold;
   padding: 10px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;                         /* مسافة بين الأيقونة والنص */
   transition: all 0.3s;
   cursor: pointer;
-  position: relative;
 }
 
-/* أيقونات الأزرار */
-.nav-btns button.prev::before {
-  content: '\f053';
-  font-family: 'Font Awesome 5 Free';
-  font-weight: 900;
-  font-size: 1.2rem;
+.nav-btns button:hover {
+  background: #ffc107;
+  transform: scale(1.05);
 }
-.nav-btns button.next::before {
-  content: '\f054';
-  font-family: 'Font Awesome 5 Free';
-  font-weight: 900;
-  font-size: 1.2rem;
-}
-.nav-btns button.lang::before {
-  content: '\f0ac';
-  font-family: 'Font Awesome 5 Free';
-  font-weight: 900;
-  font-size: 1.2rem;
-}
-/* زر النتيجة: كأس مضيء */
-.nav-btns button.result::before {
-  content: '\f091';                   /* رمز الكأس */
-  font-family: 'Font Awesome 5 Free';
-  font-weight: 900;
-  font-size: 1.4rem;
-  color: #FFD700;                     /* لون ذهبي ساطع */
-  text-shadow: 0 0 6px rgba(255,215,0,0.8);
-}
-
-/* نص الأزرار */
-.nav-btns button span {
-  display: inline-block;
-  font-size: 0.85rem;
-  color: inherit;
-}
-
-/* حركة Hover */
-.nav-btns button:hover:not(:disabled) {
-  background: rgba(212,175,55,0.1);
-  color: #fff;
-  transform: translateY(-2px) scale(1.03);
-}
-
-/* زر معطل */
-.nav-btns button:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-/* وميض زر النتيجة */
-@keyframes blink {
-  0%, 100% { opacity: 1;   transform: scale(1.05); }
-  50%      { opacity: 0.4; transform: scale(1);    }
-}
-.nav-btns button.result.blink {
-  animation: blink 1.2s infinite ease-in-out;
-  border-color: #FFD700;
-  background: rgba(255,215,0,0.15);
-}
-
-
-
-
 
 /* 📅 اختيار السنة */
 .year-selection {
