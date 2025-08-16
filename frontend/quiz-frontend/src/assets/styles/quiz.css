@@ -101,6 +101,7 @@ body {
   margin-top: 20px;
   direction: rtl;
   padding: 1rem;
+  
 }
 
 .answers button {
@@ -119,7 +120,15 @@ body {
   text-align: center;
   line-height: 1.4;
   animation: fadeInUp 0.4s ease both;
+  padding-bottom: 20px;
 }
+
+@media (max-width: 640px) {
+  .answer-button:last-of-type {
+    margin-bottom: 30px;  /* اضبط القيمة حسب حاجتك على الموبايل */
+  }
+}
+
 
 .answers button:hover {
   transform: scale(1.07);
@@ -419,3 +428,8 @@ body {
 .footer-bar button.result span {
   animation: blink 1.2s infinite ease-in-out;
 }
+
+.quiz-footer {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
+}
+
