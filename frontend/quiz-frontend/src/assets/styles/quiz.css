@@ -95,6 +95,7 @@ body {
 
 /* ✅ الأجوبة */
 .answers {
+  margin-top: 0.4rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -112,8 +113,8 @@ body {
   font-size: 17px;
   font-weight: bold;
   padding: 12px 20px;
-  box-shadow: 0 0 15px var(--primary);
-  transition: all 0.3s ease-in-out;
+  /* box-shadow: 0 0 15px var(--primary);  */
+  transition: all 0.3s ease-in-out; 
   cursor: pointer;
   white-space: normal;
   max-width: 100%;
@@ -299,27 +300,127 @@ body {
   max-width: 100%;
 }
 
-/* 🧠 زر فتح النص المرفق */
-/* زر النص: عائم أعلى يمين */
-.open-text-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 10;
-  background: #f59e0b;
-  color: #fff;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  cursor: pointer;
-  transition: transform .2s;
-}
-.open-text-btn:hover {
-  transform: scale(1.1);
+
+
+/* 1. تقليل المسافة أسفل الأيقونات لتقترب من الأجوبة */
+.question-actions {
+  /* فوق 1rem، تحت 0.2rem فقط */
+  margin: 1rem 0 0.2rem;
 }
 
+/* 6. تباعد الزرين */
+.question-actions button + button {
+  margin-left: 1rem;  /* اضبط القيمة لزيادة أو تقليل التباعد */
+}
+
+
+/* 2. إزالة أي مسافة زائدة فوق قائمة الأجوبة */
+.answers {
+  margin-top: 0;
+}
+
+/* 3. تكبير الأزرار الدائرية وإضافة لمسة فخمة */
+.open-text-btn,
+.lang-toggle-btn {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #fdb813, #d4a017);
+  border: 2px solid #d4af37;
+  box-shadow:
+    0 4px 8px rgba(212,175,55,0.5),
+    inset 0 2px 4px rgba(255,255,255,0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* 4. تكبير الأيقونات داخل الأزرار */
+.open-text-btn i,
+.lang-toggle-btn i {
+  font-size: 1.6rem;
+  color: #fff;
+  text-shadow: 0 0 4px rgba(0,0,0,0.3);
+}
+
+/* 5. تأثير Hover راقٍ */
+.open-text-btn:hover,
+.lang-toggle-btn:hover {
+  transform: scale(1.2);
+  box-shadow:
+    0 6px 12px rgba(212,175,55,0.7),
+    inset 0 2px 6px rgba(255,255,255,0.4);
+}
+
+
+
+
+
+/* 💎 تنسيق فخم جداً لأزرار “السابق” و“التالي” */
+
+/* تأكد من استيراد أيقونات FontAwesome في مشروعك */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+
+.prev-btn,
+.next-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.5rem;                        /* مساحات أوسع */
+  background: linear-gradient(45deg, #D4AF37, #FFD700);
+  border: 2px solid #D4AF37;                    /* إطار ذهبي */
+  border-radius: 999px;                         /* شكل كبسولة */
+  color: #001f3f;
+  font-family: 'Cairo', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.6);
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: 
+    background 0.3s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  margin: 0 0.5rem;                             /* تباعد جانبي بين الأزرار */
+}
+
+/* أيقونة السهم في زر “السابق” */
+.prev-btn::before {
+  content: '\f053';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+/* أيقونة السهم في زر “التالي” */
+.next-btn::after {
+  content: '\f054';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  margin-left: 0.5rem;
+  font-size: 1.2rem;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+/* تأثير Hover لتعزيز الفخامة */
+.prev-btn:hover,
+.next-btn:hover {
+  background: linear-gradient(45deg, #FFD700, #D4AF37);
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 12px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+/* حالة الضغط (Active) */
+.prev-btn:active,
+.next-btn:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+}
 
 /* 📖 النافذة المنبثقة للنص */
 .modal-text {
@@ -359,42 +460,6 @@ body {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
-
-
-/* زر الترجمة: عائم أعلى يسار */
-.lang-toggle-btn {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  z-index: 10;
-  background: #3b82f6;
-  color: #fff;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  cursor: pointer;
-  transition: transform .2s, background .2s;
-}
-.lang-toggle-btn:hover {
-  transform: scale(1.1);
-  background: #2563eb;
-}
-
-/* اختياري:-tooltip قصير */
-.lang-toggle-btn .tooltip {
-  position: absolute;
-  top: 48px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.75);
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  white-space: nowrap;
 }
 
 .tooltip {

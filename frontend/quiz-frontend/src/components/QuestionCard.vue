@@ -30,23 +30,32 @@
 
     <!-- … -->
 <!-- زر النص المرفق -->
-<button
-  v-if="hasText"
-  class="open-text-btn"
-  @click="$emit('open-text')"
-  title="عرض النص المرفق"
->📝</button>
 
-<!-- زر الترجمة -->
-<button
-  class="lang-toggle-btn"
-  @click="$emit('toggle-lang')"
-  title="تبديل اللغة"
->🌐</button>
-<!-- … -->
 
     <!-- السؤال -->
     <h2 id="question">{{ current[`question_${lang}`] }}</h2>
+
+    <!-- بعد <h2 id="question">…</h2> -->
+<div class="question-actions">
+  <!-- زر النص المرفق -->
+  <button
+    v-if="hasText"
+    class="open-text-btn"
+    @click="$emit('open-text')"
+    title="عرض النص المرفق"
+  >
+    <i class="fas fa-file-alt"></i>
+  </button>
+
+  <!-- زر الترجمة -->
+  <button
+    class="lang-toggle-btn"
+    @click="$emit('toggle-lang')"
+    title="ترجمة"
+  >
+    <i class="fas fa-language"></i>
+  </button>
+</div>
 
     
 
