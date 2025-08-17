@@ -28,27 +28,27 @@
       </div>
     </div>
 
-    <!-- نص مرفق -->
-    <button
-      v-if="hasText"
-      class="open-text-btn"
-      @click="$emit('open-text')"
-      title="عرض النص المرفق"
-    >📝</button>
+    <!-- … -->
+<!-- زر النص المرفق -->
+<button
+  v-if="hasText"
+  class="open-text-btn"
+  @click="$emit('open-text')"
+  title="عرض النص المرفق"
+>📝</button>
+
+<!-- زر الترجمة -->
+<button
+  class="lang-toggle-btn"
+  @click="$emit('toggle-lang')"
+  title="تبديل اللغة"
+>🌐</button>
+<!-- … -->
 
     <!-- السؤال -->
     <h2 id="question">{{ current[`question_${lang}`] }}</h2>
 
-    <!-- زر تبديل اللغة مع Tooltip -->
-    <button
-      class="lang-toggle-btn"
-      @click="$emit('toggle-lang')"
-      @mouseenter="showTooltip = true"
-      @mouseleave="showTooltip = false"
-    >
-      🌐
-      <span v-if="showTooltip" class="tooltip">ترجمة</span>
-    </button>
+    
 
     <!-- خيارات الإجابة -->
     <div class="answers">
