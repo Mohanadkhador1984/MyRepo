@@ -42,57 +42,43 @@
       </div>
     </section>
 
-   <!-- 4. شريط التحكم السفلي -->
-<div class="footer-controls">
-  <div class="btn-group">
-    <!-- زر السابق -->
-    <button
-      class="control-btn"
-      @click="$emit('prev')"
-      :disabled="currentIndex === 0"
-      aria-label="السابق"
-    >
-      <i class="fas fa-chevron-left"></i>
-    </button>
+    <!-- 4. شريط التحكم السفلي -->
+    <div class="footer-controls">
+      <button
+        class="control-btn"
+        @click="$emit('prev')"
+        :disabled="currentIndex === 0"
+        aria-label="السؤال السابق"
+      >
+        ⬅️ السابق
+      </button>
 
-    <!-- زر عرض النص المرفق -->
-    <button
-      v-if="hasText"
-      class="control-btn"
-      @click="openText"
-      aria-label="نص مرفق"
-    >
-      <i class="fas fa-file-alt"></i>
-    </button>
+      <button
+        v-if="hasText"
+        class="control-btn"
+        @click="openText"
+        title="فتح النص المرفق"
+        aria-label="فتح النص المرفق"
+      >
+        📄 نص
+      </button>
 
-    <!-- زر تبديل اللغة -->
-    <button
-      class="control-btn"
-      @click="$emit('toggle-lang')"
-      aria-label="تبديل اللغة"
-    >
-      <i class="fas fa-language"></i>
-    </button>
+      <button
+        class="control-btn"
+        @click="$emit('toggle-lang')"
+        :aria-label="lang === 'ar' ? 'تبديل إلى الإنجليزية' : 'Switch to Arabic'"
+      >
+        🌐 {{ lang === 'ar' ? 'EN' : 'AR' }}
+      </button>
 
-    <!-- زر التالي / عرض النتيجة -->
-    <button
-      class="control-btn"
-      @click="$emit('next')"
-      :disabled="currentIndex === questions.length - 1"
-      :aria-label="currentIndex < questions.length - 1 ? 'التالي' : 'عرض النتيجة'"
-    >
-      <i
-        v-if="currentIndex < questions.length - 1"
-        class="fas fa-chevron-right"
-      ></i>
-      <i
-        v-else
-        class="fas fa-flag-checkered"
-      ></i>
-    </button>
-  </div>
-</div>
-
+      <button
+        class="control-btn"
+        @click="$emit('next')"
+        aria-label="السؤال التالي أو عرض النتيجة"
+      >
+        {{ currentIndex === questions.length - 1 ? 'عرض النتيجة 🏁' : 'التالي ➡️' }}
+      </button>
+    </div>
 
     <!-- 5. نافذة النص المرفق -->
     <div id="text-screen" :class="{ active: showText }" @click.self="closeText">
