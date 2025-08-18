@@ -529,7 +529,7 @@ body {
     + var(--dropdown-height)
   );                                     /* مجموع ارتفاع شريط التنقل الثابت */
   --footer-height: 55px;                /* ارتفاع الفوتر */
-  --container-margin: 0.8rem;             /* الهامش حول الحاوية */
+  --container-margin: 2rem;             /* الهامش حول الحاوية */
 }
 
 /* 1) حاوية السؤال والأجوبة ثابتة أسفل الهيدر و فوق الفوتر */
@@ -550,7 +550,7 @@ body {
   background: rgba(0, 0, 0, 0.9);
   border: 2px solid #FFD700;
   border-radius: 10px;
-  padding: 5rem;
+  padding: 0rem;
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
 
   overflow-y: auto;   /* تمرير داخلي إذا احتاج المحتوى */
@@ -560,7 +560,7 @@ body {
 /* 2) نص السؤال داخل الحاوية */
 .question-section .question-text {
   color: #FFD700;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 
@@ -570,7 +570,7 @@ body {
   position: fixed;
   bottom: 0; left: 0; right: 0;
  left: 0; right: 0;
-  height: 3.5rem;  
+  height: 3rem;  
   background: rgba(0, 0, 0, 0.8);
   border-top: 2px solid #FFD700;
   display: flex;
@@ -612,12 +612,12 @@ body {
 
 
   #question {
-    font-size:18px;
+    font-size:17px;
     padding: 0.5rem;
   }
 
   .question-section {
-    padding: 0.9rem;
+    padding: 0.5rem;
   }
 
   
