@@ -18,7 +18,7 @@ body {
   background: linear-gradient(135deg, var(--bg-main), var(--secondary));
   color: var(--text);
   margin: 0;
-  padding: 60px 10px 40px;
+  padding: 80px 1px 50px;
   min-height: 100vh;
   box-sizing: border-box;
   display: flex;
@@ -33,9 +33,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-inline: clamp(10px, 4vw, 20px);
+  padding-inline: clamp(5px, 1vw, 5px);
   width: 100%;
-  max-width: 1000px;
+  max-width: 1500px;
   min-height: 600px;
   margin-inline: auto;
   box-sizing: border-box;
@@ -46,8 +46,8 @@ body {
   background: var(--bg-card);
   border: 3px solid var(--primary);
   border-radius: 20px;
-  padding: 25px 15px;
-  margin-block: 20px;
+  padding: 5px 5px;
+  margin-block: 10px;
   text-align: center;
   font-size: 16px;
   line-height: 1.7;
@@ -56,6 +56,10 @@ body {
   backdrop-filter: blur(5px);
   overflow: hidden;
 }
+
+
+
+
 
 .quiz-container::before {
   content: "";
@@ -71,7 +75,7 @@ body {
 .quiz-container h1 {
   font-size: 24px;
   color: var(--primary);
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   letter-spacing: 1.1px;
 }
 
@@ -83,9 +87,9 @@ body {
     text-align: center; /* توسيط النص */
     margin: 0 auto; /* مركزية العنصر */
     max-width: 100%; /* عرض أقصى */
-    font-size: 24px; /* حجم النص */
+    font-size: 20px; /* حجم النص */
     line-height: 1.5; /* تحسين المسافة بين السطور */
-    padding: 10px; /* إضافة مسافة داخلية */
+    padding: 5px; /* إضافة مسافة داخلية */
     color: #FFD700; /* لون النص */
     background-color: rgba(0, 0, 0, 0.7); /* خلفية شفافة */
     border: 2px solid #FFD700; /* إطار ذهبي */
@@ -110,9 +114,9 @@ body {
   border: 3px solid var(--primary);
   border-radius: 999px;
   color: #fff;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: bold;
-  padding: 12px 20px;
+  padding: 11px 15px;
   /* box-shadow: 0 0 15px var(--primary);  */
   transition: all 0.3s ease-in-out; 
   cursor: pointer;
@@ -154,33 +158,6 @@ body {
   }
 }
 
-/* ⏱️ المؤقت في منتصف الشاشة */
-.timer {
-  font-size: 26px;
-  font-weight: bold;
-  padding: 10px 25px;
-  background: rgba(0, 255, 255, 0.1);
-  border: 2px solid #00ffff;
-  border-radius: 12px;
-  box-shadow: 0 0 10px #00ffff55;
-  animation: pulse 2s ease-in-out infinite;
-  color: #00ffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  text-align: center;
-}
-
-/* نبض */
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
 
 
 
@@ -211,27 +188,6 @@ body {
   transform: scale(1.05);
 }
 
-/* 🔙 زر العودة */
-#home-button {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  width: 55px;
-  height: 55px;
-  background: var(--accent);
-  border: none;
-  border-radius: 50%;
-  color: #fff;
-  font-size: 24px;
-  box-shadow: 0 0 12px var(--accent);
-  transition: transform 0.3s, background 0.3s;
-  z-index: 9999;
-}
-
-#home-button:hover {
-  background: #138496;
-  transform: scale(1.1);
-}
 
 
 
@@ -302,15 +258,6 @@ body {
     inset 0 2px 6px rgba(255,255,255,0.4);
 }
 
-
-
-
-
-/* 💎 تنسيق فخم جداً لأزرار “السابق” و“التالي” */
-
-/* تأكد من استيراد أيقونات FontAwesome في مشروعك */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
-
 .prev-btn,
 .next-btn {
   position: relative;
@@ -357,165 +304,328 @@ body {
 }
 
 
-
-
-
-
-
-/*===============================================
-  1) Overlay كامل الشاشة بزجاجية مطفية
-  ===============================================*/
 #text-screen {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: var(--overlay-bg);
-  backdrop-filter: blur(5px);
-  z-index: 10000;
-  transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+  position: fixed; inset: 0; display: none;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  z-index: 10000; transition: opacity .3s;
 }
+#text-screen.active { display: flex; opacity: 1; }
 
-#text-screen.active {
-  display: flex;
-  opacity: 1;
-  backdrop-filter: blur(8px);
-}
-
-/*===============================================
-  2) البطاقة الرئيسية للمودال
-  ===============================================*/
+/*———— Modal ————*/
 #text-screen .modal-text {
-  position: relative;
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-dark), var(--shadow-light);
-  width: calc(100vw - 2rem);
-  max-width: 700px;
-  max-height: 80vh;
-  overflow-y: auto;
-  margin: 1rem auto;
-  padding: 1.5rem;
-  animation: fadeInScale 0.35s ease forwards;
-}
-
-/* حركة دخول ناعمة */
-@keyframes fadeInScale {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/*===============================================
-  3) زر الإغلاق الأنيق
-  ===============================================*/
-#text-screen .close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: transparent;
-  border: none;
-  color: var(--accent);
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-#text-screen .close-btn:hover {
-  color: #fff;
-  transform: scale(1.1);
-}
-
-/*===============================================
-  4) تنسيق النص المرفق بفخامة
-  ===============================================*/
-#text-screen .attached-text {
-  width: calc(100% - 2rem);
-  margin: 0.5rem 1rem;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.6);
-  border-left: 4px solid var(--primary);
-  border-radius: 0 var(--radius) var(--radius) 0;
-  box-shadow: inset 0 0 8px rgba(255, 215, 0, 0.3);
-  color: var(--text-color);
-  font-size: 1rem;
-  line-height: 1.7;
-  text-align: justify;
-  direction: rtl;
-}
-
-/* تخصيص شريط التمرير داخل المودال */
-#text-screen .modal-text::-webkit-scrollbar {
-  width: 6px;
-}
-
-#text-screen .modal-text::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-#text-screen .modal-text::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 3px;
-}
-
-/* عرض كل سطر كلغة مستقلة */
-#text-screen .attached-text .en-line,
-#text-screen .attached-text .ar-line {
-  display: block;
-  margin: 0;
-  font-size: 1rem;
-  font-weight: bold;
-}
-
-/* الفراغ بين السطر الإنجليزي والعربي */
-#text-screen .attached-text .ar-line {
-  margin-top: 1rem;
-}
-
-/* ألوان النصوص حسب اللغة */
-#text-screen .attached-text .en-line {
-  color: var(--en-color, #e0e0e0);
-}
-
-#text-screen .attached-text .ar-line {
-  color: var(--ar-color, #ffd700);
-}
-
-
-.attached-text .en-line {
-  color: var(--en-color, #e0e0e0);
-  font-weight: bold;
-  margin: 0;
-}
-
-.attached-text .ar-line {
-  color: var(--ar-color, #ffd700);
-  font-weight: bold;
-  margin: 1rem 0 0; /* مسافة قبل السطر العربي */
-}
-
-
-/*===============================================
-  5) أداة التلميح (Tooltip)
-  ===============================================*/
-.tooltip {
-  position: absolute;
-  top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
   background: #222;
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 1;          /* يظهر طالما العنصر موجود */
-  transition: opacity 0.2s;
+  border: 3px solid #FFD700;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 90vw; max-width: 600px; max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  animation: fadeInScale .35s ease forwards;
 }
+@keyframes fadeInScale {
+  from { transform: scale(.95); opacity: 0 }
+  to   { transform: scale(1);    opacity: 1 }
+}
+/* زر الإغلاق */
+#text-screen .close-btn {
+  position: absolute; top: .75rem; right: .75rem;
+  background: none; border: none;
+  color: #FFD700; font-size: 1.2rem; cursor: pointer;
+  transition: transform .2s;
+}
+#text-screen .close-btn:hover { transform: scale(1.2) }
+
+/*———— Attached Text ————*/
+#text-screen .attached-text {
+  background: #111;
+  border-left: 4px solid #FFD700;
+  border-radius: 0 6px 6px 0;
+  padding: 1rem;
+  color: #FFD700;
+  line-height: 1.6;
+}
+#text-screen .attached-text p {
+  margin: .5rem 0; font-weight: bold;
+}
+#text-screen .attached-text .en-line { color: #FFF }
+#text-screen .attached-text .ar-line { color: #FFD700 }
+
+
+
+
+
+
+
+
+.footer-controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: var(--bg-card);               /* نفس خلفية الكويز */
+  border-top: 2px solid var(--primary);     /* فاصل ذهبي */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+
+/* 🚩 ضبط حاوية أزرار الفوتر لتمركزها وتقريبها */
+.footer-controls {
+  display: flex;
+  justify-content: center;   /* تمركز الأزرار في منتصف الشاشة */
+  align-items: center;
+  gap: 0.5rem;               /* مسافة موحدة قليلة بين الأزرار */
+  padding: 0 var(--gutter);
+}
+
+/* إزالة المساحات الجانبية الافتراضية للأزرار */
+.footer-controls .control-btn {
+  margin: 0;
+}
+
+
+
+/* 1) إجعل الهيدر الأساسي ثابت */
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  height: 64px;
+  z-index: 1000;
+  height: 64px;
+}
+
+
+/* شريط التنقل مع هوامش بسيطة من كل الجهات */
+.navbar {
+  position: fixed;
+  /* نضيف 8px مسافة بين الهيدر وشريط التنقل */
+  top: calc(64px + 8px);
+  /* نضيف 8px مسافة من اليسار واليمين */
+  left: 8px;
+  right: 8px;
+  
+  /* ارتفاع وعرض مرنين ليتناسب مع المسافات الجديدة */
+  width: auto;
+  
+  /* تنسيق الشريط */
+  background-color: #111;
+  border: 2px solid gold;
+  border-radius: 8px;
+  padding: 10px 15px;
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  
+  z-index: 999;
+}
+
+/* تنسيق قائمة الاختيار داخل الشريط */
+.navbar select {
+  background-color: #000;
+  color: gold;
+  border: 1px solid gold;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 1rem;
+  appearance: none;
+  cursor: pointer;
+}
+
+/* رفع محتوى الصفحة لأسفل بما يكفي لتفادي التداخل */
+.page-content {
+  padding-top: calc(
+    64px           /* ارتفاع الهيدر */
+     8px          /* المسافة العليا بين الهيدر و navbar */
+     (2*10px)     /* padding عام لـ navbar (علياً وسفلاً) */
+     (2*2px)      /* سماكة الـ border العام (علياً وسفلاً) */
+     8px          /* margin سفلي افتراضي لشريط التنقل */
+  );
+}
+
+
+/* 4) ارفع محتوى الصفحة لأسفل لتفادي التداخل مع الهيدر والشريط */
+.quiz-container {
+  padding-top: calc(64px /* ارتفاع الهيدر */
+                  + 10px /* padding فوق navbar */
+                  + 10px /* padding تحت navbar */
+                  + 2px  /* border-top/navbar */
+                  + 2px  /* border-bottom/navbar */
+                 );
+}
+
+#score-summary {
+  font-size: 1rem;
+  color: gold;
+  background-color: #111;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid gold;
+}
+.navbar .timer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  color: gold;
+}
+.timer-icon::before {
+  content: "⏰";
+  font-size: 1.2rem;
+}
+
+
+
+
+/* شريط التحكم السفلي */
+.footer-controls {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-top: 1px solid gold;
+  padding-top: 1rem;
+}
+.control-btn {
+  background-color: #111;
+  color: gold;
+  border: 1px solid gold;
+  padding: 10px 15px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s;
+}
+.control-btn:hover {
+  background-color: #222;
+}
+
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: gold;
+  cursor: pointer;
+}
+.attached-text p {
+  margin-bottom: 1rem;
+}
+.en-line {
+  direction: ltr;
+  text-align: left;
+}
+.ar-line {
+  direction: rtl;
+  text-align: right;
+}
+
+/* استجابة للجوال */
+@media (min-width: 600px) {
+  .answers {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+:root {
+  --main-header-height: 64px;      /* ارتفاع الهيدر الرئيسي */
+  --sticky-navbar-height: 112px;   /* مجموع ارتفاع شريط المؤقت + dropdown */
+  --footer-height: 60px;           /* ارتفاع الفوتر الثابت */
+}
+
+
+/* 2) تنسيق حاوية السؤال والأجوبة */
+.question-section {
+  background: rgba(0, 0, 0, 0.8);    /* خلفية سوداء شفافة */
+  border: 2px solid #FFD700;        /* إطار ذهبي صلب */
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0 1rem 1.5rem;            /* هوامش جانبية وسفلية */
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+/* إعادة تطبيق نفس خلفية السؤال على h2 فقط إذا احتجت */
+.question-text {
+  background: transparent;
+  color: #FFD700;
+  margin-bottom: 1rem;
+}
+
+
+/* 4) الفوتر ثابت بأسفل الشاشة */
+.footer-controls {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--footer-height);
+  background: rgba(0, 0, 0, 0.8);
+  border-top: 2px solid #FFD700;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 1rem;
+  z-index: 1000;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* 5) زر “الرجوع للصفحة الرئيسية” أعلى قليلاً فوق الفوتر */
+#home-button {
+  position: fixed;
+  bottom: calc(var(--footer-height) + 1rem);
+  left: 1rem;
+  z-index: 1001;
+}
+
+/* 6) تنسيق أزرار الفوتر */
+.footer-controls .control-btn {
+  background: transparent;
+  border: 2px solid #FFD700;
+  border-radius: 8px;
+  color: #FFD700;
+  padding: 0.5rem 1rem;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.footer-controls .control-btn:hover:not(:disabled) {
+  background: #FFD700;
+  color: #000;
+  transform: scale(1.05);
+}
+
+.footer-controls .control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
+
+
+
+
+
+  #question {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  .question-section {
+    padding: 0.5rem;
+  }
+
+  
