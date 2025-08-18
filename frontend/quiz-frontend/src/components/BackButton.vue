@@ -1,26 +1,13 @@
-<!-- src/components/BackButton.vue -->
 <template>
-  <button
-    class="floating-back-btn"
-    @click="goBack"
-    aria-label="رجوع"
-    title="رجوع"
-  >
+  <button class="floating-back-btn" @click="$emit('back')">
     <i class="fas fa-arrow-left"></i>
-    <span class="back-text">رجوع</span>
   </button>
 </template>
 
 <script>
 export default {
-  name: 'BackButton',
-  emits: ['click'],
-  methods: {
-    goBack() {
-      this.$emit('click')
-    }
-  }
-}
+  name: 'FloatingBackButton'
+};
 </script>
 
 <style scoped>
@@ -30,33 +17,34 @@ export default {
 .floating-back-btn {
   position: fixed;
   bottom: 1.5rem;
-  right: 1.5rem;
+  left: 1.5rem;
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
-  background: #8b5cf6;
+  justify-content: center;
   color: #fff;
-  border: none;
-  border-radius: 50px;
-  padding: 0.75rem 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   font-family: 'Cairo', sans-serif;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.2rem;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: transform 0.1s;
   z-index: 1001;
 }
 
 .floating-back-btn:hover {
-  background: #7c3aed;
-  transform: scale(1.05);
+  transform: scale(1.1);
+}
+
+.floating-back-btn:active {
+  transform: scale(0.95);
 }
 
 .floating-back-btn i {
-  font-size: 1.25rem;
-}
-
-.back-text {
-  margin-left: 0.5rem;
+  pointer-events: none;
 }
 </style>
