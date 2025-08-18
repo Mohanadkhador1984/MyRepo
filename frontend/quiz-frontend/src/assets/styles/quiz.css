@@ -621,13 +621,3 @@ body {
   }
 
   
-
-  .select-arrow {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: #555;
-  font-size: 0.8rem;
-}

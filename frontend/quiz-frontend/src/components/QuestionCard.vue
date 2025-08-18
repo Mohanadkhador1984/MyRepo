@@ -18,7 +18,7 @@
               سؤال {{ idx + 1 }} / {{ questions.length }} {{ statuses[idx] }}
             </option>
           </select>
-          <span class="select-arrow">⌄</span>
+          <span class="select-arrow">▼</span>
         </div>
 
         <div class="timer" aria-label="المؤقت">
@@ -195,43 +195,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-/*— فقط تعديل الدروب داون ليست لتصبح أفخم —*/
-.custom-select-wrapper {
-  position: relative;
-  display: inline-block;
-  width: 220px;
-}
-
-.custom-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  width: 100%;
-  padding: 0.75rem 1.5rem 0.75rem 1rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
- 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-
-.custom-select:focus {
-  outline: none;
-  border-color: #6c63ff;
-  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
-}
-
-.select-arrow {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  font-size: 0.75rem;
-  color: #6c63ff;
-}
-</style>
