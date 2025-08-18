@@ -16,7 +16,8 @@ export default {
 
 .floating-back-btn {
   position: fixed;
-  bottom: 1.5rem;
+  /* ارتفع 1 سم أعلى من موقعه الحالي */
+  bottom: calc(1.5rem + 1.1cm);
   left: 1.5rem;
   width: 3rem;
   height: 3rem;
@@ -35,6 +36,7 @@ export default {
   transition: transform 0.1s;
   z-index: 1001;
 }
+
 
 .floating-back-btn:hover {
   transform: scale(1.1);

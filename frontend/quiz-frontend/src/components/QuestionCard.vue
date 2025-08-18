@@ -1,31 +1,35 @@
-
 <template>
   <div class="question-card">
-    <!-- ✅ الهيدر الرئيسي للتطبيق -->
-   
 
-    <!-- ✅ شريط التنقل الثابت الجديد -->
+    <!-- 1. الهيدر: اختيار السؤال + المؤقت -->
     <div class="sticky-navbar">
       <div class="navbar">
-        <select v-model.number="selectedIndex" aria-label="اختر سؤالاً">
-          <option v-for="(q, idx) in questions" :key="q.id" :value="idx">
-            سؤال {{ idx + 1 }} / {{ questions.length }} {{ statuses[idx] }}
-          </option>
-        </select>
+        <div class="custom-select-wrapper">
+          <select
+            v-model.number="selectedIndex"
+            class="custom-select"
+            aria-label="اختر سؤالاً"
+          >
+            <option
+              v-for="(q, idx) in questions"
+              :key="q.id"
+              :value="idx"
+            >
+              سؤال {{ idx + 1 }} / {{ questions.length }} {{ statuses[idx] }}
+            </option>
+          </select>
+          <span class="select-arrow">⌄</span>
+        </div>
 
-        
         <div class="timer" aria-label="المؤقت">
-          <span class="timer-icon"></span> {{ formattedTime }}
+          <span class="timer-icon"></span>
+          {{ formattedTime }}
         </div>
       </div>
     </div>
 
-
-
-  
-
-    <!-- 2. نص السؤال -->
-   <section class="question-section">
+    <!-- 2. نص السؤال والإجابات -->
+    <section class="question-section">
       <h2 id="question" class="question-text">
         {{ current[`question_${lang}`] }}
       </h2>
@@ -42,52 +46,72 @@
       </div>
     </section>
 
-    <!-- 4. شريط التحكم السفلي -->
+    <!-- 3. شريط التحكم السفلي بأيقونات فقط -->
     <div class="footer-controls">
       <button
         class="control-btn"
         @click="$emit('prev')"
         :disabled="currentIndex === 0"
-        aria-label="السؤال السابق"
+        aria-label="السابق"
       >
-        ⬅️ السابق
+        ▼
       </button>
 
       <button
         v-if="hasText"
         class="control-btn"
         @click="openText"
-        title="فتح النص المرفق"
-        aria-label="فتح النص المرفق"
+        aria-label="عرض النص"
       >
-        📄 نص
+        📄
       </button>
 
       <button
         class="control-btn"
         @click="$emit('toggle-lang')"
-        :aria-label="lang === 'ar' ? 'تبديل إلى الإنجليزية' : 'Switch to Arabic'"
+        aria-label="تبديل لغة"
       >
-        🌐 {{ lang === 'ar' ? 'EN' : 'AR' }}
+        🌐
       </button>
 
       <button
         class="control-btn"
         @click="$emit('next')"
-        aria-label="السؤال التالي أو عرض النتيجة"
+        aria-label="التالي أو عرض النتيجة"
       >
-        {{ currentIndex === questions.length - 1 ? 'عرض النتيجة 🏁' : 'التالي ➡️' }}
+        <template v-if="currentIndex < questions.length - 1">➡️</template>
+        <template v-else>🏁</template>
       </button>
     </div>
 
-    <!-- 5. نافذة النص المرفق -->
-    <div id="text-screen" :class="{ active: showText }" @click.self="closeText">
+    <!-- 4. مودال النص المرفق مع زرّ رجوع محترف -->
+    <div
+      id="text-screen"
+      :class="{ active: showText }"
+      @click.self="closeText"
+    >
       <div class="modal-text">
-        <button class="close-btn" @click="closeText" aria-label="إغلاق النص">
-          &times;
-        </button>
+        <div class="modal-header">
+          <button
+            class="modal-back"
+            @click="closeText"
+            aria-label="رجوع"
+          >
+            ←
+          </button>
+          <button
+            class="modal-close"
+            @click="closeText"
+            aria-label="إغلاق"
+          >
+            ×
+          </button>
+        </div>
         <div class="attached-text">
-          <template v-for="(line, idx) in attachedLines" :key="idx">
+          <template
+            v-for="(line, idx) in attachedLines"
+            :key="idx"
+          >
             <p :class="idx % 2 === 0 ? 'en-line' : 'ar-line'">
               {{ line }}
             </p>
@@ -111,16 +135,11 @@ export default {
     formattedTime: { type: String, required: true }
   },
   data() {
-    return {
-      showText: false
-    };
+    return { showText: false };
   },
   computed: {
     answerOpts() {
-      return [1, 2, 3, 4].map(i => this.current[`answer${i}_${this.lang}`]);
-    },
-    wrong() {
-      return Object.keys(this.answered).length - this.score.correct;
+      return [1,2,3,4].map(i => this.current[`answer${i}_${this.lang}`]);
     },
     attachedText() {
       return (
@@ -130,12 +149,12 @@ export default {
       ).trim();
     },
     hasText() {
-      return this.attachedText.length > 0 && !/^[*_-\s]+$/.test(this.attachedText);
+      return this.attachedText.length > 0;
     },
     attachedLines() {
       return this.attachedText
         .split('\n')
-        .map(line => line.trim())
+        .map(l => l.trim())
         .filter(Boolean);
     },
     isAnswered() {
@@ -148,35 +167,71 @@ export default {
       return this.questions.map((q, idx) => {
         const ans = this.answered[q.id];
         if (ans == null) return '';
-        return ans === this.questions[idx].correct_answer - 1 ? '✅' : '❌';
+        return ans === this.questions[idx].correct_answer - 1
+          ? '✅'
+          : '❌';
       });
     },
     selectedIndex: {
-      get() {
-        return this.currentIndex;
-      },
-      set(val) {
-        this.$emit('jump', val);
-      }
+      get() { return this.currentIndex; },
+      set(val) { this.$emit('jump', val); }
     }
   },
   methods: {
+    selectAnswer(idx) {
+      this.$emit('answer', idx);
+    },
     openText() {
       this.showText = true;
     },
     closeText() {
       this.showText = false;
     },
-    selectAnswer(idx) {
-      this.$emit('answer', idx);
-    },
     getAnswerClass(idx) {
       if (!this.isAnswered) return '';
       if (idx === this.correctIndex) return 'correct';
-      if (idx === this.answered[this.current.id]) return 'wrong';
-      return '';
+      return this.answered[this.current.id] === idx ? 'wrong' : '';
     }
   }
 };
 </script>
 
+<style scoped>
+/*— فقط تعديل الدروب داون ليست لتصبح أفخم —*/
+.custom-select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 220px;
+}
+
+.custom-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100%;
+  padding: 0.75rem 1.5rem 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+ 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.custom-select:focus {
+  outline: none;
+  border-color: #6c63ff;
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+}
+
+.select-arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 0.75rem;
+  color: #6c63ff;
+}
+</style>

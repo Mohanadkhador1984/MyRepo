@@ -47,11 +47,11 @@ body {
   background: var(--bg-card);
   border: 3px solid var(--primary);
   border-radius: 20px;
-  padding: 5px 5px;
-  margin-block: 10px;
+  padding: 1px 5px;
+  margin-block: 5px;
   text-align: center;
   font-size: 16px;
-  line-height: 1.7;
+  line-height: 0.7;
   position: relative;
   box-shadow: 0 0 40px 8px rgba(255, 215, 0, 0.4);
   backdrop-filter: blur(5px);
@@ -61,16 +61,6 @@ body {
 
 
 
-
-.quiz-container::before {
-  content: "";
-  position: absolute;
-  inset: -10px;
-  border-radius: 30px;
-  background: linear-gradient(135deg, #FFD70033, transparent, #FFD70022);
-  filter: blur(10px);
-  z-index: -1;
-}
 
 /* 📝 عنوان السؤال */
 .quiz-container h1 {
@@ -242,22 +232,8 @@ body {
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* 4. تكبير الأيقونات داخل الأزرار */
-.open-text-btn i,
-.lang-toggle-btn i {
-  font-size: 1.6rem;
-  color: #fff;
-  text-shadow: 0 0 4px rgba(0,0,0,0.3);
-}
 
-/* 5. تأثير Hover راقٍ */
-.open-text-btn:hover,
-.lang-toggle-btn:hover {
-  transform: scale(1.2);
-  box-shadow:
-    0 6px 12px rgba(212,175,55,0.7),
-    inset 0 2px 6px rgba(255,255,255,0.4);
-}
+
 
 .prev-btn,
 .next-btn {
@@ -281,7 +257,7 @@ body {
     background 0.3s ease,
     transform 0.2s ease,
     box-shadow 0.2s ease;
-  margin: 0 0.5rem;                             /* تباعد جانبي بين الأزرار */
+  margin: 0 0.1rem;                             /* تباعد جانبي بين الأزرار */
 }
 
 /* أيقونة السهم في زر “السابق” */
@@ -357,28 +333,6 @@ body {
 
 
 
-/* الفوتر بعرض كامل في أسفل الشاشة */
-.footer-controls {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  background: var(--bg-card);
-  border-top: 2px solid var(--primary);
-  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.4);
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;    /* يركّز المحتوى داخله */
-  align-items: center;
-  z-index: 1000;
-}
-
-/* مجموعة الأزرار مُغلَّفة لتتقلص لحجمها وتُركّز */
-.footer-controls .btn-group {
-  display: flex;
-  gap: 0.4rem;                /* مسافة ضيقة بين الأزرار */
-}
 
 /* زرّ دائري بمقاس مناسب للموبايل */
 .footer-controls .control-btn {
@@ -409,7 +363,7 @@ body {
 
 /* تأمين مساحة أسفل المحتوى حتى لا يغطّيه الفوتر */
 .quiz-container {
-  padding-bottom: calc(1.5rem + 1rem);
+  padding-bottom: calc(0.5rem + 1rem);
 }
 
 
@@ -567,15 +521,15 @@ body {
 
 :root {
   /* عدّل القيم التالية لتطابق ارتفاعات مشروعك فعلياً */
-  --main-header-height: 64px;           /* ارتفاع الهيدر الرئيسي */
+  --main-header-height: 44px;           /* ارتفاع الهيدر الرئيسي */
   --timer-bar-height: 2.5rem;           /* ارتفاع شريط المؤقت */
   --dropdown-height: 3rem;              /* ارتفاع شريط الـ select */
   --sticky-navbar-height: calc(
     var(--timer-bar-height)
     + var(--dropdown-height)
   );                                     /* مجموع ارتفاع شريط التنقل الثابت */
-  --footer-height: 60px;                /* ارتفاع الفوتر */
-  --container-margin: 1rem;             /* الهامش حول الحاوية */
+  --footer-height: 55px;                /* ارتفاع الفوتر */
+  --container-margin: 0.8rem;             /* الهامش حول الحاوية */
 }
 
 /* 1) حاوية السؤال والأجوبة ثابتة أسفل الهيدر و فوق الفوتر */
@@ -596,7 +550,7 @@ body {
   background: rgba(0, 0, 0, 0.9);
   border: 2px solid #FFD700;
   border-radius: 10px;
-  padding: 0rem;
+  padding: 5rem;
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
 
   overflow-y: auto;   /* تمرير داخلي إذا احتاج المحتوى */
@@ -606,7 +560,7 @@ body {
 /* 2) نص السؤال داخل الحاوية */
 .question-section .question-text {
   color: #FFD700;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 
@@ -616,7 +570,7 @@ body {
   position: fixed;
   bottom: 0; left: 0; right: 0;
  left: 0; right: 0;
-  height: 3rem;  
+  height: 3.5rem;  
   background: rgba(0, 0, 0, 0.8);
   border-top: 2px solid #FFD700;
   display: flex;
@@ -658,12 +612,22 @@ body {
 
 
   #question {
-    font-size:17px;
+    font-size:18px;
     padding: 0.5rem;
   }
 
   .question-section {
-    padding: 0.5rem;
+    padding: 0.9rem;
   }
 
   
+
+  .select-arrow {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #555;
+  font-size: 0.8rem;
+}
