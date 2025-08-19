@@ -88,7 +88,6 @@ body {
     direction: ltr; /* اتجاه النص من اليمين إلى اليسار */
 }
 
-
 .answers {
   display: flex;
   flex-direction: column;
@@ -96,15 +95,15 @@ body {
   gap: 15px;
   direction: rtl;
   padding: 1rem;
-  /* أزلنا الهامش العلوي لأنه لم يعد ضروريًا مع التمركز الكامل */
 }
 
 .answers button {
-  display: inline-flex;           /* يتوسع حسب النص فقط */
-  align-items: center;
+  display: inline-flex;            /* يسمح بالتوسع حسب المحتوى */
+  flex-wrap: wrap;                  /* التفاف نص الأزرار للسطر التالي */
   justify-content: center;
-  width: auto;                     /* عرض ديناميكي */
-  max-width: none;                 /* إلغاء الحد الأقصى في حال وُضع سابقًا */
+  align-items: center;
+  width: auto;                      /* عرض ديناميكي */
+  max-width: 100%;                  /* يمنع تجاوز عرض الحاوية */
   padding: 10px 12px;
   background: #001f3f;
   border: 3px solid var(--primary);
@@ -112,13 +111,15 @@ body {
   color: #fff;
   font-size: 16px;
   font-weight: bold;
-  white-space: nowrap;             /* منع تكسير النص */
+  white-space: normal;              /* يتيح لفّ النص */
+  word-break: break-word;           /* يكسر الكلمات الطويلة */
   text-align: center;
   line-height: 1.4;
-  transition: transform 0.3s ease-in-out,
-              box-shadow 0.3s ease-in-out,
-              background 0.3s ease-in-out,
-              color 0.3s ease-in-out;
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out,
+    background 0.3s ease-in-out,
+    color 0.3s ease-in-out;
   cursor: pointer;
   animation: fadeInUp 0.4s ease both;
 }
@@ -152,7 +153,6 @@ body {
     opacity: 1;
   }
 }
-
 
 
 
