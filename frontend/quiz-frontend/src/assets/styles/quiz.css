@@ -412,8 +412,8 @@ body {
 
 /* تنسيق قائمة الاختيار داخل الشريط */
 .navbar select {
-  width: 200px;                   /* زيادة العرض */
-  max-width: 690%;                 
+  width: 150px;                   /* زيادة العرض */
+  max-width: 50%;                 
   padding: 0.6rem 1.2rem;         /* حشوة مريحة */
   background-color: #000;
   color: gold;

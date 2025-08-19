@@ -2,7 +2,7 @@
   <div class="question-card">
 
     <!-- 1. الهيدر: اختيار السؤال + المؤقت -->
-    <div class="sticky-navbar">
+    <div class="navbar select">
       <div class="navbar">
         <select
           v-model.number="selectedIndex"
