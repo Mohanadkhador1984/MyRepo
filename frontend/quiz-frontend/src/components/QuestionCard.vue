@@ -4,22 +4,18 @@
     <!-- 1. الهيدر: اختيار السؤال + المؤقت -->
     <div class="sticky-navbar">
       <div class="navbar">
-        <div class="custom-select-wrapper">
-          <select
-            v-model.number="selectedIndex"
-            class="custom-select"
-            aria-label="اختر سؤالاً"
+        <select
+          v-model.number="selectedIndex"
+          aria-label="اختر سؤالاً"
+        >
+          <option
+            v-for="(q, idx) in questions"
+            :key="q.id"
+            :value="idx"
           >
-            <option
-              v-for="(q, idx) in questions"
-              :key="q.id"
-              :value="idx"
-            >
-              سؤال {{ idx + 1 }} / {{ questions.length }} {{ statuses[idx] }}
-            </option>
-          </select>
-          <span class="select-arrow">▼</span>
-        </div>
+            سؤال {{ idx + 1 }} / {{ questions.length }} {{ statuses[idx] }}
+          </option>
+        </select>
 
         <div class="timer" aria-label="المؤقت">
           <span class="timer-icon"></span>
@@ -46,45 +42,39 @@
       </div>
     </section>
 
-    <!-- 3. شريط التحكم السفلي بأيقونات فقط -->
+    <!-- 3. شريط التحكم السفلي (أيقونات فقط) -->
     <div class="footer-controls">
       <button
         class="control-btn"
         @click="$emit('prev')"
         :disabled="currentIndex === 0"
         aria-label="السابق"
-      >
-        ▼
-      </button>
+      >⬅️</button>
 
       <button
         v-if="hasText"
         class="control-btn"
         @click="openText"
-        aria-label="عرض النص"
-      >
-        📄
-      </button>
+        aria-label="عرض النص المرفق"
+      >📄</button>
 
       <button
         class="control-btn"
         @click="$emit('toggle-lang')"
         aria-label="تبديل لغة"
-      >
-        🌐
-      </button>
+      >🌐</button>
 
       <button
         class="control-btn"
         @click="$emit('next')"
         aria-label="التالي أو عرض النتيجة"
       >
-        <template v-if="currentIndex < questions.length - 1">➡️</template>
-        <template v-else>🏁</template>
+        <span v-if="currentIndex < questions.length - 1">➡️</span>
+        <span v-else>🏁</span>
       </button>
     </div>
 
-    <!-- 4. مودال النص المرفق مع زرّ رجوع محترف -->
+    <!-- 4. نافذة النص المرفق مع زر رجوع وإغلاق -->
     <div
       id="text-screen"
       :class="{ active: showText }"
@@ -92,26 +82,15 @@
     >
       <div class="modal-text">
         <div class="modal-header">
-          <button
-            class="modal-back"
-            @click="closeText"
-            aria-label="رجوع"
-          >
-            ←
+          <button class="modal-back" @click="closeText" aria-label="رجوع">
+            ← رجوع
           </button>
-          <button
-            class="modal-close"
-            @click="closeText"
-            aria-label="إغلاق"
-          >
+          <button class="modal-close" @click="closeText" aria-label="إغلاق">
             ×
           </button>
         </div>
         <div class="attached-text">
-          <template
-            v-for="(line, idx) in attachedLines"
-            :key="idx"
-          >
+          <template v-for="(line, idx) in attachedLines" :key="idx">
             <p :class="idx % 2 === 0 ? 'en-line' : 'ar-line'">
               {{ line }}
             </p>
@@ -119,6 +98,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -135,21 +115,25 @@ export default {
     formattedTime: { type: String, required: true }
   },
   data() {
-    return { showText: false };
+    return {
+      showText: false
+    };
   },
   computed: {
     answerOpts() {
       return [1,2,3,4].map(i => this.current[`answer${i}_${this.lang}`]);
     },
     attachedText() {
-      return (
+      const txt = (
         this.current[`attached_text_${this.lang}`] ||
-        this.current.attached_text ||
+        this.current.attached_text  ||
         ''
       ).trim();
+      return txt;
     },
     hasText() {
-      return this.attachedText.length > 0;
+      const txt = this.attachedText;
+      return txt.length > 0 && !/^[*_]+$/.test(txt);
     },
     attachedLines() {
       return this.attachedText
@@ -195,3 +179,4 @@ export default {
   }
 };
 </script>
+

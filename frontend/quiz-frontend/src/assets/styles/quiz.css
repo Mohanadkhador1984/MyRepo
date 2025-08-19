@@ -88,33 +88,38 @@ body {
     direction: ltr; /* اتجاه النص من اليمين إلى اليسار */
 }
 
-/* ✅ الأجوبة */
+
 .answers {
-  margin-top: 0.4rem;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   gap: 15px;
-  margin-top: 20px;
   direction: rtl;
   padding: 1rem;
+  /* أزلنا الهامش العلوي لأنه لم يعد ضروريًا مع التمركز الكامل */
 }
 
 .answers button {
+  display: inline-flex;           /* يتوسع حسب النص فقط */
+  align-items: center;
+  justify-content: center;
+  width: auto;                     /* عرض ديناميكي */
+  max-width: none;                 /* إلغاء الحد الأقصى في حال وُضع سابقًا */
+  padding: 10px 12px;
   background: #001f3f;
   border: 3px solid var(--primary);
   border-radius: 999px;
   color: #fff;
   font-size: 16px;
   font-weight: bold;
-  padding: 10px 12px;
-  /* box-shadow: 0 0 15px var(--primary);  */
-  transition: all 0.3s ease-in-out; 
-  cursor: pointer;
-  white-space: normal;
-  max-width: 100%;
+  white-space: nowrap;             /* منع تكسير النص */
   text-align: center;
   line-height: 1.4;
+  transition: transform 0.3s ease-in-out,
+              box-shadow 0.3s ease-in-out,
+              background 0.3s ease-in-out,
+              color 0.3s ease-in-out;
+  cursor: pointer;
   animation: fadeInUp 0.4s ease both;
 }
 
@@ -127,17 +132,16 @@ body {
 
 .answers button.correct {
   background: var(--success) !important;
-  border-color: #fff !important;
-  color: #fff !important;
+  border-color: #fff       !important;
+  color: #fff              !important;
 }
 
 .answers button.wrong {
-  background: var(--danger) !important;
-  border-color: #fff !important;
-  color: #000 !important;
+  background: var(--danger)  !important;
+  border-color: #fff       !important;
+  color: #000              !important;
 }
 
-/* حركة دخول ناعمة */
 @keyframes fadeInUp {
   from {
     transform: translateY(20px);
@@ -529,7 +533,7 @@ body {
     + var(--dropdown-height)
   );                                     /* مجموع ارتفاع شريط التنقل الثابت */
   --footer-height: 55px;                /* ارتفاع الفوتر */
-  --container-margin: 2rem;             /* الهامش حول الحاوية */
+  --container-margin: 1rem;             /* 2222222222222222222222222222222222الهامش حول الحاوية */
 }
 
 /* 1) حاوية السؤال والأجوبة ثابتة أسفل الهيدر و فوق الفوتر */
@@ -619,5 +623,29 @@ body {
   .question-section {
     padding: 0.5rem;
   }
+
+
+  /* تنسيق رأس المودال وزر الرجوع */
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+/* زر رجوع شاشة النص المرفق */
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
 
   
