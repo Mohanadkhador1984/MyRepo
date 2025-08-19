@@ -19,7 +19,12 @@
 <script>
 export default {
   name: 'YearSelector',
-  props: { options: { type: Array, required: true } },
+  props: {
+    options: {
+      type: Array,
+      required: true
+    }
+  },
   emits: ['select'],
   data() {
     return {
@@ -39,66 +44,91 @@ export default {
 </script>
 
 <style scoped>
-/* استخدام متغيرات جذّابة */
+/* 1. خط عربي عصري */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
+:root {
+  --primary:   #c59e44;   /* ذهبي */
+  --secondary: #001f3f;   /* أزرق داكن */
+  --text:      #f5f5f5;   /* أبيض فاتح */
+  --radius:    12px;
+  --gap:       1.5rem;
+  --padding:   2rem;
+  --transition: 0.3s ease;
+}
+
 .year-selector {
-  max-width: 800px;
-  margin: 0 auto 2rem;
-  padding: var(--spacing);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Tajawal', sans-serif;
+  margin-bottom: 2rem;
 }
 
 .title {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
   color: var(--primary);
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  margin-bottom: calc(var(--spacing) * 1.5);
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  margin-bottom: calc(var(--padding) / 1.5);
 }
 
 .years-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: var(--spacing);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--gap);
+  background: #000;
+  border: 3px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--padding);
+  width: fit-content;
+  max-width: 90vw;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
 }
 
-/* زر السنة */
 .year-button {
   position: relative;
-  background: var(--bg-card);
-  color: var(--text-light);
-  border: 2px solid var(--primary);
-  padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem);
-  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  width: 100%;
+  padding: 1.25rem 0;
+  font-size: clamp(1rem, 2vw, 1.3rem);
   font-weight: 600;
+  color: var(--text);
+  background: var(--secondary);
+  border: 2px solid var(--primary);
   border-radius: var(--radius);
   cursor: pointer;
-  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 
+    background var(--transition), 
+    transform var(--transition), 
+    box-shadow var(--transition);
 }
 
-/* تأثير التحويم */
-.year-button:hover:not(.locked) {
-  background: var(--secondary);
-  color: var(--text);
-  transform: translateY(-3px) scale(1.03);
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.5),
+.year-button:hover:not(.locked),
+.year-button:focus:not(.locked) {
+  background: var(--primary);
+  color: var(--secondary);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.7), 
     0 0 20px var(--primary);
+  outline: none;
 }
 
-/* الحالة المقفلة */
 .year-button.locked {
   background: #222;
   border-color: #555;
   color: #777;
+  filter: grayscale(80%);
   cursor: not-allowed;
   box-shadow: none;
-  filter: grayscale(80%);
 }
 
-/* أيقونة القفل */
 .lock-icon {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 0.75rem;
+  right: 0.75rem;
   font-size: 1.2rem;
   opacity: 0.8;
 }
