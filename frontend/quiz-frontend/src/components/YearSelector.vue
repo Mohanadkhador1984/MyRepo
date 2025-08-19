@@ -9,7 +9,7 @@
         @click="select(year)"
         :class="['year-button', { locked: isLocked(year) }]"
       >
-        {{ year }}
+        <span class="year-text">{{ year }}</span>
         <span v-if="isLocked(year)" class="lock-icon">🔒</span>
       </button>
     </div>
@@ -46,95 +46,165 @@ export default {
 </script>
 
 <style scoped>
-/* استيراد خط عربي عصري */
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
 
 :root {
-  --primary:    #c59e44;    /* ذهبي */
-  --secondary:  #001f3f;    /* أزرق داكن */
-  --text-light: #f5f5f5;    /* أبيض فاتح */
-  --radius:     12px;
-  --gap:        1rem;
-  --padding:    1.5rem;
-  --transition: 0.3s ease;
+  --gold-light:    #ffe16a;
+  --gold-med:      #c59e44;
+  --gold-dark:     #b07f17;
+  --gold-med-rgb:  197,158,68;
+  --locked-bg:     rgba(0, 0, 0, 0.75);
+  --locked-border: var(--gold-med);
+  --white-soft:    #f5f5f5;
+  --glass-bg:      rgba(255,255,255,0.08);
+  --glass-border:  rgba(255,255,255,0.2);
+  --radius:        20px;
+  --gap:           2rem;
+  --padding:       2.5rem;
+  --transition:    0.4s ease-in-out;
 }
 
+/* إطار ذهبي متدرج حول الشاشة */
 .year-selector {
+  position: relative;
+  padding: calc(var(--padding) + 12px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: radial-gradient(circle at center, #111 0%, #000 75%);
   font-family: 'Tajawal', sans-serif;
-  text-align: center;
-  padding: var(--padding) 0;
+  overflow: hidden;
+  border: 12px solid transparent;
+  border-image: conic-gradient(
+    from 45deg,
+    var(--gold-light),
+    var(--gold-med),
+    var(--gold-dark),
+    var(--gold-med),
+    var(--gold-light)
+  ) 1;
+  box-shadow:
+    0 0 20px var(--gold-med),
+    inset 0 0 30px rgba(0,0,0,0.6);
 }
 
+/* عنوان بتدرج ذهبي وشفافية */
 .title {
-  font-size: clamp(1.8rem, 5vw, 2.4rem);
-  color: var(--primary);
+  font-size: clamp(2.4rem, 6vw, 3.2rem);
+  font-weight: 900;
+  background: linear-gradient(90deg, var(--gold-light), var(--gold-med));
+  -webkit-background-clip: text;
+  color: transparent;
   margin-bottom: var(--gap);
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
 }
 
-/* شبكة الأزرار: جدولية واستجابة تامة على الهاتف */
+/* حاوية الأزرار بزجاج ضبابي */
 .years-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: var(--gap);
-  margin: 0 auto;
-  padding: var(--padding);
-  background: #000;
-  border: 3px solid var(--primary);
-  border-radius: var(--radius);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-
-  /* تشغل 90% من عرض الشاشة على الهواتف */
   width: 90vw;
-  max-width: 480px;
+  max-width: 540px;
+  padding: var(--padding);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 0 36px rgba(255,255,255,0.1),
+    0 10px 28px rgba(0,0,0,0.75);
 }
 
-/* زر السنة */
+/* تصميم الأزرار العامة */
 .year-button {
   position: relative;
-  width: 100%;
-  padding: 1rem 0;
-  font-size: clamp(1rem, 2.5vw, 1.25rem);
-  font-weight: 600;
-  color: var(--text-light);
-  background: var(--secondary);
-  border: 2px solid var(--primary);
+  padding: clamp(0.8rem, 3vw, 1.2rem) 0;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  font-weight: 700;
+  color: var(--white-soft);
+  background: linear-gradient(145deg, var(--gold-light), var(--gold-med));
+  border: 2px solid transparent;
+  border-image: conic-gradient(
+    from 0deg,
+    var(--gold-light),
+    var(--gold-med),
+    var(--gold-light)
+  ) 1;
   border-radius: var(--radius);
+  box-shadow:
+    inset -3px -3px 12px rgba(255,255,255,0.3),
+    inset 3px 3px 8px rgba(0,0,0,0.4),
+    0 6px 20px rgba(0,0,0,0.8);
   cursor: pointer;
-  transition:
-    background var(--transition),
-    transform var(--transition),
-    box-shadow var(--transition);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  transition: transform var(--transition), box-shadow var(--transition);
+  overflow: hidden;
 }
 
 .year-button:hover:not(.locked),
 .year-button:focus:not(.locked) {
-  background: var(--primary);
-  color: var(--secondary);
-  transform: translateY(-3px) scale(1.03);
+  transform: translateY(-5px) scale(1.07);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.7),
-    0 0 20px var(--primary);
+    inset -3px -3px 12px rgba(255,255,255,0.35),
+    inset 3px 3px 8px rgba(0,0,0,0.45),
+    0 8px 24px rgba(0,0,0,0.85),
+    0 0 16px var(--gold-light);
   outline: none;
 }
 
+/* أسلوب فاخر للأزرار المؤمَّنة */
 .year-button.locked {
-  background: #222;
-  border-color: #555;
-  color: #777;
-  filter: grayscale(80%);
+  background: var(--locked-bg);
+  border: 2px solid var(--locked-border);
+  color: var(--locked-border);
+  box-shadow:
+    inset 0 0 8px rgba(0,0,0,0.8),
+    0 0 12px rgba(var(--gold-med-rgb),0.5);
+  text-shadow: 0 0 3px var(--locked-border);
+  backdrop-filter: blur(4px);
   cursor: not-allowed;
-  box-shadow: none;
 }
 
-.lock-icon {
+/* إخفاء نص السنة عند القفل */
+.year-button.locked .year-text {
+  visibility: hidden;
+}
+
+/* أيقونة قفل متوهجة ونابضة */
+.year-button.locked .lock-icon {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  font-size: 1.2rem;
-  opacity: 0.8;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: var(--gold-light);
+  text-shadow:
+    0 0 6px var(--gold-light),
+    0 0 12px var(--gold-med);
+  animation: pulseLock 2.5s ease-in-out infinite;
+  opacity: 0.9;
+}
+
+@keyframes pulseLock {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+/* تحسين للشاشات الصغيرة */
+@media (max-width: 360px) {
+  :root {
+    --gap: 1.5rem;
+    --padding: 1.5rem;
+  }
+  .title {
+    margin-bottom: 1.5rem;
+    font-size: clamp(2rem, 8vw, 2.6rem);
+  }
 }
 </style>
