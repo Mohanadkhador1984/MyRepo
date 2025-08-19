@@ -30,88 +30,93 @@ export default {
     return {
       lockedYears: [2022],
       isActivated: localStorage.getItem('activated') === 'true'
-    }
+    };
   },
   methods: {
     select(year) {
-      if (!this.isLocked(year)) this.$emit('select', year)
+      if (!this.isLocked(year)) {
+        this.$emit('select', year);
+      }
     },
     isLocked(year) {
-      return this.lockedYears.includes(Number(year)) && !this.isActivated
+      return this.lockedYears.includes(Number(year)) && !this.isActivated;
     }
   }
-}
+};
 </script>
 
 <style scoped>
-/* 1. خط عربي عصري */
+/* استيراد خط عربي عصري */
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
 
 :root {
-  --primary:   #c59e44;   /* ذهبي */
-  --secondary: #001f3f;   /* أزرق داكن */
-  --text:      #f5f5f5;   /* أبيض فاتح */
-  --radius:    12px;
-  --gap:       1.5rem;
-  --padding:   2rem;
+  --primary:    #c59e44;    /* ذهبي */
+  --secondary:  #001f3f;    /* أزرق داكن */
+  --text-light: #f5f5f5;    /* أبيض فاتح */
+  --radius:     12px;
+  --gap:        1rem;
+  --padding:    1.5rem;
   --transition: 0.3s ease;
 }
 
 .year-selector {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   font-family: 'Tajawal', sans-serif;
-  margin-bottom: 2rem;
+  text-align: center;
+  padding: var(--padding) 0;
 }
 
 .title {
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
   color: var(--primary);
+  margin-bottom: var(--gap);
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-  margin-bottom: calc(var(--padding) / 1.5);
 }
 
+/* شبكة الأزرار: جدولية واستجابة تامة على الهاتف */
 .years-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: var(--gap);
+  margin: 0 auto;
+  padding: var(--padding);
   background: #000;
   border: 3px solid var(--primary);
   border-radius: var(--radius);
-  padding: var(--padding);
-  width: fit-content;
-  max-width: 90vw;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+
+  /* تشغل 90% من عرض الشاشة على الهواتف */
+  width: 90vw;
+  max-width: 480px;
 }
 
+/* زر السنة */
 .year-button {
   position: relative;
   width: 100%;
-  padding: 1.25rem 0;
-  font-size: clamp(1rem, 2vw, 1.3rem);
+  padding: 1rem 0;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
   font-weight: 600;
-  color: var(--text);
+  color: var(--text-light);
   background: var(--secondary);
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   cursor: pointer;
+  transition:
+    background var(--transition),
+    transform var(--transition),
+    box-shadow var(--transition);
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: 
-    background var(--transition), 
-    transform var(--transition), 
-    box-shadow var(--transition);
 }
 
 .year-button:hover:not(.locked),
 .year-button:focus:not(.locked) {
   background: var(--primary);
   color: var(--secondary);
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.7), 
+  transform: translateY(-3px) scale(1.03);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.7),
     0 0 20px var(--primary);
   outline: none;
 }
@@ -127,8 +132,8 @@ export default {
 
 .lock-icon {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  top: 0.5rem;
+  right: 0.5rem;
   font-size: 1.2rem;
   opacity: 0.8;
 }

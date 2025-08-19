@@ -1,7 +1,7 @@
 <template>
   <div class="quiz-container">
     <div class="welcome">مرحبا بك في تطبيق بكالوريا إنكليزي</div>
-    <div class="subtitle">اختر الفرع</div>
+   
     <div class="year-selection">
       <button @click="$emit('select','A')">أدبي</button>
       <button @click="$emit('select','B')">علمي</button>
@@ -26,31 +26,22 @@ export default {
   --light:     #f5f5f5;   /* أبيض فاتح */
 }
 
-/* 3. تنسيق الحاوية الرئيسية */
-.quiz-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem 1rem;
-  text-align: center;
-  background: transparent;
-  font-family: 'Tajawal', sans-serif;
-}
+
 
 /* 4. ترحيب كبير بنص ذهبي وظل خفيف */
 .welcome {
-  font-size: 2.5rem;
+  font-size: 2.0rem;
   font-weight: 700;
   color: var(--primary);
   text-shadow: 0 3px 8px rgba(0, 0, 0, 0.6);
-  margin-bottom: 0.5rem;
+  margin-bottom: 3.5rem;
   line-height: 1.2;
 }
 
 /* 5. العنوان الفرعي بنص أبيض وحجم متناسق */
 .subtitle {
   font-size: 1.5rem;
-  font-weight: 400;
+  font-weight: 200;
   color: var(--light);
   margin-bottom: 2rem;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);

@@ -109,7 +109,7 @@ body {
   border: 3px solid var(--primary);
   border-radius: 999px;
   color: #fff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   white-space: normal;              /* يتيح لفّ النص */
   word-break: break-word;           /* يكسر الكلمات الطويلة */
@@ -590,7 +590,7 @@ body {
 
 
   #question {
-    font-size:20px;
+    font-size:18px;
     padding: 0.5rem;
   }
 
