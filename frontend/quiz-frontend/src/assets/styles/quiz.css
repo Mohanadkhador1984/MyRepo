@@ -109,7 +109,7 @@ body {
   border: 3px solid var(--primary);
   border-radius: 999px;
   color: #fff;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   white-space: normal;              /* يتيح لفّ النص */
   word-break: break-word;           /* يكسر الكلمات الطويلة */
@@ -410,17 +410,47 @@ body {
   z-index: 999;
 }
 
-/* تنسيق قائمة الاختيار داخل الشريط */
+/* تنسيق قائمة الاختيار داخل الشريط - أكبر حجماً وفخمة مع سهم مدمج */
 .navbar select {
+  width: 280px;                   /* زيادة العرض */
+  max-width: 90%;                 
+  padding: 0.6rem 1.2rem;         /* حشوة مريحة */
+  
+  /* خلفية سوداء مع سهم ذهبي بصيغة SVG */
   background-color: #000;
+  background-image:
+    url('data:image/svg+xml;utf8,\
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="gold" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l5 5 5-5"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 14px;
+
   color: gold;
-  border: 1px solid gold;
-  padding: 8px 12px;
-  border-radius: 6px;
+  border: 2px solid gold;
+  border-radius: 8px;             /* حواف ناعمة */
   font-size: 1rem;
-  appearance: none;
+  font-weight: 600;
+  appearance: none;               /* إخفاء السهم الافتراضي */
   cursor: pointer;
+
+  /* ظل خفيف وفخم حول الصندوق */
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.8),
+    0 0 4px rgba(255, 215, 0, 0.6);
+
+  transition: 
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
 }
+
+.navbar select:hover,
+.navbar select:focus {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.8),
+    0 0 8px rgba(255, 215, 0, 0.8);
+}
+
 
 /* رفع محتوى الصفحة لأسفل بما يكفي لتفادي التداخل */
 .page-content {
@@ -616,7 +646,7 @@ body {
 
 
   #question {
-    font-size:17px;
+    font-size:20px;
     padding: 0.5rem;
   }
 
