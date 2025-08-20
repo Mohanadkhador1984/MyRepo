@@ -241,12 +241,6 @@ onBeforeUnmount(() => {
   font-size: 0.85rem;
   color: #FFD700;
 }
-.hint {
-  display: block;
-  margin-top: 0.4rem;
-  font-size: 0.75rem;
-  color: #ffe066;
-}
 
 .btn.send {
   display: block;
@@ -332,10 +326,5 @@ onBeforeUnmount(() => {
   transform: translateY(-2px);
 }
 
-@media (max-width: 480px) {
-  .results-container { padding: 1.5rem; }
-  .title { font-size: 2.4rem; }
-  .chart-box { max-width: 200px; height: 200px; }
-  .cards-grid { gap: 0.75rem; }
-}
+
 </style>
