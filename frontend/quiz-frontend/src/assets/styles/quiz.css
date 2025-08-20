@@ -12,6 +12,9 @@
   --spacing: 1rem;
 }
 
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap');
+
 /* 🌌 الجسم العام */
 body {
   font-family: var(--font);

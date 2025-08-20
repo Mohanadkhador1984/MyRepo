@@ -35,7 +35,7 @@
           :key="idx"
           :disabled="isAnswered"
           :class="getAnswerClass(idx)"
-          @click="selectAnswer(idx)"
+          @click="selectLocalAnswer(idx)"
         >
           {{ ans }}
         </button>
@@ -116,7 +116,8 @@ export default {
   },
   data() {
     return {
-      showText: false
+      showText: false,
+      examFinished: false,
     };
   },
   computed: {
@@ -159,10 +160,27 @@ export default {
     selectedIndex: {
       get() { return this.currentIndex; },
       set(val) { this.$emit('jump', val); }
+    },
+    allAnswered() {
+      return Object.keys(this.answered).length >= this.questions.length;
     }
   },
+  watch: {
+    allAnswered(val) {
+      if (val) this.finishExam();
+    }
+  },
+  mounted() {
+    history.pushState({ inQuiz: true }, '', location.href);
+    window.addEventListener('popstate', this.handleBack);
+    window.addEventListener('beforeunload', this.beforeUnload);
+  },
+  beforeUnmount() {
+    window.removeEventListener('popstate', this.handleBack);
+    window.removeEventListener('beforeunload', this.beforeUnload);
+  },
   methods: {
-    selectAnswer(idx) {
+    selectLocalAnswer(idx) {
       this.$emit('answer', idx);
     },
     openText() {
@@ -175,8 +193,37 @@ export default {
       if (!this.isAnswered) return '';
       if (idx === this.correctIndex) return 'correct';
       return this.answered[this.current.id] === idx ? 'wrong' : '';
+    },
+
+    // eslint-disable-next-line no-unused-vars
+    handleBack(event) {
+      if (!this.examFinished) {
+        history.pushState({ inQuiz: true }, '', location.href);
+        const leave = confirm('هل تريد إلغاء الامتحان فعلاً؟');
+        if (leave) {
+          this.finishExam();
+          history.back();
+        }
+      }
+    },
+
+    beforeUnload(e) {
+      if (!this.examFinished) {
+        const msg = 'الاختبار لم ينتهِ بعد. تأكيد الخروج وإلغاء الامتحان؟';
+        e.returnValue = msg;
+        return msg;
+      }
+    },
+    finishExam() {
+      this.examFinished = true;
+      window.removeEventListener('popstate', this.handleBack);
+      window.removeEventListener('beforeunload', this.beforeUnload);
     }
   }
 };
 </script>
 
+<style scoped>
+/* تحتفظ بأنماط QuestionCard الأصلية */
+/* ... */
+</style>
