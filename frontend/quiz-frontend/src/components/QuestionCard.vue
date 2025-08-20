@@ -346,4 +346,38 @@ export default {
     transform: translateY(0) scale(1);
   }
 }
+
+
+
+
+/* حالة عرض النتائج */
+.control-btn.next.finish {
+  background: linear-gradient(90deg, #facc15, #f43f5e);
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.8),
+              0 0 16px rgba(244, 63, 94, 0.8);
+  animation: blink 1s ease-in-out infinite alternate;
+}
+
+/* أيقونة وزوم بسيط */
+.control-btn .icon {
+  display: inline-block;
+  font-size: 1.2rem;
+  transition: transform 0.2s;
+}
+
+.control-btn.next.finish .icon {
+  animation: pop 0.6s ease infinite;
+}
+
+/* Keyframes */
+@keyframes blink {
+  from { opacity: 1; }
+  to   { opacity: 0.6; }
+}
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
 </style>
