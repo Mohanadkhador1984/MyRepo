@@ -42,7 +42,7 @@
       </div>
     </section>
 
-    <!-- 3. شريط التحكم السفلي (أيقونات فقط) -->
+    <!-- 3. شريط التحكم السفلي -->
     <div class="footer-controls">
       <button
         class="control-btn"
@@ -74,7 +74,7 @@
       </button>
     </div>
 
-    <!-- 4. نافذة النص المرفق مع زر رجوع وإغلاق -->
+    <!-- 4. نافذة النص المرفق -->
     <div
       id="text-screen"
       :class="{ active: showText }"
@@ -99,6 +99,25 @@
       </div>
     </div>
 
+    <!-- 5. نافذة تأكيد إلغاء الامتحان -->
+    <div v-if="showConfirm" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-window">
+        <i class="fas fa-exclamation-circle modal-icon"></i>
+        <h3 class="modal-title">تأكيد إلغاء الامتحان</h3>
+        <p class="modal-text">
+          هل تريد فعلاً إلغاء الامتحان؟ لن تتمكن من استئنافه بعد ذلك.
+        </p>
+        <div class="modal-actions">
+          <button class="btn btn-outline" @click="closeModal">
+            أكمل الامتحان
+          </button>
+          <button class="btn btn-danger" @click="confirmLeave">
+            ألغي الامتحان
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -116,7 +135,8 @@ export default {
   },
   data() {
     return {
-      showText: false,
+      showText:     false,
+      showConfirm:  false,
       examFinished: false,
     };
   },
@@ -199,14 +219,9 @@ export default {
     handleBack(event) {
       if (!this.examFinished) {
         history.pushState({ inQuiz: true }, '', location.href);
-        const leave = confirm('هل تريد إلغاء الامتحان فعلاً؟');
-        if (leave) {
-          this.finishExam();
-          history.back();
-        }
+        this.showConfirm = true;
       }
     },
-
     beforeUnload(e) {
       if (!this.examFinished) {
         const msg = 'الاختبار لم ينتهِ بعد. تأكيد الخروج وإلغاء الامتحان؟';
@@ -214,16 +229,121 @@ export default {
         return msg;
       }
     },
-    finishExam() {
+    closeModal() {
+      this.showConfirm = false;
+    },
+    confirmLeave() {
       this.examFinished = true;
+      this.finishExam();
+      this.closeModal();
+      history.back();
+    },
+    finishExam() {
       window.removeEventListener('popstate', this.handleBack);
       window.removeEventListener('beforeunload', this.beforeUnload);
+      this.$emit('exam-finished');
     }
   }
 };
 </script>
 
 <style scoped>
-/* تحتفظ بأنماط QuestionCard الأصلية */
-/* ... */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-window {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 1.8rem;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+  animation: slide-down 0.3s ease-out forwards;
+}
+
+.modal-icon {
+  font-size: 2.2rem;
+  color: #fbbf24;
+  margin-bottom: 0.4rem;
+}
+
+.modal-title {
+  font-family: 'Cairo', sans-serif;
+  font-size: 1.4rem;
+  color: #fbbf24;
+  margin-bottom: 0.6rem;
+}
+
+.modal-text {
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.95rem;
+  color: #eee;
+  margin-bottom: 1.2rem;
+  line-height: 1.3;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.55rem 0.8rem;
+  border-radius: 8px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid #16a34a;
+  color: #16a34a;
+}
+
+.btn-outline:hover {
+  background: #16a34a;
+  color: #111;
+}
+
+.btn-danger {
+  background: #dc2626;
+  border: 2px solid #b91c1c;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 </style>
