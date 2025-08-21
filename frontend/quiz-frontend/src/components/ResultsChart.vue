@@ -181,9 +181,9 @@ export default {
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
 
 .results-container {
-  max-width: 700px;
-  margin: 3rem auto;
-  padding: 2rem 3.5rem;
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem 1.5rem;
   border-radius: 16px;
   background: rgba(20, 20, 30, 0.6);
   backdrop-filter: blur(15px);
