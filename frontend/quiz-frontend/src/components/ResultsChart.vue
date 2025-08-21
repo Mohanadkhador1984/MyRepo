@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
 .results-container {
   max-width: 640px;
   margin: 2.5rem auto;
-  padding:3.5rem;
+  padding:4.5rem;
   border-radius: 24px;
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(20px);

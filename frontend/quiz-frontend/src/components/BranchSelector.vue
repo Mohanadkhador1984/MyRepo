@@ -29,7 +29,7 @@ export default {
 .quiz-container {
   display: grid;
   place-items: center;
-  min-height: 100vh;
+  min-height: 50vh;
   padding: clamp(1rem, 5vw, 2rem);
   background: radial-gradient(circle at top left, #111 0%, var(--bg-dark) 90%);
   font-family: 'Tajawal', sans-serif;
