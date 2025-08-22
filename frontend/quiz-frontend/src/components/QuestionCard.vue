@@ -35,17 +35,17 @@
           :key="idx"
           :disabled="isAnswered"
           :class="getAnswerClass(idx)"
-          @click="selectLocalAnswer(idx)"
+          @click="selectAnswer(idx)"
         >
           {{ ans }}
         </button>
       </div>
     </section>
 
-    <!-- 3. شريط التحكم السفلي -->
+    <!-- 3. شريط التحكم السفلي (أيقونات فقط) -->
     <div class="footer-controls">
       <button
-        class="control-btn nav-btn"
+        class="control-btn"
         @click="$emit('prev')"
         :disabled="currentIndex === 0"
         aria-label="السابق"
@@ -53,21 +53,20 @@
 
       <button
         v-if="hasText"
-        class="control-btn nav-btn"
+        class="control-btn"
         @click="openText"
         aria-label="عرض النص المرفق"
       >📄</button>
 
       <button
-        class="control-btn nav-btn"
+        class="control-btn"
         @click="$emit('toggle-lang')"
         aria-label="تبديل لغة"
       >🌐</button>
 
       <button
-        class="control-btn nav-btn next-btn"
-        :class="{ finish: currentIndex === questions.length - 1 && allAnswered }"
-        @click="$emit(currentIndex < questions.length - 1 ? 'next' : 'finish')"
+        class="control-btn"
+        @click="$emit('next')"
         aria-label="التالي أو عرض النتيجة"
       >
         <span v-if="currentIndex < questions.length - 1">➡️</span>
@@ -75,7 +74,7 @@
       </button>
     </div>
 
-    <!-- 4. نافذة النص المرفق -->
+    <!-- 4. نافذة النص المرفق مع زر رجوع وإغلاق -->
     <div
       id="text-screen"
       :class="{ active: showText }"
@@ -97,29 +96,6 @@
             </p>
           </template>
         </div>
-        <!-- زر رجوع للامتحان الحالي -->
-        <button class="btn return-exam" @click="closeText">
-          ↩️ رجوع للامتحان
-        </button>
-      </div>
-    </div>
-
-    <!-- 5. نافذة تأكيد إلغاء الامتحان -->
-    <div v-if="showConfirm" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-window">
-        <i class="fas fa-exclamation-circle modal-icon"></i>
-        <h3 class="modal-title">تأكيد إلغاء الامتحان</h3>
-        <p class="modal-text">
-          هل تريد فعلاً إلغاء الامتحان؟ لن تتمكن من استئنافه بعد ذلك.
-        </p>
-        <div class="modal-actions">
-          <button class="btn btn-outline" @click="closeModal">
-            أكمل الامتحان
-          </button>
-          <button class="btn btn-danger" @click="confirmLeave">
-            ألغي الامتحان
-          </button>
-        </div>
       </div>
     </div>
 
@@ -140,9 +116,7 @@ export default {
   },
   data() {
     return {
-      showText:     false,
-      showConfirm:  false,
-      examFinished: false,
+      showText: false
     };
   },
   computed: {
@@ -185,27 +159,10 @@ export default {
     selectedIndex: {
       get() { return this.currentIndex; },
       set(val) { this.$emit('jump', val); }
-    },
-    allAnswered() {
-      return Object.keys(this.answered).length >= this.questions.length;
     }
-  },
-  watch: {
-    allAnswered(val) {
-      if (val) this.finishExam();
-    }
-  },
-  mounted() {
-    history.pushState({ inQuiz: true }, '', location.href);
-    window.addEventListener('popstate', this.handleBack);
-    window.addEventListener('beforeunload', this.beforeUnload);
-  },
-  beforeUnmount() {
-    window.removeEventListener('popstate', this.handleBack);
-    window.removeEventListener('beforeunload', this.beforeUnload);
   },
   methods: {
-    selectLocalAnswer(idx) {
+    selectAnswer(idx) {
       this.$emit('answer', idx);
     },
     openText() {
@@ -218,266 +175,10 @@ export default {
       if (!this.isAnswered) return '';
       if (idx === this.correctIndex) return 'correct';
       return this.answered[this.current.id] === idx ? 'wrong' : '';
-    },
-    // إزالة الوسيط غير المستخدم لتلافي تحذير no-unused-vars
-    handleBack() {
-      if (!this.examFinished) {
-        history.pushState({ inQuiz: true }, '', location.href);
-        this.showConfirm = true;
-      }
-    },
-    beforeUnload(e) {
-      if (!this.examFinished) {
-        const msg = 'الاختبار لم ينتهِ بعد. تأكيد الخروج وإلغاء الامتحان؟';
-        e.returnValue = msg;
-        return msg;
-      }
-    },
-    closeModal() {
-      this.showConfirm = false;
-    },
-    confirmLeave() {
-      this.examFinished = true;
-      this.finishExam();
-      this.closeModal();
-      history.back();
-    },
-    finishExam() {
-      window.removeEventListener('popstate', this.handleBack);
-      window.removeEventListener('beforeunload', this.beforeUnload);
-      this.$emit('exam-finished');
     }
   }
 };
 </script>
 
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
 
-.modal-window {
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
-  padding: 1.8rem;
-  width: 300px;
-  text-align: center;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.7);
-  animation: slide-down 0.3s ease-out forwards;
-}
-
-.modal-icon {
-  font-size: 2.2rem;
-  color: #fbbf24;
-  margin-bottom: 0.4rem;
-}
-
-.modal-title {
-  font-family: 'Cairo', sans-serif;
-  font-size: 1.4rem;
-  color: #fbbf24;
-  margin-bottom: 0.6rem;
-}
-
-.modal-text {
-  font-family: 'Cairo', sans-serif;
-  font-size: 0.95rem;
-  color: #eee;
-  margin-bottom: 1.2rem;
-  line-height: 1.3;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 0.6rem;
-}
-
-.btn {
-  flex: 1;
-  padding: 0.55rem 0.8rem;
-  border-radius: 8px;
-  font-family: 'Cairo', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.2s;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
-}
-
-.btn-outline {
-  background: transparent;
-  border: 2px solid #16a34a;
-  color: #16a34a;
-}
-
-.btn-outline:hover {
-  background: #16a34a;
-  color: #111;
-}
-
-.btn-danger {
-  background: #dc2626;
-  border: 2px solid #b91c1c;
-  color: #fff;
-}
-
-.btn-danger:hover {
-  background: #b91c1c;
-}
-
-@keyframes slide-down {
-  from {
-    opacity: 0;
-    transform: translateY(-15px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* أيقونة وزوم بسيط عند النهاية */
-.control-btn .icon {
-  display: inline-block;
-  font-size: 1.2rem;
-  transition: transform 0.2s;
-}
-.control-btn.next.finish .icon {
-  animation: pop 0.6s ease infinite;
-}
-@keyframes pop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-
-/* حالة عرض النتائج متوهجة */
-.control-btn.next.finish {
-  background: linear-gradient(90deg, #facc15, #f43f5e);
-  box-shadow: 0 0 8px rgba(250,204,21,0.8),
-              0 0 16px rgba(244,63,94,0.8);
-  animation: blink 1s ease-in-out infinite alternate;
-}
-@keyframes blink {
-  from { opacity: 1; }
-  to   { opacity: 0.6; }
-}
-
-/* شاشة النص المرفق وزر الرجوع */
-@keyframes slide-down-modal {
-  from { opacity: 0; transform: translateY(-20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes slide-in-bottom {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-#text-screen {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: none;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 3rem;
-  z-index: 1500;
-  overflow-y: auto;
-}
-#text-screen.active {
-  display: flex;
-}
-#text-screen .modal-text {
-  background: rgba(30,30,40,0.95);
-  border-radius: 12px;
-  max-width: 90%;
-  width: 500px;
-  padding: 1.5rem;
-  animation: slide-down-modal 0.4s ease-out;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-}
-#text-screen .modal-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-#text-screen .modal-back,
-#text-screen .modal-close {
-  background: transparent;
-  border: none;
-  color: #ccc;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-#text-screen .modal-back:hover,
-#text-screen .modal-close:hover {
-  color: #fff;
-}
-#text-screen .attached-text {
-  max-height: 300px;
-  overflow-y: auto;
-  line-height: 1.4;
-  color: #eee;
-  padding-right: 0.5rem;
-}
-#text-screen .attached-text p {
-  margin: 0.6rem 0;
-}
-.en-line { font-family: monospace; direction: ltr; }
-.ar-line { font-family: 'Cairo', sans-serif; direction: rtl; }
-
-/* زر “رجوع للامتحان” */
-.return-exam {
-  width: 100%;
-  padding: 0.8rem;
-  margin-top: 1.2rem;
-  border: none;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #06b6d4, #3b82f6);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  cursor: pointer;
-  animation: slide-in-bottom 0.5s ease-out;
-  transition: transform 0.2s, background 0.3s;
-}
-.return-exam:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(90deg, #0ea5e9, #2563eb);
-}
-
-/* تحسين شكل أزرار الفوتر */
-.footer-controls .nav-btn {
-  flex: 1;
-  padding: 0.8rem 0;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #facc15, #f43f5e);
-  color: #fff;
-  font-size: 1.2rem;
-  box-shadow: 0 6px 18px rgba(244,63,94,0.5);
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.footer-controls .nav-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 22px rgba(244,63,94,0.7);
-}
-</style>

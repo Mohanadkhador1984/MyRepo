@@ -5,7 +5,7 @@
     aria-label="رجوع"
   >
     <i class="fas fa-arrow-left"></i>
-    <span class="label">رجوع</span>
+    <span class="label">إغلاق</span>
   </button>
 </template>
 
@@ -52,6 +52,7 @@ export default {
   cursor: pointer;
   transition: transform 0.15s ease, background 0.3s ease;
   z-index: 1001;
+  
 }
 
 .floating-back-btn:hover {
