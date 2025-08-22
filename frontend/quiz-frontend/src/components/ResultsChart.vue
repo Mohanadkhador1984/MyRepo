@@ -6,24 +6,24 @@
 
     <!-- حقول الإدخال -->
     <div class="inputs-wrapper">
-      <!-- اسم الطالب -->
       <div class="input-group">
         <input
           id="studentName"
           v-model="studentName"
           type="text"
           placeholder="أدخل اسم الطالب"
+          :disabled="sent"
         />
         <label for="studentName">اسم الطالب</label>
       </div>
 
-      <!-- رقم المدرّس -->
       <div class="input-group">
         <input
           id="teacherPhone"
           v-model="teacherPhone"
           type="tel"
           placeholder="مثال: 0988131514"
+          :disabled="sent"
         />
         <label for="teacherPhone">رقم المدرّس</label>
       </div>
@@ -33,16 +33,16 @@
     <div class="action-btns">
       <button
         class="btn whatsapp"
-        :disabled="!canSend"
+        :disabled="!canSend || sent"
         @click="sendReportToTeacher"
       >
         <i class="fab fa-whatsapp fa-lg"></i>
-        إرسال النتيجة عبر واتساب
+        {{ sent ? 'تم الإرسال' : 'إرسال النتيجة عبر واتساب' }}
       </button>
     </div>
 
     <!-- بطاقات النتائج -->
-    <div class="cards-grid">
+    <div class="cards-grid" :class="{ locked: sent }">
       <div class="card correct">
         <i class="fas fa-check-circle"></i>
         <div class="text">
@@ -74,15 +74,18 @@
     </div>
 
     <!-- الرسم الدائري -->
-    <div class="chart-box">
+    <div class="chart-box" :class="{ locked: sent }">
       <canvas ref="doughnutCanvas"></canvas>
     </div>
 
     <!-- زر إعادة الاختبار -->
-    <button class="btn reset" @click="$emit('reset')">
+    <button
+      class="btn reset"
+      @click="$emit('reset')"
+      :disabled="!sent"
+    >
       إعادة الاختبار
     </button>
-
   </div>
 </template>
 
@@ -98,15 +101,12 @@ export default {
     percentage: { type: Number, required: true }
   },
   setup(props) {
-    // reactive state
-    const studentName   = ref('')
-    const teacherPhone  = ref('')
+    const studentName    = ref('')
+    const teacherPhone   = ref('')
+    const sent           = ref(false)
     const doughnutCanvas = ref(null)
 
-    // الحسابات
     const total = computed(() => props.correct + props.wrong)
-
-    // صلاحية الحقول
     const studentNameValid = computed(() =>
       studentName.value.trim().length > 0
     )
@@ -114,13 +114,12 @@ export default {
       /^09\d{8}$/.test(teacherPhone.value.trim())
     )
     const canSend = computed(() =>
-      studentNameValid.value && teacherPhoneValid.value
-    )
-    const isPass = computed(() =>
-      props.percentage >= 50
+      studentNameValid.value && teacherPhoneValid.value && !sent.value
     )
 
-    // رسم مخطط الدونات
+    // eslint-disable-next-line no-unused-vars
+    const isPass = computed(() => props.percentage >= 50)
+
     const renderChart = () => {
       if (!doughnutCanvas.value) return
       new Chart(doughnutCanvas.value, {
@@ -131,48 +130,49 @@ export default {
             data: [props.correct, props.wrong],
             backgroundColor: ['#00E676', '#F44336'],
             hoverBackgroundColor: ['#00C853', '#E53935'],
-            borderWidth: 3,
-            borderColor: '#2f2f40'
+            borderColor: '#2f2f40',
+            borderWidth: 3
           }]
         },
         options: {
           cutout: '70%',
-          animation: { duration: 1500, easing: 'easeOutBounce' },
+          animation: {
+            duration: 1500,
+            easing: 'easeOutBounce'
+          },
           plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label(ctx) {
-                  const v = ctx.parsed
-                  const p = Math.round((v / total.value) * 100)
-                  return `${ctx.label}: ${v} (${p}%)`
-                }
-              }
-            }
+            legend: { display: false }
           }
         }
       })
     }
 
-    // إرسال تقرير عبر واتساب
-    const sendReportToTeacher = () => {
+    // إرسال مباشر عبر الباك-إند دون معاينة WhatsApp
+    const sendReportToTeacher = async () => {
       if (!canSend.value) return
 
-      // صياغة الرسالة
-      let message =
-        `📊 نتائج اختبار الطالب\n\n` +
-        `👤 الاسم: ${studentName.value}\n` +
-        `✅ إجابات صحيحة: ${props.correct}\n` +
-        `❌ إجابات خاطئة: ${props.wrong}\n` +
-        `🔢 الإجمالي: ${total.value}\n` +
-        `📈 النسبة: ${props.percentage}%\n\n` +
-        (isPass.value
-          ? '🎉 تهانينا للطالب/ة على هذا الإنجاز المميز ونتمنى له دوام التفوق!'
-          : '👏 لا تيأس، نستمر في المحاولة والتدريب لتحقيق النجاح في المرة القادمة.')
+      sent.value = true
 
-      const text = encodeURIComponent(message)
-      const phone = teacherPhone.value.trim()    // مثال: “0988131514”
-      window.open(`https://wa.me/${phone}?text=${text}`, '_blank')
+      const payload = {
+        phone:      teacherPhone.value.trim(),
+        name:       studentName.value.trim(),
+        correct:    props.correct,
+        wrong:      props.wrong,
+        percentage: props.percentage
+      }
+
+      try {
+        await fetch('/api/send-whatsapp', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(payload)
+        })
+        // يمكنك هنا التعامل مع رد السيرفر أو عرض إشعار نجاح
+      }
+      catch (err) {
+        console.error('Send failed:', err)
+        sent.value = false
+      }
     }
 
     onMounted(renderChart)
@@ -181,16 +181,18 @@ export default {
     return {
       studentName,
       teacherPhone,
+      canSend,
+      sendReportToTeacher,
       doughnutCanvas,
       total,
-      canSend,
-      sendReportToTeacher
+      sent
     }
   }
 }
 </script>
 
 <style scoped>
+/* eslint-disable */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
 
@@ -199,12 +201,13 @@ export default {
   margin: 3rem auto;
   padding: 2rem;
   background: linear-gradient(145deg, #1f1f35, #161626);
-  border-radius: 16px;
   color: #f1f1f1;
   font-family: 'Cairo', sans-serif;
   text-align: center;
+  border-radius: 16px;
   box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
+
 
 .title {
   font-size: 2.4rem;
@@ -253,6 +256,8 @@ export default {
 .btn.whatsapp {
   width: 100%;
   padding: 1rem;
+  background: linear-gradient(90deg, #25D366, #128C7E);
+  color: #fff;
   border: none;
   border-radius: 12px;
   font-size: 1rem;
@@ -261,10 +266,8 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(90deg, #25D366, #128C7E);
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(37,211,102,0.4);
   cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,211,102,0.4);
   transition: background 0.3s, transform 0.2s;
 }
 .btn.whatsapp:disabled {
@@ -274,6 +277,17 @@ export default {
 .btn.whatsapp:not(:disabled):hover {
   transform: translateY(-2px);
   background: linear-gradient(90deg, #1ebe5d, #0f7c6c);
+}
+
+.cards-grid,
+.chart-box {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+.cards-grid.locked,
+.chart-box.locked {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .cards-grid {
@@ -287,8 +301,8 @@ export default {
   align-items: center;
   gap: 0.8rem;
   padding: 1rem;
-  border-radius: 12px;
   background: rgba(255,255,255,0.05);
+  border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.3);
   transition: transform 0.2s;
 }
@@ -320,12 +334,12 @@ export default {
 .btn.reset {
   width: 100%;
   padding: 1rem;
+  background: #444;
+  color: #eee;
   border: none;
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 700;
-  background: #444;
-  color: #eee;
   box-shadow: 0 6px 16px rgba(0,0,0,0.4);
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
