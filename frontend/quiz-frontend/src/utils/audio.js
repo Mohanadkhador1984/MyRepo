@@ -9,6 +9,6 @@ const makeAudio = (path) => {
 
 export const clickSound   = makeAudio('click.mp3');
 export const correctSound = makeAudio('correct.mp3');
-export const wrongSound   = makeAudio('wrong.mp3');
+export const wrongSound   = makeAudio('discorrect.mp3');
 export const bgMusic      = makeAudio('bg-music.mp3');
 bgMusic.loop = true;

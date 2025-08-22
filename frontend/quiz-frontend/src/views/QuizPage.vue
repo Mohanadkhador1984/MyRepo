@@ -96,7 +96,7 @@ import BranchSelector from '@/components/BranchSelector.vue'
 import YearSelector from '@/components/YearSelector.vue'
 import QuestionCard from '@/components/QuestionCard.vue'
 import ResultsChart from '@/components/ResultsChart.vue'
-import BackButton from '@/components/BackButton.vue'
+// import BackButton from '@/components/BackButton.vue'
 
 export default {
   name: 'QuizPage',
@@ -105,7 +105,7 @@ export default {
     YearSelector,
     QuestionCard,
     ResultsChart,
-    BackButton
+    // BackButton
   },
   setup() {
     const screen = ref('branch')
