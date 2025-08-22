@@ -1,11 +1,17 @@
 <template>
   <div class="results-container">
 
+    <!-- زر الإغلاق الفاخر -->
+  <button class="close-btn" @click="$emit('reset')" aria-label="إغلاق">
+    <i class="fas fa-times fa-lg"></i>
+  </button>
+
     <!-- العنوان -->
     <h2 class="title">نتائج الاختبار</h2>
 
     <!-- حقول الإدخال -->
     <div class="inputs-wrapper">
+      <!-- اسم الطالب -->
       <div class="input-group">
         <input
           id="studentName"
@@ -17,6 +23,7 @@
         <label for="studentName">اسم الطالب</label>
       </div>
 
+      <!-- رقم المدرّس -->
       <div class="input-group">
         <input
           id="teacherPhone"
@@ -78,7 +85,7 @@
       <canvas ref="doughnutCanvas"></canvas>
     </div>
 
-    <!-- زر إعادة الاختبار -->
+    <!-- زر إعادة الاختبار (أحمر أو فاقع) -->
     <button
       class="btn reset"
       @click="$emit('reset')"
@@ -117,9 +124,7 @@ export default {
       studentNameValid.value && teacherPhoneValid.value && !sent.value
     )
 
-    // eslint-disable-next-line no-unused-vars
-    const isPass = computed(() => props.percentage >= 50)
-
+    // رسم مخطط الدونات
     const renderChart = () => {
       if (!doughnutCanvas.value) return
       new Chart(doughnutCanvas.value, {
@@ -136,21 +141,18 @@ export default {
         },
         options: {
           cutout: '70%',
-          animation: {
-            duration: 1500,
-            easing: 'easeOutBounce'
-          },
-          plugins: {
-            legend: { display: false }
-          }
+          animation: { duration: 1500, easing: 'easeOutBounce' },
+          plugins: { legend: { display: false } }
         }
       })
     }
 
-    // إرسال مباشر عبر الباك-إند دون معاينة WhatsApp
+    /**
+     * محاولة إرسال عبر الخلفية.
+     * إذا فشل، نفتح رابط wa.me كحل مؤقت.
+     */
     const sendReportToTeacher = async () => {
       if (!canSend.value) return
-
       sent.value = true
 
       const payload = {
@@ -162,16 +164,24 @@ export default {
       }
 
       try {
-        await fetch('/api/send-whatsapp', {
+        const res = await fetch('/api/send-whatsapp', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify(payload)
         })
-        // يمكنك هنا التعامل مع رد السيرفر أو عرض إشعار نجاح
+        if (!res.ok) throw new Error('Server error')
       }
       catch (err) {
-        console.error('Send failed:', err)
-        sent.value = false
+        console.warn('Backend send failed, fallback to wa.me', err)
+        // فتح تطبيق واتساب مع معاينة (طالب سيضغط للإرسال)
+        const message =
+          `📘 نتائج اختبار الطالب\n\n` +
+          `👤 الاسم: ${payload.name}\n` +
+          `✅ صحيحة: ${payload.correct}  ❌ خاطئة: ${payload.wrong}\n` +
+          `🔢 المجموع: ${payload.correct + payload.wrong}\n` +
+          `📊 النسبة: ${payload.percentage}%`
+        const text = encodeURIComponent(message)
+        window.open(`https://wa.me/${payload.phone}?text=${text}`, '_blank')
       }
     }
 
@@ -192,11 +202,11 @@ export default {
 </script>
 
 <style scoped>
-/* eslint-disable */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
 
 .results-container {
+  position: relative;
   max-width: 650px;
   margin: 3rem auto;
   padding: 2rem;
@@ -208,6 +218,48 @@ export default {
   box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
 
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(145deg, #ffdd00, #e6c200);
+  border: 2px solid #fff8c6;
+  border-radius: 50%;
+  box-shadow:
+    0 0 8px rgba(255,221,0,0.6),
+    0 0 20px rgba(230,194,0,0.4),
+    inset 0 0 10px rgba(255,255,255,0.5);
+  color: #ffffff;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.close-btn::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), transparent 70%);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.close-btn:hover {
+  transform: scale(1.2);
+  box-shadow:
+    0 0 12px rgba(255,221,0,0.8),
+    0 0 30px rgba(230,194,0,0.6),
+    inset 0 0 15px rgba(255,255,255,0.7);
+}
 
 .title {
   font-size: 2.4rem;
@@ -334,8 +386,8 @@ export default {
 .btn.reset {
   width: 100%;
   padding: 1rem;
-  background: #444;
-  color: #eee;
+  background: #e53935; /* أحمر فاقع */
+  color: #fff;
   border: none;
   border-radius: 12px;
   font-size: 1rem;
@@ -344,8 +396,12 @@ export default {
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
 }
-.btn.reset:hover {
-  background: #555;
+.btn.reset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn.reset:hover:not(:disabled) {
+  background: #d32f2f;
   transform: translateY(-2px);
 }
 
