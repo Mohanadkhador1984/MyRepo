@@ -35,7 +35,7 @@ export default {
 /* زر ثابت في الأسفل بنفس موضعك السابق */
 .floating-back-btn {
   position: fixed;
-  bottom: calc(1.5rem + 1cm);
+  bottom: calc(1.5rem + 1.5cm);
   left: 1.5rem;
   display: flex;
   align-items: center;

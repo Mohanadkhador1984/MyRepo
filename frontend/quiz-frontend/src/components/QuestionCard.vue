@@ -45,7 +45,7 @@
     <!-- 3. شريط التحكم السفلي -->
     <div class="footer-controls">
       <button
-        class="control-btn"
+        class="control-btn nav-btn"
         @click="$emit('prev')"
         :disabled="currentIndex === 0"
         aria-label="السابق"
@@ -53,20 +53,21 @@
 
       <button
         v-if="hasText"
-        class="control-btn"
+        class="control-btn nav-btn"
         @click="openText"
         aria-label="عرض النص المرفق"
       >📄</button>
 
       <button
-        class="control-btn"
+        class="control-btn nav-btn"
         @click="$emit('toggle-lang')"
         aria-label="تبديل لغة"
       >🌐</button>
 
       <button
-        class="control-btn"
-        @click="$emit('next')"
+        class="control-btn nav-btn next-btn"
+        :class="{ finish: currentIndex === questions.length - 1 && allAnswered }"
+        @click="$emit(currentIndex < questions.length - 1 ? 'next' : 'finish')"
         aria-label="التالي أو عرض النتيجة"
       >
         <span v-if="currentIndex < questions.length - 1">➡️</span>
@@ -96,6 +97,10 @@
             </p>
           </template>
         </div>
+        <!-- زر رجوع للامتحان الحالي -->
+        <button class="btn return-exam" @click="closeText">
+          ↩️ رجوع للامتحان
+        </button>
       </div>
     </div>
 
@@ -214,9 +219,8 @@ export default {
       if (idx === this.correctIndex) return 'correct';
       return this.answered[this.current.id] === idx ? 'wrong' : '';
     },
-
-    // eslint-disable-next-line no-unused-vars
-    handleBack(event) {
+    // إزالة الوسيط غير المستخدم لتلافي تحذير no-unused-vars
+    handleBack() {
       if (!this.examFinished) {
         history.pushState({ inQuiz: true }, '', location.href);
         this.showConfirm = true;
@@ -347,37 +351,133 @@ export default {
   }
 }
 
-
-
-
-/* حالة عرض النتائج */
-.control-btn.next.finish {
-  background: linear-gradient(90deg, #facc15, #f43f5e);
-  box-shadow: 0 0 8px rgba(250, 204, 21, 0.8),
-              0 0 16px rgba(244, 63, 94, 0.8);
-  animation: blink 1s ease-in-out infinite alternate;
-}
-
-/* أيقونة وزوم بسيط */
+/* أيقونة وزوم بسيط عند النهاية */
 .control-btn .icon {
   display: inline-block;
   font-size: 1.2rem;
   transition: transform 0.2s;
 }
-
 .control-btn.next.finish .icon {
   animation: pop 0.6s ease infinite;
 }
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
 
-/* Keyframes */
+/* حالة عرض النتائج متوهجة */
+.control-btn.next.finish {
+  background: linear-gradient(90deg, #facc15, #f43f5e);
+  box-shadow: 0 0 8px rgba(250,204,21,0.8),
+              0 0 16px rgba(244,63,94,0.8);
+  animation: blink 1s ease-in-out infinite alternate;
+}
 @keyframes blink {
   from { opacity: 1; }
   to   { opacity: 0.6; }
 }
 
-@keyframes pop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.3); }
-  100% { transform: scale(1); }
+/* شاشة النص المرفق وزر الرجوع */
+@keyframes slide-down-modal {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-in-bottom {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+#text-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 3rem;
+  z-index: 1500;
+  overflow-y: auto;
+}
+#text-screen.active {
+  display: flex;
+}
+#text-screen .modal-text {
+  background: rgba(30,30,40,0.95);
+  border-radius: 12px;
+  max-width: 90%;
+  width: 500px;
+  padding: 1.5rem;
+  animation: slide-down-modal 0.4s ease-out;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+}
+#text-screen .modal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+#text-screen .modal-back,
+#text-screen .modal-close {
+  background: transparent;
+  border: none;
+  color: #ccc;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+#text-screen .modal-back:hover,
+#text-screen .modal-close:hover {
+  color: #fff;
+}
+#text-screen .attached-text {
+  max-height: 300px;
+  overflow-y: auto;
+  line-height: 1.4;
+  color: #eee;
+  padding-right: 0.5rem;
+}
+#text-screen .attached-text p {
+  margin: 0.6rem 0;
+}
+.en-line { font-family: monospace; direction: ltr; }
+.ar-line { font-family: 'Cairo', sans-serif; direction: rtl; }
+
+/* زر “رجوع للامتحان” */
+.return-exam {
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 1.2rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  cursor: pointer;
+  animation: slide-in-bottom 0.5s ease-out;
+  transition: transform 0.2s, background 0.3s;
+}
+.return-exam:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(90deg, #0ea5e9, #2563eb);
+}
+
+/* تحسين شكل أزرار الفوتر */
+.footer-controls .nav-btn {
+  flex: 1;
+  padding: 0.8rem 0;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #facc15, #f43f5e);
+  color: #fff;
+  font-size: 1.2rem;
+  box-shadow: 0 6px 18px rgba(244,63,94,0.5);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.footer-controls .nav-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(244,63,94,0.7);
 }
 </style>
