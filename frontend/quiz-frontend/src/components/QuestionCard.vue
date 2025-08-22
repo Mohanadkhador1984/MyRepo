@@ -80,18 +80,12 @@
       :class="{ active: showText }"
       @keydown.esc="closeText"
     >
-      <!-- الخلفية المموّهة -->
       <div class="modal-overlay" @click="closeText"></div>
-
-      <!-- صندوق النص المميز -->
       <div class="modal-text">
-        <!-- رأس المودال -->
         <div class="modal-header">
           <h3>النص المرفق</h3>
           <button class="modal-close" @click="closeText" aria-label="إغلاق">×</button>
         </div>
-
-        <!-- جسم المودال -->
         <div class="attached-body">
           <div class="attached-text">
             <template v-for="(line, idx) in attachedLines" :key="idx">
@@ -100,14 +94,23 @@
               </p>
             </template>
           </div>
-          <!-- زر الرجوع العائم -->
           <button
             class="modal-back-floating"
             @click="closeText"
             aria-label="رجوع"
-          >
-            ← رجوع
-          </button>
+          >← رجوع</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. شاشة تأكيد الخروج عند الضغط على زر الرجوع في الجهاز -->
+    <div v-if="showConfirm" class="confirm-overlay" @click.self="closeConfirm">
+      <div class="confirm-dialog">
+        <h3>تـأكيـد الخـروج</h3>
+        <p>هل تريد فعلاً إلغاء الامتحان؟ لن تتمكن من استئنافه بعد ذلك.</p>
+        <div class="confirm-actions">
+          <button class="btn btn-outline" @click="closeConfirm">أكمل الامتحان</button>
+          <button class="btn btn-danger"  @click="confirmLeave">إلغاء الامتحان</button>
         </div>
       </div>
     </div>
@@ -123,13 +126,14 @@ export default {
     current:       { type: Object, required: true },
     currentIndex:  { type: Number, required: true },
     answered:      { type: Object, required: true },
-    score:         { type: Object, required: true },
     lang:          { type: String, required: true },
     formattedTime: { type: String, required: true }
   },
   data() {
     return {
-      showText: false
+      showText:    false,
+      showConfirm: false,
+      examFinished: false
     };
   },
   computed: {
@@ -139,7 +143,7 @@ export default {
     attachedText() {
       const txt = (
         this.current[`attached_text_${this.lang}`] ||
-        this.current.attached_text  ||
+        this.current.attached_text ||
         ''
       ).trim();
       return txt;
@@ -161,17 +165,15 @@ export default {
       return this.current.correct_answer - 1;
     },
     statuses() {
-      return this.questions.map((q, idx) => {
+      return this.questions.map((q, i) => {
         const ans = this.answered[q.id];
         if (ans == null) return '';
-        return ans === this.questions[idx].correct_answer - 1
-          ? '✅'
-          : '❌';
+        return ans === this.questions[i].correct_answer - 1 ? '✅' : '❌';
       });
     },
     selectedIndex: {
       get() { return this.currentIndex; },
-      set(val) { this.$emit('jump', val); }
+      set(v) { this.$emit('jump', v); }
     }
   },
   methods: {
@@ -191,126 +193,99 @@ export default {
       if (!this.isAnswered) return '';
       if (idx === this.correctIndex) return 'correct';
       return this.answered[this.current.id] === idx ? 'wrong' : '';
+    },
+    // اعتراض زر الرجوع في المتصفح/الجهاز
+    // eslint-disable-next-line no-unused-vars
+    handlePopState(event) {
+      if (!this.examFinished) {
+        history.pushState({ inQuiz: true }, '', location.href);
+        this.showConfirm = true;
+      }
+    },
+    closeConfirm() {
+      this.showConfirm = false;
+    },
+    confirmLeave() {
+      this.examFinished = true;
+      this.$emit('exam-finished');
+      this.closeConfirm();
+      history.back();
     }
+  },
+  mounted() {
+    // منع الخروج المفاجئ
+    history.pushState({ inQuiz: true }, '', location.href);
+    window.addEventListener('popstate', this.handlePopState);
+  },
+  beforeUnmount() {
+    window.removeEventListener('popstate', this.handlePopState);
   }
 };
 </script>
 
 <style scoped>
-/* النص المرفق – شاشة مودال كاملة */
-#text-screen {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-#text-screen.active {
-  display: flex;
-  animation: fadeIn 0.25s ease-out;
-}
-
-/* الخلفية المموّهة */
-.modal-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+/* الخلفية المموّهة للنص */
+#text-screen .modal-overlay {
+  background: rgba(0,0,0,0.6);
   backdrop-filter: blur(6px);
 }
 
-/* صندوق المودال */
-.modal-text {
-  position: relative;
-  width: 90%;
-  max-width: 640px;
-  max-height: 90vh;
-  background: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  display: flex;
-  flex-direction: column;
-}
-
-/* رأس المودال */
-.modal-header {
+/* مودال تأكيد الخروج */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(90deg, #6a11cb, #2575fc);
-  padding: 1rem 1.5rem;
-  color: #fff;
+  justify-content: center;
+  z-index: 1200;
 }
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-.modal-close {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1.6rem;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.modal-close:hover {
-  transform: scale(1.2);
-}
-
-/* جسم المودال مع التمرير */
-.attached-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-}
-.attached-text {
-  flex: 1;
-  overflow-y: auto;
+.confirm-dialog {
+  background: #fff;
+  border-radius: 12px;
   padding: 1.5rem;
-  line-height: 1.6;
-  color: #333;
-  font-family: 'Cairo', sans-serif;
-}
-/* شريط التمرير المخصص */
-.attached-text::-webkit-scrollbar {
-  width: 8px;
-}
-.attached-text::-webkit-scrollbar-track {
-  background: transparent;
-}
-.attached-text::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-/* زر الرجوع العائم أسفل النص */
-.modal-back-floating {
-  position: sticky;
-  bottom: 0;
-  width: 100%;
-  padding: 0.8rem;
-  background: linear-gradient(90deg, #2575fc, #6a11cb);
-  color: #fff;
-  font-size: 1rem;
+  width: 300px;
   text-align: center;
-  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.confirm-dialog h3 {
+  margin-bottom: 0.8rem;
+  font-family: 'Cairo', sans-serif;
+  color: #dc2626;
+}
+.confirm-dialog p {
+  font-family: 'Cairo', sans-serif;
+  margin-bottom: 1.2rem;
+  color: #333;
+}
+.confirm-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+.confirm-actions .btn {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 8px;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
-  transition: background 0.3s, transform 0.2s;
-  z-index: 1;
+  border: none;
 }
-.modal-back-floating:hover {
-  background: linear-gradient(90deg, #1e65d1, #205bbf);
-  transform: translateY(-2px);
+.btn-outline {
+  background: transparent;
+  border: 2px solid #16a34a;
+  color: #16a34a;
 }
-
-/* تأثير فتح المودال */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.btn-outline:hover {
+  background: #16a34a;
+  color: #fff;
+}
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #b91c1c;
 }
 </style>
