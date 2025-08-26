@@ -1,31 +1,36 @@
-<!-- src/views/QuizPage.vue -->
 <template>
   <div class="relative min-h-screen p-4">
+    <!-- 1) Show activation modal only when needed -->
+    <ActivationModal
+      v-if="showActivationModal"
+      @activated="onActivated"
+      @close="showActivationModal = false"
+    />
+
+    <!-- 2) Branch selector screen -->
     <BranchSelector
       v-if="screen === 'branch'"
       @select="goYear"
     />
 
+    <!-- 3) Year selector screen -->
     <YearSelector
       v-else-if="screen === 'year'"
       :options="years"
-      @select="startQuiz"
+      :activated="isActivated"
+      :locked-years="lockedYears"
+      @select="handleYearSelect"
     />
 
-    <div
-      v-else-if="loadingQuestions"
-      class="text-center mt-10"
-    >
+    <!-- 4) Loading / error -->
+    <div v-else-if="loadingQuestions" class="text-center mt-10">
       جاري تحميل الأسئلة…
     </div>
-
-    <div
-      v-else-if="loadError"
-      class="text-red-600 text-center mt-10"
-    >
+    <div v-else-if="loadError" class="text-red-600 text-center mt-10">
       {{ loadError }}
     </div>
 
+    <!-- 5) Quiz screen -->
     <QuestionCard
       v-else-if="screen === 'quiz' && questions.length"
       :questions="questions"
@@ -51,6 +56,7 @@
       لا توجد أسئلة لهذا الاختبار. الرجوع للاختيار.
     </div>
 
+    <!-- 6) Attached text screen -->
     <div
       v-else-if="screen === 'text'"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -72,6 +78,7 @@
       </div>
     </div>
 
+    <!-- 7) Results screen -->
     <ResultsChart
       v-else-if="screen === 'report'"
       :correct="correct"
@@ -80,6 +87,7 @@
       @reset="resetQuiz"
     />
 
+    <!-- 8) Back button -->
     <BackButton
       v-if="screen !== 'branch'"
       @click="goBack"
@@ -88,69 +96,66 @@
 </template>
 
 <script>
+/* eslint-disable */
 import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
+import BranchSelector  from '@/components/BranchSelector.vue'
+import YearSelector    from '@/components/YearSelector.vue'
+import ActivationModal from '@/components/ActivationModal.vue'
+import QuestionCard    from '@/components/QuestionCard.vue'
+import ResultsChart    from '@/components/ResultsChart.vue'
+import BackButton      from '@/components/BackButton.vue'
 import { loadQuestionsFromJSON, fetchQuestionsFromAPI } from '@/services/quizService.js'
 import { correctSound, wrongSound } from '@/utils/audio'
-
-import BranchSelector from '@/components/BranchSelector.vue'
-import YearSelector from '@/components/YearSelector.vue'
-import QuestionCard from '@/components/QuestionCard.vue'
-import ResultsChart from '@/components/ResultsChart.vue'
-// import BackButton from '@/components/BackButton.vue'
 
 export default {
   name: 'QuizPage',
   components: {
     BranchSelector,
     YearSelector,
+    ActivationModal,
     QuestionCard,
     ResultsChart,
-    // BackButton
+    BackButton
   },
   setup() {
-    const screen = ref('branch')
-    const isActivated = ref(!!localStorage.getItem('device_code'))
+    // 1) Screens & activation state
+    const screen              = ref('branch')
+    const isActivated         = ref(localStorage.getItem('activated') === 'true')
+    const showActivationModal = ref(false)
 
-    const years = [
-      'الاختبار الأول','الاختبار الثاني','الاختبار الثالث',
-      'الاختبار الرابع','الاختبار الخامس','الاختبار السادس',
-      'الاختبار السابع','الاختبار الثامن','الاختبار التاسع',
-      2022, 2023, 2024
-    ]
-    const lockedYears = [2022]
+    // 2) Year options and which are locked
+    const years       = [2021, 2022, 2023, 2024]
+    const lockedYears = ref([2022])
 
-    const branch = ref(null)
-    const allQ = ref([])
-    const questions = ref([])
-    const current = ref(0)
-    const answered = reactive({})
-    const correct = ref(0)
-    const lang = ref('en')
-    const attachedText = ref('')
-
+    // 3) Quiz data holders
+    const branch           = ref(null)
+    const allQ             = ref([])
+    const questions        = ref([])
+    const current          = ref(0)
+    const answered         = reactive({})
+    const correct          = ref(0)
+    const lang             = ref('en')
+    const attachedText     = ref('')
     const loadingQuestions = ref(false)
-    const loadError = ref(null)
+    const loadError        = ref(null)
+    const totalSec         = ref(90 * 60)
+    let   timer            = null
 
-    const totalSec = ref(90 * 60)
-    let timer = null
-
+    // 4) Computed helpers
     const wrong = computed(() =>
       Object.keys(answered).length - correct.value
     )
-
     const formattedTime = computed(() => {
       const m = String(Math.floor(totalSec.value / 60)).padStart(2, '0')
       const s = String(totalSec.value % 60).padStart(2, '0')
       return `00:${m}:${s}`
     })
-
     const percentage = computed(() => {
       const tot = correct.value + wrong.value
-      return tot ? Math.round((correct.value / tot) * 100) : 0
+      return tot ? Math.round((correct.value/ tot) * 100) : 0
     })
-
-    const formattedAttachedText = computed(() => {
-      return (attachedText.value || '')
+    const formattedAttachedText = computed(() =>
+      (attachedText.value || '')
         .split('\n')
         .filter(l => l.trim())
         .map((line, i) =>
@@ -159,64 +164,28 @@ export default {
             : `<p style="direction:rtl;text-align:right;margin-bottom:1rem">${line}</p>`
         )
         .join('')
-    })
+    )
 
+    // 5) Initialize question bank
     async function init() {
       loadingQuestions.value = true
       loadError.value = null
       try {
-        // أول استجابة من API أو JSON
-        const response = await Promise.race([
+        const resp = await Promise.race([
           fetchQuestionsFromAPI(),
           loadQuestionsFromJSON()
         ])
-        // فك تغليف data إذا وُجد
-        let data = response.data ?? response
-        // إذا وجدنا حقل questions كمصفوفة، نستخرجها
-        if (Array.isArray(data.questions)) {
-          data = data.questions
-        }
-        // نضمن أن allQ.value ستكون مصفوفة
+        let data = resp.data ?? resp
+        if (Array.isArray(data.questions)) data = data.questions
         allQ.value = Array.isArray(data) ? data : []
-      } catch (err) {
-        console.error('❌ فشل تحميل الأسئلة:', err)
+      } catch {
         loadError.value = 'تعذّر تحميل الأسئلة.'
       } finally {
         loadingQuestions.value = false
       }
     }
 
-    function goYear(selectedBranch) {
-      branch.value = selectedBranch
-      screen.value = 'year'
-    }
-
-    function startQuiz(y) {
-      const yearNum = Number(y)
-      if (lockedYears.includes(yearNum) && !isActivated.value) {
-        loadError.value = 'هذه السنة مقفلة. الرجاء التفعيل للوصول.'
-        screen.value = 'year'
-        return
-      }
-
-      questions.value = allQ.value
-        .filter(q => q.year === yearNum && q.type === branch.value)
-        .sort((a, b) => a.id - b.id)
-
-      if (!questions.value.length) {
-        loadError.value = 'لا توجد أسئلة لهذا الاختبار.'
-        screen.value = 'year'
-        return
-      }
-
-      current.value = 0
-      correct.value = 0
-      Object.keys(answered).forEach(k => delete answered[k])
-      totalSec.value = 90 * 60
-      screen.value = 'quiz'
-      startTimer()
-    }
-
+    // 6) Timer logic
     function startTimer() {
       clearInterval(timer)
       timer = setInterval(() => {
@@ -227,13 +196,62 @@ export default {
       }, 1000)
     }
 
+    // 7) Handle activation code entry
+    function onActivated(code) {
+      localStorage.setItem('activated', 'true')
+      isActivated.value = true
+      showActivationModal.value = false
+      // Unlock year 2022 in the array
+      lockedYears.value = lockedYears.value.filter(y => y !== 2022)
+    }
+
+    // 8) Branch → Year
+    function goYear(chosen) {
+      branch.value = chosen
+      screen.value = 'year'
+    }
+
+    // 9) Year selection handler
+    function handleYearSelect(y) {
+      const num = Number(y)
+      if (lockedYears.value.includes(num) && !isActivated.value) {
+        showActivationModal.value = true
+      } else {
+        startQuiz(y)
+      }
+    }
+
+    // 10) Start quiz for a valid year
+    function startQuiz(y) {
+      const yearNum = Number(y)
+      loadingQuestions.value = true
+      loadError.value = null
+
+      const list = allQ.value.filter(
+        q => q.year === yearNum && q.type === branch.value
+      )
+      loadingQuestions.value = false
+
+      if (!list.length) {
+        loadError.value = 'لا توجد أسئلة لهذا الاختبار.'
+        return
+      }
+
+      questions.value = list.sort((a,b)=> a.id-b.id)
+      current.value   = 0
+      correct.value   = 0
+      Object.keys(answered).forEach(k=> delete answered[k])
+      totalSec.value  = 90*60
+      screen.value    = 'quiz'
+      startTimer()
+    }
+
+    // 11) Question interactions
     function selectAnswer(idx) {
       const q = questions.value[current.value]
       if (answered[q.id] != null) return
-
       answered[q.id] = idx
-      const correctIdx = q.correct_answer - 1
-      if (idx === correctIdx) {
+      if (idx === q.correct_answer - 1) {
         correctSound.currentTime = 0
         correctSound.play()
         correct.value++
@@ -242,55 +260,55 @@ export default {
         wrongSound.play()
       }
     }
-
     function nextQuestion() {
-      if (current.value < questions.value.length - 1) {
-        current.value++
-      } else {
-        screen.value = 'report'
-      }
+      if (current.value < questions.value.length - 1) current.value++
+      else screen.value = 'report'
     }
-
     function prevQuestion() {
       if (current.value > 0) current.value--
     }
-
     function jumpToQuestion(i) {
       current.value = i
     }
-
     function toggleLanguage() {
       lang.value = lang.value === 'ar' ? 'en' : 'ar'
     }
-
     function openTextScreen() {
       const q = questions.value[current.value]
       attachedText.value =
-        q[`attached_text_${lang.value}`] || q.attached_text || 'لا يوجد نص مرفق'
+        q[`attached_text_${lang.value}`] ||
+        q.attached_text ||
+        'لا يوجد نص مرفق'
       screen.value = 'text'
     }
-
     function backToQuiz() {
       screen.value = 'quiz'
     }
-
     function goBack() {
       if (screen.value === 'text') backToQuiz()
       else if (screen.value === 'quiz') screen.value = 'year'
       else if (screen.value === 'year') screen.value = 'branch'
     }
-
     function resetQuiz() {
       clearInterval(timer)
       screen.value = 'branch'
     }
 
+    // 12) Lifecycle
     onMounted(init)
-    onBeforeUnmount(() => clearInterval(timer))
+    onBeforeUnmount(()=> clearInterval(timer))
 
+    // 13) Return all for template
     return {
       screen,
+      isActivated,
+      showActivationModal,
       years,
+      lockedYears,
+      goYear,
+      handleYearSelect,
+      loadingQuestions,
+      loadError,
       questions,
       current,
       answered,
@@ -300,10 +318,6 @@ export default {
       formattedTime,
       percentage,
       formattedAttachedText,
-      loadingQuestions,
-      loadError,
-      goYear,
-      startQuiz,
       selectAnswer,
       nextQuestion,
       prevQuestion,
@@ -312,7 +326,8 @@ export default {
       openTextScreen,
       backToQuiz,
       goBack,
-      resetQuiz
+      resetQuiz,
+      onActivated
     }
   }
 }
