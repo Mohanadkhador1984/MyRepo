@@ -11,14 +11,11 @@
       <div class="drawer-overlay" @click="$emit('close')" />
 
       <!-- Side Drawer -->
-      <aside
-        class="side-drawer"
-        role="navigation"
-        aria-label="القائمة الجانبية"
-      >
+      <aside class="side-drawer" role="navigation" aria-label="القائمة الجانبية">
         <header class="drawer-header">
           <h2 class="drawer-title">القائمة</h2>
           <button
+            type="button"
             class="close-btn"
             aria-label="إغلاق"
             @click="$emit('close')"
@@ -29,17 +26,13 @@
 
         <nav class="drawer-nav">
           <router-link to="/" class="drawer-item">
-            <div class="icon-wrap">
-              <i class="fas fa-home"></i>
-            </div>
-            <span class="label">الرئيسية</span>
+            <i class="fas fa-home"></i>
+            <span>الصفحة الرئيسية</span>
           </router-link>
 
-          <router-link to="/profile" class="drawer-item">
-            <div class="icon-wrap">
-              <i class="fas fa-user"></i>
-            </div>
-            <span class="label">حسابي الشخصي</span>
+          <router-link to="/about" class="drawer-item">
+            <i class="fas fa-info-circle"></i>
+            <span>من نحن</span>
           </router-link>
 
           <a
@@ -48,18 +41,9 @@
             rel="noopener"
             class="drawer-item"
           >
-            <div class="icon-wrap">
-              <i class="fab fa-facebook-f"></i>
-            </div>
-            <span class="label">فيسبوك</span>
+            <i class="fab fa-facebook-f"></i>
+            <span>فيسبوك</span>
           </a>
-
-          <router-link to="/dev" class="drawer-item">
-            <div class="icon-wrap">
-              <i class="fas fa-tools"></i>
-            </div>
-            <span class="label">حساب المطور</span>
-          </router-link>
 
           <a
             href="https://wa.me/0953447860"
@@ -67,69 +51,94 @@
             rel="noopener"
             class="drawer-item"
           >
-            <div class="icon-wrap whatsapp">
-              <i class="fab fa-whatsapp"></i>
-            </div>
-            <div class="label-group">
-              <span class="label">واتساب</span>
-              <span class="sub-label">0953447860</span>
-            </div>
+            <i class="fab fa-whatsapp"></i>
+            <span>واتساب</span>
           </a>
 
           <a
-            href="https://myrepo-29.onrender.com"
+            href="https://t.me/YourChannel"
             target="_blank"
             rel="noopener"
             class="drawer-item"
           >
-            <div class="icon-wrap">
-              <i class="fas fa-share-alt"></i>
-            </div>
-            <span class="label">دعوة الأصدقاء</span>
+            <i class="fab fa-telegram-plane"></i>
+            <span>تليجرام</span>
           </a>
 
           <hr class="divider" />
 
-          <button class="drawer-item" @click="$emit('toggle-lang')">
-            <div class="icon-wrap">
-              <i class="fas fa-globe"></i>
-            </div>
-            <span class="label">تغيير اللغة</span>
+          <button
+            type="button"
+            class="drawer-item share-btn"
+            @click="shareApp"
+          >
+            <i class="fas fa-share-alt"></i>
+            <span>مشاركة التطبيق</span>
           </button>
 
-          <button class="drawer-item" @click="$emit('reset')">
-            <div class="icon-wrap">
-              <i class="fas fa-redo-alt"></i>
-            </div>
-            <span class="label">إعادة الاختبار</span>
+          <!-- زر صفحة المطور -->
+          <button
+            type="button"
+            class="drawer-item dev-btn"
+            @click="devModalOpen = true"
+          >
+            <i class="fas fa-user-shield"></i>
+            <span>صفحة المطوّر</span>
           </button>
         </nav>
       </aside>
+
+      <!-- النافذة المنبثقة لصفحة المطور -->
+      <DevModal
+        v-if="devModalOpen"
+        @close="devModalOpen = false"
+      />
     </div>
   </transition>
 </template>
 
 <script>
+import DevModal from '@/components/DevModal.vue';
+
 export default {
   name: 'SideDrawer',
+  components: { DevModal },
   props: {
     open: { type: Boolean, required: true }
+  },
+  data() {
+    return {
+      appUrl: 'https://myrepo-29.onrender.com',
+      shareTitle: 'تطبيق مفيد',
+      devModalOpen: false
+    };
+  },
+  methods: {
+    async shareApp() {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: this.shareTitle,
+            text: 'جرب هذا التطبيق وسيُسعدك:',
+            url: this.appUrl
+          });
+        } catch (err) {
+          // المستخدم ألغى أو فشل
+        }
+      } else {
+        try {
+          await navigator.clipboard.writeText(this.appUrl);
+          alert('تم نسخ رابط التطبيق إلى الحافظة');
+        } catch {
+          prompt('انسخ الرابط يدوياً:', this.appUrl);
+        }
+      }
+    }
   }
-}
+};
 </script>
 
 <style scoped>
-/* Theme Variables */
-:root {
-  --drawer-bg: #1f2029;
-  --overlay-bg: rgba(0, 0, 0, 0.6);
-  --text-color: #e4e6f0;
-  --accent: #8b5cf6;
-  --hover-bg: rgba(139, 92, 246, 0.15);
-  --divider-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Import fonts & icons */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
 
@@ -144,173 +153,142 @@ export default {
 
 .drawer-overlay {
   position: absolute;
-  top: 4rem; /* below navbar */
-  left: 0; right: 0; bottom: 0;
-  background: var(--overlay-bg);
-  backdrop-filter: blur(6px);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
 }
 
 .side-drawer {
   position: relative;
-  top: 4rem;
-  width: 280px;
-  height: calc(100% - 4rem);
-  background: var(--drawer-bg);
-  color: var(--text-color);
-  font-family: 'Cairo', sans-serif;
-  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.8);
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-  overflow: hidden;
+  width: 300px;
+  max-width: 85%;
+  height: 100%;
+  background: #1f2733;
+  border-left: 6px solid #ff4081;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
+  color: #ececec;
+  font-family: 'Cairo', sans-serif;
 }
 
-/* Header */
 .drawer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.2rem 1.5rem;
-  border-bottom: 1px solid var(--divider-color);
+  padding: 1.2rem 1.6rem;
+  background: #252f3a;
 }
 
 .drawer-title {
   margin: 0;
   font-size: 1.3rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
-/* Close Button */
 .close-btn {
-  background: transparent;
+  background: none;
   border: none;
-  color: var(--text-color);
+  color: inherit;
   font-size: 1.2rem;
-  width: 32px;
-  height: 32px;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background 0.2s, transform 0.1s;
+  transition: transform 0.2s;
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: scale(1.1);
+  transform: rotate(90deg);
+  color: #e74c3c;
 }
 
-/* Navigation & Items */
 .drawer-nav {
-  flex-grow: 1;
+  flex: 1;
   overflow-y: auto;
-  padding: 1rem 0;
-  display: flex;
-  flex-direction: column;
+  padding: 0.8rem 0;
 }
 
 .drawer-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.75rem 1.5rem;
+  gap: 0.9rem;
+  padding: 0.8rem 1.6rem;
+  color: inherit;
   text-decoration: none;
-  color: var(--text-color);
-  border-radius: 6px;
-  transition: background 0.25s, color 0.25s, padding-left 0.25s;
+  border-radius: 8px;
   font-weight: 500;
+  transition: background 0.2s, transform 0.2s;
 }
 
-.drawer-item:hover {
-  background: var(--hover-bg);
-  padding-left: 1.75rem;
-}
-
-.drawer-item:active {
-  background: rgba(139, 92, 246, 0.25);
-}
-
-/* Icon Wrap */
-.icon-wrap {
-  width: 36px;
-  height: 36px;
-  background: rgba(139, 92, 246, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.25s, transform 0.25s;
-}
-
-.drawer-item:hover .icon-wrap {
-  background: rgba(139, 92, 246, 0.2);
-  transform: scale(1.05);
-}
-
-.icon-wrap.whatsapp {
-  background: rgba(37, 211, 102, 0.1);
-}
-
-.drawer-item:hover .icon-wrap.whatsapp {
-  background: rgba(37, 211, 102, 0.2);
-}
-
-/* Icon */
-.icon-wrap i {
-  color: var(--accent);
+.drawer-item i {
+  width: 24px;
+  text-align: center;
   font-size: 1.1rem;
 }
 
-/* Labels */
-.label {
-  flex-grow: 1;
-  font-size: 1rem;
+.drawer-item span {
+  flex: 1;
 }
 
-.label-group {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+.drawer-item:hover {
+  background: #303b47;
+  transform: translateX(4px);
 }
 
-.sub-label {
-  font-size: 0.85rem;
-  color: #a1a6b0;
-  margin-top: 2px;
-}
-
-/* Divider */
 .divider {
+  margin: 1rem 1.6rem;
   border: none;
-  height: 1px;
-  margin: 0.75rem 1.5rem;
-  background: var(--divider-color);
+  border-top: 1px solid #3b4550;
 }
 
-/* Slide Animation */
+.share-btn {
+  background: linear-gradient(45deg, #e91e63, #ff4081);
+  color: #fff;
+  border-radius: 30px;
+}
+
+.share-btn:hover {
+  background: linear-gradient(45deg, #ff4081, #e91e63);
+  box-shadow: 0 6px 16px rgba(233, 30, 99, 0.4);
+  transform: scale(1.05);
+}
+
+/* زر المطور */
+.dev-btn {
+  background: #424a57;
+  color: #facc15;
+  border-radius: 8px;
+}
+
+.dev-btn i {
+  color: #facc15;
+}
+
+.dev-btn:hover {
+  background: #535c6a;
+  transform: translateX(4px) scale(1.02);
+}
+
+/* Slide animation */
 .slide-drawer-enter-active,
 .slide-drawer-leave-active {
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+  transition: transform 0.3s ease;
 }
+
 .slide-drawer-enter-from,
 .slide-drawer-leave-to {
   transform: translateX(100%);
 }
+
 .slide-drawer-enter-to,
 .slide-drawer-leave-from {
   transform: translateX(0);
 }
 
-/* Scrollbar */
+/* Custom scrollbar */
 .drawer-nav::-webkit-scrollbar {
   width: 6px;
 }
-.drawer-nav::-webkit-scrollbar-track {
-  background: transparent;
-}
+
 .drawer-nav::-webkit-scrollbar-thumb {
-  background-color: rgba(255,255,255,0.2);
+  background: #555;
   border-radius: 3px;
 }
 </style>

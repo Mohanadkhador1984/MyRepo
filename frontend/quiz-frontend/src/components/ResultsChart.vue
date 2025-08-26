@@ -1,10 +1,15 @@
 <template>
-  <div class="results-container">
+  <div class="results-container" ref="resultsContainer">
 
     <!-- زر الإغلاق الفاخر -->
-  <button class="close-btn" @click="$emit('reset')" aria-label="إغلاق">
-    <i class="fas fa-times fa-lg"></i>
-  </button>
+    <button
+      type="button"
+      class="close-btn"
+      @click="$emit('reset')"
+      aria-label="إغلاق"
+    >
+      <i class="fas fa-times fa-lg"></i>
+    </button>
 
     <!-- العنوان -->
     <h2 class="title">نتائج الاختبار</h2>
@@ -23,22 +28,33 @@
         <label for="studentName">اسم الطالب</label>
       </div>
 
-      <!-- رقم المدرّس -->
+      <!-- رقم المدرّس مع أيقونة اختيار من جهات الاتصال داخل الحقل -->
       <div class="input-group">
         <input
           id="teacherPhone"
           v-model="teacherPhone"
           type="tel"
-          placeholder="مثال: 0988131514"
+          inputmode="tel"
+          pattern="09[0-9]{8}"
+          placeholder="مثال: 0991234567"
           :disabled="sent"
         />
-        <label for="teacherPhone">رقم المدرّس</label>
+        <!-- أيقونة اختيار جهة الاتصال -->
+        <i
+          v-if="canPickContact && !sent"
+          type="button"
+          class="fas fa-address-book pick-icon"
+          @click="pickContact"
+          aria-label="اختر رقم من جهات الاتصال"
+        ></i>
+        <label for="teacherPhone">رقم المدرّس (09xxxxxxx)</label>
       </div>
     </div>
 
     <!-- زر إرسال واتساب -->
     <div class="action-btns">
       <button
+        type="button"
         class="btn whatsapp"
         :disabled="!canSend || sent"
         @click="sendReportToTeacher"
@@ -85,8 +101,9 @@
       <canvas ref="doughnutCanvas"></canvas>
     </div>
 
-    <!-- زر إعادة الاختبار (أحمر أو فاقع) -->
+    <!-- زر إعادة الاختبار (أحمر فاقع) -->
     <button
+      type="button"
       class="btn reset"
       @click="$emit('reset')"
       :disabled="!sent"
@@ -99,6 +116,7 @@
 <script>
 import { ref, computed, onMounted, watch } from 'vue'
 import Chart from 'chart.js/auto'
+import html2canvas from 'html2canvas'
 
 export default {
   name: 'ResultsChartModern',
@@ -108,50 +126,58 @@ export default {
     percentage: { type: Number, required: true }
   },
   setup(props) {
-    const studentName    = ref('')
-    const teacherPhone   = ref('')
-    const sent           = ref(false)
-    const doughnutCanvas = ref(null)
+    const studentName      = ref('')
+    const teacherPhone     = ref('')
+    const sent             = ref(false)
+    const doughnutCanvas   = ref(null)
+    const resultsContainer = ref(null)
 
     const total = computed(() => props.correct + props.wrong)
-    const studentNameValid = computed(() =>
-      studentName.value.trim().length > 0
-    )
-    const teacherPhoneValid = computed(() =>
-      /^09\d{8}$/.test(teacherPhone.value.trim())
-    )
+
+    // Syrian numbers: local 09xxxxxxxx or with +9639xxxxxxxx
+    const teacherPhoneValid = computed(() => /^09\d{8}$/.test(teacherPhone.value.trim()))
+    const studentNameValid = computed(() => studentName.value.trim().length > 0)
     const canSend = computed(() =>
       studentNameValid.value && teacherPhoneValid.value && !sent.value
     )
 
-    // رسم مخطط الدونات
-    const renderChart = () => {
+    // Contact Picker support
+    const canPickContact = 'contacts' in navigator && 'select' in navigator.contacts
+
+    async function pickContact() {
+      try {
+        const contacts = await navigator.contacts.select(['tel'], { multiple: false })
+        if (contacts.length && contacts[0].tel.length) {
+          let num = contacts[0].tel[0].replace(/\s+/g, '')
+          // Normalize +9639... or 9639... to local 09...
+          if (num.startsWith('+963')) num = '0' + num.slice(4)
+          else if (num.startsWith('963')) num = '0' + num.slice(3)
+          teacherPhone.value = num
+        }
+      } catch {
+        // ignore user cancel or unsupported
+      }
+    }
+
+    function renderChart() {
       if (!doughnutCanvas.value) return
       new Chart(doughnutCanvas.value, {
         type: 'doughnut',
         data: {
-          labels: ['صحيحة', 'خاطئة'],
+          labels: ['صحيحة','خاطئة'],
           datasets: [{
             data: [props.correct, props.wrong],
-            backgroundColor: ['#00E676', '#F44336'],
-            hoverBackgroundColor: ['#00C853', '#E53935'],
+            backgroundColor: ['#00E676','#F44336'],
+            hoverBackgroundColor: ['#00C853','#E53935'],
             borderColor: '#2f2f40',
             borderWidth: 3
           }]
         },
-        options: {
-          cutout: '70%',
-          animation: { duration: 1500, easing: 'easeOutBounce' },
-          plugins: { legend: { display: false } }
-        }
+        options: { cutout: '70%' }
       })
     }
 
-    /**
-     * محاولة إرسال عبر الخلفية.
-     * إذا فشل، نفتح رابط wa.me كحل مؤقت.
-     */
-    const sendReportToTeacher = async () => {
+    async function sendReportToTeacher() {
       if (!canSend.value) return
       sent.value = true
 
@@ -163,26 +189,39 @@ export default {
         percentage: props.percentage
       }
 
-      try {
-        const res = await fetch('/api/send-whatsapp', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify(payload)
-        })
-        if (!res.ok) throw new Error('Server error')
+      const lines = [
+        '📊 *نتائج اختبار الطالب* 📊',
+        '',
+        `👤 *الاسم:* ${payload.name}`,
+        `✅ *صحيحة:* ${payload.correct}`,
+        `❌ *خاطئة:* ${payload.wrong}`,
+        `🔢 *المجموع:* ${payload.correct + payload.wrong}`,
+        `📈 *النسبة:* ${payload.percentage}%`,
+        '',
+        payload.percentage >= 50
+          ? '🎉 *مبروك* على النجاح! 🚀'
+          : '💪 *لا تيأس*! المحاولة القادمة أفضل. 🌟'
+      ]
+      const formattedMsg = lines.join('\n')
+
+      // Try Web Share API with image
+      if (navigator.canShare && navigator.canShare({ files: [] })) {
+        try {
+          const canvas = await html2canvas(resultsContainer.value, { scale: 2 })
+          const blob = await new Promise(res => canvas.toBlob(res, 'image/png'))
+          const file = new File([blob], 'result.png', { type: 'image/png' })
+          await navigator.share({ files: [file], text: formattedMsg })
+          return
+        } catch {
+          /* fallback */
+        }
       }
-      catch (err) {
-        console.warn('Backend send failed, fallback to wa.me', err)
-        // فتح تطبيق واتساب مع معاينة (طالب سيضغط للإرسال)
-        const message =
-          `📘 نتائج اختبار الطالب\n\n` +
-          `👤 الاسم: ${payload.name}\n` +
-          `✅ صحيحة: ${payload.correct}  ❌ خاطئة: ${payload.wrong}\n` +
-          `🔢 المجموع: ${payload.correct + payload.wrong}\n` +
-          `📊 النسبة: ${payload.percentage}%`
-        const text = encodeURIComponent(message)
-        window.open(`https://wa.me/${payload.phone}?text=${text}`, '_blank')
-      }
+
+      // Fallback wa.me
+      window.open(
+        `https://wa.me/${payload.phone}?text=${encodeURIComponent(formattedMsg)}`,
+        '_blank'
+      )
     }
 
     onMounted(renderChart)
@@ -191,11 +230,14 @@ export default {
     return {
       studentName,
       teacherPhone,
+      sent,
+      total,
       canSend,
+      canPickContact,
+      pickContact,
       sendReportToTeacher,
       doughnutCanvas,
-      total,
-      sent
+      resultsContainer
     }
   }
 }
@@ -204,6 +246,56 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+
+/* ضع أنماطك الأصلية هنا */
+
+.input-group {
+  position: relative;
+}
+.pick-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.pick-icon:hover {
+  color: #fff;
+}
+
+/* وأبقي باقي الأنماط كما هي سابقاً */
+</style>
+
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
+
+/* preserve your existing styles… */
+
+.inputs-wrapper .pick-contact {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.8rem;
+  background: #304ffe;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+.inputs-wrapper .pick-contact:hover {
+  background: #1e40ff;
+  transform: translateY(-2px);
+}
 
 .results-container {
   position: relative;
