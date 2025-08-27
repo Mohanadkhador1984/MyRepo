@@ -163,14 +163,14 @@ export default {
       })
     },
     sendWhatsApp() {
-      const msg = `🔑 رقم الجهاز: ${this.deviceId}`
+      const msg = `${this.deviceId}`
       window.open(
         `https://wa.me/0953447860?text=${encodeURIComponent(msg)}`,
         '_blank'
       )
     },
     sendMessenger() {
-      const msg = `🔑 رقم الجهاز: ${this.deviceId}`
+      const msg = `${this.deviceId}`
       window.open(
         `https://m.me/devAccount?text=${encodeURIComponent(msg)}`,
         '_blank'
