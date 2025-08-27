@@ -1,80 +1,66 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="ar">
   <head>
-
-  <link rel="manifest" href="<%= BASE_URL %>manifest.json" />
-<meta name="theme-color" content="#1976D2" />
-
-<link
-  rel="icon"
-  type="image/png"
-  sizes="32x32"
-  href="<%= BASE_URL %>img/icons/icon-32x32.png"
-/>
-<link
-  rel="apple-touch-icon"
-  sizes="180x180"
-  href="<%= BASE_URL %>img/icons/icon-192x192.png"
-/>
-
-    <!-- manifest -->
-  <link rel="manifest" href="<%= BASE_URL %>manifest.json">
-  <link
-  href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap"
-  rel="stylesheet"
-/>
-
-<link href="./static/css/app.css" rel="stylesheet">
-<script src="./static/js/chunk-vendors.js"></script>
-<script src="./static/js/app.js"></script>
-
-
-
-  <!-- theme color -->
-  <meta name="theme-color" content="#1976D2">
-
-  <!-- apple touch icon -->
-  <!-- <link rel="apple-touch-icon" href="<%= BASE_URL %>img/icons/icon-192x192.png"> -->
-
-  <!-- favicon -->
-  <!-- <link rel="icon" type="image/png" sizes="32x32" href="<%= BASE_URL %>img/icons/favicon-32x32.png"> -->
-
-  <!-- CSS (Vue ستضيف publicPath تلقائياً) -->
-  <link rel="stylesheet" href="<%= BASE_URL %>css/app.css">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <!-- <link rel="icon" href="<%= BASE_URL %>favicon.ico"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= htmlWebpackPlugin.options.title %></title>
+
+    <!-- Manifest و Theme Color -->
+    <link rel="manifest" href="<%= BASE_URL %>manifest.json">
+    <meta name="theme-color" content="#1976D2">
+
+    <!-- Icons -->
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="<%= BASE_URL %>img/icons/icon-32x32.png"
+    >
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="<%= BASE_URL %>img/icons/icon-192x192.png"
+    >
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    >
+
+    <!-- CSS: Vue CLI سيحقن publicPath تلقائيًا -->
+    <link rel="stylesheet" href="<%= BASE_URL %>css/app.css">
   </head>
   <body>
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>
+        We're sorry but <%= htmlWebpackPlugin.options.title %>
+        doesn't work properly without JavaScript enabled.
+        Please enable it to continue.
+      </strong>
     </noscript>
+
+    <!-- عنصر الجذر لتطبيق Vue -->
     <div id="app"></div>
-    <!-- built files will be auto injected -->
 
-     <div id="app"></div>
+    <!-- ملفات JS: يفضل الاعتماد على حقن Vue CLI -->
+    <!--
+    <script src="<%= BASE_URL %>js/chunk-vendors.js"></script>
+    <script src="<%= BASE_URL %>js/app.js"></script>
+    -->
 
-  <!-- JS bundles -->
-  <script src="<%= BASE_URL %>js/chunk-vendors.js"></script>
-  <script src="<%= BASE_URL %>js/app.js"></script>
-
-  <!-- Service Worker registration -->
-  <script>
-   if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    console.log('⏳ Registering SW…');
-    navigator.serviceWorker
-      .register('/service-worker.js')
-      .then(reg => console.log('✅ SW registered, scope=', reg.scope))
-      .catch(err => console.error('❌ SW registration failed:', err));
-  });
-}
-
-
-  </script>
-
-    
+    <!-- تسجيل Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          console.log('⏳ Registering SW…');
+          navigator.serviceWorker
+            .register('/service-worker.js')
+            .then(reg => console.log('✅ SW registered, scope=', reg.scope))
+            .catch(err => console.error('❌ SW registration failed:', err));
+        });
+      }
+    </script>
   </body>
 </html>
