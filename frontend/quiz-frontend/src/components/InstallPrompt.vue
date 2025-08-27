@@ -1,7 +1,8 @@
+<!-- src/components/InstallCTA.vue -->
 <template>
-  <div v-if="!installed" class="install-wrapper">
+  <div v-if="!installed" class="install-wrapper" @click.self="hideManual">
 
-    <!-- 1. Fancy Install Button -->
+    <!-- 1. زر التثبيت الفخم -->
     <button
       v-if="canPrompt"
       class="install-btn"
@@ -12,43 +13,30 @@
       <span v-else class="spinner"></span>
     </button>
 
-    <!-- 2. Fallback + Icon for old browsers -->
-    <div
+    <!-- 2. زر التنويه للمتصفحات القديمة -->
+    <button
       v-else-if="!installing"
-      class="fallback-icon"
+      class="fallback-btn"
       @click="showManual = true"
       title="أضف للتطبيق / Add to Home Screen"
     >
-      <i class="fas fa-plus-circle"></i>
-    </div>
+      <i class="fas fa-bell"></i>
+    </button>
 
-    <!-- 3. Manual Glassmorphic Popup -->
-    <transition name="fade-slide">
-      <div
-        v-if="showManual && !installed"
-        class="manual-popup"
-      >
+    <!-- 3. النافذة المنبثقة الشفافة الفاخرة -->
+    <transition name="fade">
+      <div v-if="showManual" class="manual-popup">
         <button class="close-btn" @click="showManual = false">
           <i class="fas fa-times"></i>
         </button>
-        <h3 class="popup-title">
-          إضافة للتطبيق  
-          <span class="en">/ Add to Home Screen</span>
-        </h3>
-        <ul class="popup-steps">
-          <li>
-            <i class="fas fa-ellipsis-h step-icon"></i>
-            اضغط ⋮ في شريط المتصفح  
-            <span class="en">Tap ⋮ in your browser</span>
-          </li>
-          <li>
-            <i class="fas fa-plus step-icon"></i>
-            اختر “Add to Home screen”  
-            <span class="en">Select “Add to Home screen”</span>
-          </li>
-        </ul>
+        <h3 class="popup-title">كيفية إضافة التطبيق</h3>
+        <p class="popup-text">
+          اضغط على ⋮ في شريط المتصفح ثم اختر
+          <strong>"Add to Home Screen"</strong>
+        </p>
       </div>
     </transition>
+
   </div>
 </template>
 
@@ -61,49 +49,45 @@ const installing     = ref(false)
 const installed      = ref(false)
 const showManual     = ref(false)
 
+function detectInstalled() {
+  if (window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true) {
+    installed.value = true
+  }
+}
+
 function onInstallClick() {
   if (!deferredPrompt.value) return
   installing.value = true
   deferredPrompt.value.prompt()
   deferredPrompt.value.userChoice.then(({ outcome }) => {
     installing.value = false
-    showManual.value = false
-    if (outcome === 'accepted') {
-      installed.value = true
-    }
+    if (outcome === 'accepted') installed.value = true
     deferredPrompt.value = null
   })
 }
 
-// Called when PWA is installed via system UI
 function onAppInstalled() {
   installed.value = true
 }
 
-function detectInstalled() {
-  // Chrome, Edge, etc.
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    installed.value = true
-  }
-  // Safari iOS
-  if (window.navigator.standalone === true) {
-    installed.value = true
-  }
+function hideManual() {
+  showManual.value = false
 }
 
 onMounted(() => {
   detectInstalled()
-  window.addEventListener('appinstalled', onAppInstalled)
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault()
     deferredPrompt.value = e
     canPrompt.value      = true
   })
+  window.addEventListener('appinstalled', onAppInstalled)
 
-  // If no beforeinstallprompt after 800ms → show fallback
+  // إذا لم نرَ قبل 800ms، نظهر الfallback-icon
   setTimeout(() => {
     if (!canPrompt.value && !installed.value) {
-      showManual.value = false // don't auto-open manual popup
+      showManual.value = false
       canPrompt.value  = false
     }
   }, 800)
@@ -121,40 +105,35 @@ onBeforeUnmount(() => {
   position: fixed;
   left: 2cm;
   bottom: 2cm;
-  /* نلغي التحويل لأننا نقوم بضبط الإحداثيات يدوياً */
-  transform: none;
   z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* 2) Gradient pulsating button */
+/* زر التثبيت الفاخر */
 .install-btn {
-  background: linear-gradient(135deg, #6b21a8, #9333ea);
+  background: linear-gradient(135deg, #f1c40f, #e67e22);
   color: #fff;
   border: none;
-  border-radius: 100px;
-  padding: 0.8rem 2rem;
-  font-size: 1.1rem;
+  border-radius: 50px;
+  padding: 0.8rem 1.8rem;
+  font-size: 1rem;
   font-weight: 600;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
   cursor: pointer;
-  animation: pulse 1.6s ease-in-out infinite;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  animation: pulse 1.8s ease-in-out infinite;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .install-btn:hover:not(:disabled) {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.3);
 }
 .install-btn:disabled {
   opacity: 0.7;
   cursor: wait;
 }
-/* Spinner inside button */
+/* دوار التحميل */
 .spinner {
   width: 1rem;
   height: 1rem;
@@ -164,112 +143,99 @@ onBeforeUnmount(() => {
   animation: spin 0.8s linear infinite;
 }
 
-/* 3) Fallback icon pulsating */
-.fallback-icon {
-  font-size: 2.2rem;
-  color: #9333ea;
+/* زر التنويه */
+.fallback-btn {
+  background: #fff;
+  border: 2px solid #f1c40f;
+  color: #f1c40f;
+  border-radius: 50%;
+  padding: 0.5rem;
+  font-size: 1.6rem;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   animation: pulse 2s ease-in-out infinite;
-  text-shadow: 0 0 6px rgba(147,51,234,0.6);
+  transition: transform 0.2s;
+}
+.fallback-btn:hover {
+  transform: scale(1.1);
 }
 
-/* 4) Manual glassmorphic popup */
+/* النافذة المنبثقة */
 .manual-popup {
   position: absolute;
+  left: 2cm;
   bottom: 5.5cm;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 280px;
-  background: rgba(255,255,255,0.85);
+  width: 260px;
+  background: rgba(255,255,255,0.15);
   backdrop-filter: blur(12px);
   border-radius: 12px;
-  padding: 1.4rem 1.2rem;
-  text-align: right;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  padding: 1rem 1.2rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  color: #fff;
   overflow: hidden;
 }
-/* Animated gradient border */
+/* إطار ذهبي */
 .manual-popup::before {
   content: '';
   position: absolute;
-  top: -2px; left: -2px; right: -2px; bottom: -2px;
-  background: conic-gradient(from 0deg, #9333ea, #6b21a8, #9333ea);
+  inset: -2px;
   border-radius: inherit;
+  background: linear-gradient(135deg, #f1c40f, #e67e22);
   z-index: -1;
-  filter: blur(8px);
-  animation: rotateBorder 5s linear infinite;
+  filter: blur(6px);
+  animation: glow 3s ease-in-out infinite alternate;
 }
 
-/* Close button */
+/* زر الإغلاق */
 .close-btn {
   position: absolute;
-  top: 0.6rem; left: 0.6rem;
+  top: 0.6rem;
+  left: 0.6rem;
   background: transparent;
   border: none;
-  color: #555;
+  color: #fff;
   font-size: 1.1rem;
   cursor: pointer;
   transition: color 0.2s;
 }
 .close-btn:hover {
-  color: #000;
+  color: #e67e22;
 }
 
-/* Popup title */
+/* العنوان والنص */
 .popup-title {
-  margin: 0 0 1rem;
+  margin: 0 0 0.6rem;
   font-size: 1rem;
   font-weight: 600;
-  color: #222;
 }
-.popup-title .en {
-  display: block;
-  font-size: 0.85rem;
-  color: #555;
-  margin-top: 0.2rem;
-}
-
-/* Steps list */
-.popup-steps {
-  list-style: none;
-  padding: 0;
+.popup-text {
   margin: 0;
-}
-.popup-steps li {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 1rem;
   font-size: 0.9rem;
-  color: #333;
-}
-.step-icon {
-  font-size: 1.2rem;
-  color: #9333ea;
-  margin-left: 0.6rem;
-  margin-top: 2px;
+  line-height: 1.4;
 }
 
-/* Animations */
-@keyframes pulse {
-  0%,100% { transform: scale(1); }
-  50%     { transform: scale(1.05); }
-}
+/* أنيميشنات */
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-@keyframes rotateBorder {
-  to { transform: rotate(360deg); }
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes glow {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
 }
 
-/* Fade-slide transitions */
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.3s ease;
+/* انتقال fade */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.fade-slide-enter-from {
+.fade-enter-from {
   opacity: 0; transform: translateY(10px);
 }
-.fade-slide-leave-to {
+.fade-leave-to {
   opacity: 0; transform: translateY(10px);
 }
 </style>
