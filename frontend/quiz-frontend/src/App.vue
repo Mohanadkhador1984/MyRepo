@@ -24,6 +24,7 @@ import NavBar from './components/NavBar.vue'
 import SideDrawer from './components/SideDrawer.vue'
 import InstallPrompt from './components/InstallPrompt.vue'
 
+
 export default {
   name: 'App',
   components: {
