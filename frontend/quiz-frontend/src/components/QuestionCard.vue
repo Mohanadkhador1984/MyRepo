@@ -84,7 +84,7 @@
       <div class="modal-text">
         <div class="modal-header">
           <h3>النص المرفق</h3>
-          <button class="modal-close" @click="closeText" aria-label="إغلاق">×</button>
+          <!-- <button class="modal-close" @click="closeText" aria-label="إغلاق">×</button> -->
         </div>
         <div class="attached-body">
           <div class="attached-text">

@@ -68,12 +68,12 @@
           v-html="formattedAttachedText"
         ></div>
         <div class="text-center">
-          <button
+          <!-- <button
             @click="backToQuiz"
             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
           >
             إغلاق
-          </button>
+          </button> -->
         </div>
       </div>
     </div>
@@ -103,7 +103,7 @@ import YearSelector    from '@/components/YearSelector.vue'
 import ActivationModal from '@/components/ActivationModal.vue'
 import QuestionCard    from '@/components/QuestionCard.vue'
 import ResultsChart    from '@/components/ResultsChart.vue'
-import BackButton      from '@/components/BackButton.vue'
+// import BackButton      from '@/components/BackButton.vue'
 import { loadQuestionsFromJSON, fetchQuestionsFromAPI } from '@/services/quizService.js'
 import { correctSound, wrongSound } from '@/utils/audio'
 
@@ -115,7 +115,7 @@ export default {
     ActivationModal,
     QuestionCard,
     ResultsChart,
-    BackButton
+    // BackButton
   },
   setup() {
     // 1) Screens & activation state
