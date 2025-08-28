@@ -1,52 +1,43 @@
-<!-- src/components/InstallCTA.vue -->
+<!-- eslint-disable vue/no-parsing-error -->
 <template>
-  <div v-if="!installed" class="install-wrapper" @click.self="hideManual">
-
-    <!-- 1. زر التثبيت الفاخر -->
+  <div class="install-wrapper">
+    <!-- زر التثبيت الرسمي (المتصفحات الداعمة لـ PWA) -->
     <button
-      v-if="canPrompt"
+      v-if="showInstallBtn"
       class="install-btn"
-      :disabled="installing"
-      @click.stop="onInstallClick"
+      @click="installApp"
     >
-      <span v-if="!installing">📥 تثبيت التطبيق</span>
-      <span v-else class="spinner"></span>
+      📲 تثبيت التطبيق
     </button>
 
-    <!-- 2. أيقونة التنويه للمتصفحات غير المدعومة -->
-    <button
-      v-else-if="!installing"
+    <!-- أيقونة بديلة في حال المتصفح قديم أو لم يصلنا beforeinstallprompt -->
+    <div
+      v-else-if="showFallback"
       class="fallback-btn"
-      @click.stop="showManual = true"
-      title="أضف للتطبيق / Add to Home Screen"
+      @click="showManual = true"
+      title="اضغط هنا لمعرفة طريقة الإضافة"
     >
-      <i class="fas fa-bell"></i>
-    </button>
+      <i class="fas fa-info-circle"></i>
+    </div>
 
-    <!-- 3. نافذة الشرح التفصيلي (بالونوسيوني ـ Balloon) -->
+    <!-- صندوق الإرشادات اليدوية يظهر عند الضغط على الأيقونة البديلة -->
     <transition name="fade-scale">
       <div
         v-if="showManual"
+        ref="manualRef"
         class="manual-popup"
-        @click.stop
       >
         <button class="close-btn" @click="hideManual">
           <i class="fas fa-times"></i>
         </button>
-        <h3 class="popup-title">كيفية تثبيت التطبيق</h3>
+        <h3 class="popup-title">كيفية إضافة التطبيق للشاشة الرئيسية</h3>
         <p class="popup-text">
-          لتثبيت التطبيق:
-          <br />
-          اضغط زر القائمة (⋮) في متصفحك
-          <br />
-          ثم اختر <strong>إضافة إلى الشاشة الرئيسية</strong>
+          1. اضغط زر القائمة (⋮) في متصفحك<br>
+          2. اختر <strong>إضافة إلى الشاشة الرئيسية</strong>
         </p>
         <p class="popup-text en">
-          To install the app:
-          <br />
-          Press the menu button (⋮) in your browser
-          <br />
-          then select <strong>Add to Home Screen</strong>
+          1. Tap the menu button (⋮) in your browser<br>
+          2. Select <strong>Add to Home Screen</strong>
         </p>
       </div>
     </transition>
@@ -57,124 +48,106 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const deferredPrompt = ref(null)
-const canPrompt      = ref(false)
-const installing     = ref(false)
-const installed      = ref(false)
+const showInstallBtn = ref(false)
+const showFallback   = ref(false)
 const showManual     = ref(false)
+const manualRef      = ref(null)
 
-function detectInstalled() {
-  if (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true
-  ) {
-    installed.value = true
-  }
-}
-
-function onInstallClick() {
+function installApp() {
   if (!deferredPrompt.value) return
-  installing.value = true
   deferredPrompt.value.prompt()
-  deferredPrompt.value.userChoice.then(({ outcome }) => {
-    installing.value = false
-    if (outcome === 'accepted') installed.value = true
-    deferredPrompt.value = null
-  })
-}
 
-function onAppInstalled() {
-  installed.value = true
+  // استخدمنا 'choice' بالكامل حتى لا يظهر خطأ no-unused-vars
+  deferredPrompt.value.userChoice.then(choice => {
+    console.log('Install outcome:', choice.outcome)
+    deferredPrompt.value = null
+    showInstallBtn.value = false
+  })
 }
 
 function hideManual() {
   showManual.value = false
 }
 
+function handleClickOutside(e) {
+  if (
+    showManual.value &&
+    manualRef.value &&
+    !manualRef.value.contains(e.target)
+  ) {
+    hideManual()
+  }
+}
+
 onMounted(() => {
-  detectInstalled()
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault()
     deferredPrompt.value = e
-    canPrompt.value      = true
+    showInstallBtn.value = true
   })
-  window.addEventListener('appinstalled', onAppInstalled)
 
-  // بعد 800ms، إن لم يظهر beforeinstallprompt
+  // بعد 800ms إذا لم يصلنا beforeinstallprompt، نظهر أيقونة fallback
   setTimeout(() => {
-    if (!canPrompt.value && !installed.value) {
-      showManual.value = false
-      canPrompt.value  = false
+    if (!showInstallBtn.value) {
+      showFallback.value = true
     }
   }, 800)
+
+  document.addEventListener('click', handleClickOutside)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('appinstalled', onAppInstalled)
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
 <style scoped>
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
 
-/* كامل الشاشة لالتقاط النقرات */
 .install-wrapper {
   position: fixed;
-  inset: 0;
+  bottom: 2cm;
+  left: 2cm;
   z-index: 10000;
-  pointer-events: auto;
-  display: flex;
-  align-items: flex-end; /* زر في الأسفل */
-  padding: 2cm;         /* يرفع 2 سم من الأسفل ولليسار */
 }
 
 /* زر التثبيت */
 .install-btn {
-  background: linear-gradient(135deg, #4e54c8, #8f94fb);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: #fff;
   border: none;
   border-radius: 50px;
-  padding: 0.8rem 1.8rem;
-  font-size: 1rem;
+  padding: .8rem 1.8rem;
   font-weight: 600;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 24px rgba(37,99,235,0.3);
   cursor: pointer;
-  animation: pulse 1.8s ease-in-out infinite;
-  transition: transform 0.2s, box-shadow 0.2s;
+  pointer-events: auto;
+  animation: pulse 1.6s ease-in-out infinite;
+  transition: transform .2s, box-shadow .2s;
 }
 .install-btn:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 10px 28px rgba(0,0,0,0.3);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(37,99,235,0.5);
 }
 .install-btn:disabled {
-  opacity: 0.7;
+  opacity: .7;
   cursor: wait;
 }
-.spinner {
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid #fff;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
 
-/* زر التنويه */
+/* أيقونة fallback */
 .fallback-btn {
+  font-size: 2rem;
+  color: #2563eb;
   background: rgba(255,255,255,0.9);
-  border: 2px solid #4e54c8;
-  color: #4e54c8;
   border-radius: 50%;
-  padding: 0.5rem;
-  font-size: 1.6rem;
-  cursor: pointer;
+  padding: .4rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  cursor: pointer;
+  pointer-events: auto;
   animation: pulse 2s ease-in-out infinite;
 }
-.fallback-btn:hover {
-  transform: scale(1.1);
-}
 
-/* Balloony glass popup في وسط الشاشة */
+/* صندوق التعليمات */
 .manual-popup {
   position: fixed;
   top: 50%;
@@ -184,74 +157,60 @@ onBeforeUnmount(() => {
   background: rgba(255,255,255,0.9);
   backdrop-filter: blur(8px);
   border-radius: 24px;
-  padding: 1.5rem;
+  padding: 1.2rem 1rem;
   box-shadow: 0 12px 32px rgba(0,0,0,0.2);
-  color: #333;
   text-align: center;
-  pointer-events: auto;
 }
-/* ذيل البالون */
 .manual-popup::after {
-  content: '';
+  content: "";
   position: absolute;
-  bottom: -16px;
+  bottom: -12px;
   left: 50%;
   transform: translateX(-50%);
-  border-width: 8px;
-  border-style: solid;
-  border-color: rgba(255,255,255,0.9) transparent transparent transparent;
+  border: 12px solid transparent;
+  border-top-color: rgba(255,255,255,0.9);
 }
-
-/* Close button */
 .close-btn {
   position: absolute;
-  top: 0.8rem;
-  right: 0.8rem;
-  background: transparent;
+  top: .6rem;
+  right: .6rem;
+  background: none;
   border: none;
-  color: #666;
   font-size: 1rem;
+  color: #666;
   cursor: pointer;
-  transition: color 0.2s;
 }
 .close-btn:hover {
-  color: #000;
+  color: #333;
 }
-
-/* Popup content */
 .popup-title {
-  margin: 0 0 0.8rem;
+  margin: 0 0 .6rem;
   font-size: 1.1rem;
   font-weight: 600;
 }
 .popup-text {
-  margin: 0.4rem 0;
-  font-size: 0.95rem;
+  margin: .4rem 0;
+  font-size: .95rem;
   line-height: 1.4;
 }
 .popup-text.en {
-  margin-top: 1rem;
+  margin-top: .8rem;
   color: #555;
+  font-style: italic;
 }
 
-/* Animations */
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
 @keyframes pulse {
   0%,100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  50%     { transform: scale(1.05); }
 }
 
-/* Fade & scale transition */
 .fade-scale-enter-active,
 .fade-scale-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity .3s ease, transform .3s ease;
 }
-.fade-scale-enter-from {
-  opacity: 0; transform: scale(0.9);
-}
+.fade-scale-enter-from,
 .fade-scale-leave-to {
-  opacity: 0; transform: scale(0.9);
+  opacity: 0;
+  transform: scale(0.9);
 }
 </style>
