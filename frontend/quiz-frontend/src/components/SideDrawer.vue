@@ -1,294 +1,264 @@
 <!-- src/components/SideDrawer.vue -->
 <template>
-  <transition name="slide-drawer">
-    <div
-      v-if="open"
-      class="drawer-wrapper"
-      @keydown.esc="$emit('close')"
-      tabindex="0"
-    >
-      <!-- Overlay -->
-      <div class="drawer-overlay" @click="$emit('close')" />
+  <transition name="fade">
+    <div v-if="open" class="drawer-backdrop" @click.self="$emit('close')">
+      <transition name="slide">
+        <aside
+          class="side-drawer"
+          role="navigation"
+          aria-label="أهلا وسهلا بكم"
+        >
+          <!-- Header -->
+          <header class="drawer-header">
+            <h2>أهلا وسهلا بكم</h2>
+            <button class="btn close-btn" aria-label="إغلاق" @click="$emit('close')">
+              <i class="fas fa-times"></i>
+            </button>
+          </header>
 
-      <!-- Side Drawer -->
-      <aside class="side-drawer" role="navigation" aria-label="القائمة الجانبية">
-        <header class="drawer-header">
-          <h2 class="drawer-title">القائمة</h2>
-          <button
-            type="button"
-            class="close-btn"
-            aria-label="إغلاق"
-            @click="$emit('close')"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </header>
+          <!-- Home -->
+          <nav class="drawer-nav">
+            <router-link to="/" class="drawer-item" @click="$emit('close')">
+              <i class="fas fa-home"></i>
+              <span>الصفحة الرئيسية</span>
+            </router-link>
+          </nav>
 
-        <nav class="drawer-nav">
-          <router-link to="/" class="drawer-item">
-            <i class="fas fa-home"></i>
-            <span>الصفحة الرئيسية</span>
-          </router-link>
+          <hr/>
 
-          <router-link to="/about" class="drawer-item">
-            <i class="fas fa-info-circle"></i>
-            <span>من نحن</span>
-          </router-link>
+          <!-- تواصل مع المطوّر -->
+          <section class="section">
+            <p class="section-title">تواصل مع المطوّر</p>
+            <div class="social-grid">
+              <button class="social-btn whatsapp" @click="contactWhatsApp">
+                <i class="fab fa-whatsapp"></i>
+                <span>واتساب</span>
+              </button>
+              <button class="social-btn sms" @click="contactSMS">
+                <i class="fas fa-sms"></i>
+                <span>رسالة نصية</span>
+              </button>
+              <button class="social-btn telegram" @click="contactTelegram">
+                <i class="fab fa-telegram-plane"></i>
+                <span>تليجرام</span>
+              </button>
+            </div>
+          </section>
 
-          <a
-            href="https://facebook.com/YourPage"
-            target="_blank"
-            rel="noopener"
-            class="drawer-item"
-          >
-            <i class="fab fa-facebook-f"></i>
-            <span>فيسبوك</span>
-          </a>
+          <hr/>
 
-          <a
-            href="https://wa.me/0953447860"
-            target="_blank"
-            rel="noopener"
-            class="drawer-item"
-          >
-            <i class="fab fa-whatsapp"></i>
-            <span>واتساب</span>
-          </a>
-
-          <a
-            href="https://t.me/YourChannel"
-            target="_blank"
-            rel="noopener"
-            class="drawer-item"
-          >
-            <i class="fab fa-telegram-plane"></i>
-            <span>تليجرام</span>
-          </a>
-
-          <hr class="divider" />
-
-          <button
-            type="button"
-            class="drawer-item share-btn"
-            @click="shareApp"
-          >
-            <i class="fas fa-share-alt"></i>
-            <span>مشاركة التطبيق</span>
-          </button>
-
-          <!-- زر صفحة المطور -->
-          <button
-            type="button"
-            class="drawer-item dev-btn"
-            @click="devModalOpen = true"
-          >
-            <i class="fas fa-user-shield"></i>
-            <span>صفحة المطوّر</span>
-          </button>
-        </nav>
-      </aside>
-
-      <!-- النافذة المنبثقة لصفحة المطور -->
-      <DevModal
-        v-if="devModalOpen"
-        @close="devModalOpen = false"
-      />
+          <!-- مشاركة التطبيق -->
+          <section class="section">
+            <p class="section-title">مشاركة التطبيق</p>
+            <div class="social-grid">
+              <button class="social-btn whatsapp" @click="shareWhatsApp">
+                <i class="fab fa-whatsapp"></i>
+                <span>واتساب</span>
+              </button>
+              <button class="social-btn messenger" @click="shareMessenger">
+                <i class="fab fa-facebook-messenger"></i>
+                <span>مسنجر</span>
+              </button>
+              <button class="social-btn telegram" @click="shareTelegram">
+                <i class="fab fa-telegram-plane"></i>
+                <span>تليجرام</span>
+              </button>
+            </div>
+          </section>
+        </aside>
+      </transition>
     </div>
   </transition>
 </template>
 
 <script>
-import DevModal from '@/components/DevModal.vue';
-
 export default {
   name: 'SideDrawer',
-  components: { DevModal },
   props: {
     open: { type: Boolean, required: true }
   },
   data() {
     return {
-      appUrl: 'https://myrepo-29.onrender.com',
-      shareTitle: 'تطبيق مفيد',
-      devModalOpen: false
-    };
+      devPhone: '0953447860',
+      telegramUser: 'YourTelegramUsername',
+      appUrl: window.location.origin,
+      shareText: 'جرب هذا التطبيق الرائع!'
+    }
   },
   methods: {
-    async shareApp() {
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: this.shareTitle,
-            text: 'جرب هذا التطبيق وسيُسعدك:',
-            url: this.appUrl
-          });
-        } catch (err) {
-          // المستخدم ألغى أو فشل
-        }
-      } else {
-        try {
-          await navigator.clipboard.writeText(this.appUrl);
-          alert('تم نسخ رابط التطبيق إلى الحافظة');
-        } catch {
-          prompt('انسخ الرابط يدوياً:', this.appUrl);
-        }
-      }
+    contactWhatsApp() {
+      const url = `https://wa.me/${this.devPhone}`;
+      window.open(url, '_blank');
+    },
+    contactSMS() {
+      const url = `sms:${this.devPhone}?body=${encodeURIComponent('مرحباً')}`;
+      window.open(url);
+    },
+    contactTelegram() {
+      const url = `https://t.me/${this.telegramUser}`;
+      window.open(url, '_blank');
+    },
+    shareWhatsApp() {
+      const url = `https://wa.me/?text=${encodeURIComponent(this.shareText + ' ' + this.appUrl)}`;
+      window.open(url, '_blank');
+    },
+    shareMessenger() {
+      const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.appUrl)}`;
+      window.open(url, '_blank');
+    },
+    shareTelegram() {
+      const url = `https://t.me/share/url?url=${encodeURIComponent(this.appUrl)}&text=${encodeURIComponent(this.shareText)}`;
+      window.open(url, '_blank');
     }
   }
-};
+}
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
 
-.drawer-wrapper {
+/* Backdrop fade */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.drawer-backdrop {
   position: fixed;
   inset: 0;
+  background: rgba(0,0,0,0.6);
   display: flex;
-  justify-content: flex-end;
-  z-index: 1000;
-  outline: none;
+  justify-content: flex-start;
+  z-index: 2000;
 }
 
-.drawer-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+/* Drawer slide */
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease;
+}
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(-100%);
+}
+.slide-enter-to,
+.slide-leave-from {
+  transform: translateX(0);
 }
 
 .side-drawer {
-  position: relative;
-  width: 300px;
+  width: 320px;
   max-width: 85%;
-  height: 100%;
-  background: #1f2733;
-  border-left: 6px solid #ff4081;
-  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.6);
+  background: #fff;
   display: flex;
   flex-direction: column;
-  color: #ececec;
+  height: 100vh;
+  padding: 1rem;
+  box-shadow: 4px 0 12px rgba(0,0,0,0.2);
   font-family: 'Cairo', sans-serif;
 }
 
+/* Header */
 .drawer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.2rem 1.6rem;
-  background: #252f3a;
+  margin-bottom: 1rem;
 }
-
-.drawer-title {
+.drawer-header h2 {
   margin: 0;
   font-size: 1.3rem;
-  font-weight: 600;
+  color: #333;
 }
-
 .close-btn {
   background: none;
   border: none;
-  color: inherit;
   font-size: 1.2rem;
+  color: #555;
   cursor: pointer;
-  transition: transform 0.2s;
 }
-
 .close-btn:hover {
-  transform: rotate(90deg);
-  color: #e74c3c;
+  color: #000;
 }
 
+/* Nav link */
 .drawer-nav {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.8rem 0;
+  margin-bottom: 1rem;
 }
-
 .drawer-item {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
-  padding: 0.8rem 1.6rem;
-  color: inherit;
+  gap: 0.8rem;
+  padding: 0.6rem 0.4rem;
+  border-radius: 6px;
+  color: #333;
   text-decoration: none;
-  border-radius: 8px;
   font-weight: 500;
-  transition: background 0.2s, transform 0.2s;
+  transition: background 0.2s;
 }
-
 .drawer-item i {
   width: 24px;
   text-align: center;
-  font-size: 1.1rem;
 }
-
-.drawer-item span {
-  flex: 1;
-}
-
 .drawer-item:hover {
-  background: #303b47;
-  transform: translateX(4px);
+  background: #f0f0f0;
 }
 
-.divider {
-  margin: 1rem 1.6rem;
+/* Sections */
+hr {
   border: none;
-  border-top: 1px solid #3b4550;
+  border-top: 1px solid #e0e0e0;
+  margin: 1rem 0;
+}
+.section-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #444;
+}
+.social-grid {
+  display: flex;
+  gap: 0.6rem;
 }
 
-.share-btn {
-  background: linear-gradient(45deg, #e91e63, #ff4081);
+/* Buttons */
+.social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #4e54c8, #8f94fb);
   color: #fff;
-  border-radius: 30px;
-}
-
-.share-btn:hover {
-  background: linear-gradient(45deg, #ff4081, #e91e63);
-  box-shadow: 0 6px 16px rgba(233, 30, 99, 0.4);
-  transform: scale(1.05);
-}
-
-/* زر المطور */
-.dev-btn {
-  background: #424a57;
-  color: #facc15;
+  border: none;
   border-radius: 8px;
+  padding: 0.5rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.social-btn i {
+  font-size: 1.2rem;
+}
+.social-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.dev-btn i {
-  color: #facc15;
+/* Individual colors */
+.whatsapp {
+  background: #25D366;
 }
-
-.dev-btn:hover {
-  background: #535c6a;
-  transform: translateX(4px) scale(1.02);
+.sms {
+  background: #007bff;
 }
-
-/* Slide animation */
-.slide-drawer-enter-active,
-.slide-drawer-leave-active {
-  transition: transform 0.3s ease;
+.telegram {
+  background: #0088cc;
 }
-
-.slide-drawer-enter-from,
-.slide-drawer-leave-to {
-  transform: translateX(100%);
-}
-
-.slide-drawer-enter-to,
-.slide-drawer-leave-from {
-  transform: translateX(0);
-}
-
-/* Custom scrollbar */
-.drawer-nav::-webkit-scrollbar {
-  width: 6px;
-}
-
-.drawer-nav::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 3px;
+.messenger {
+  background: #0084FF;
 }
 </style>
