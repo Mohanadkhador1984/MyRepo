@@ -7,6 +7,7 @@ import axiosPlugin from './plugins/axios'
 import './assets/styles/global.css'
 import './assets/styles/quiz.css'
 
+
 // توليد UUID للجهاز
 const DEVICE_KEY = 'device_uuid'
 if (!localStorage.getItem(DEVICE_KEY)) {
