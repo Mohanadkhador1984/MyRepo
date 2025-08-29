@@ -24,53 +24,37 @@ export default {
 </script>
 
 <style scoped>
-/* 1. Import custom Arabic font */
+/* Arabic font for elegance */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
 
-/* 2. Color variables: deep black + gold accent */
-:root {
-  --bg-start:  #000000;
-  --bg-end:    #111111;
-  --accent:    #FFD700;
-  --text-main: #FFFFFF;
-  --shadow:    rgba(0, 0, 0, 0.7);
-}
-
-/* 3. Nav container: pure black gradient, soft glow & border */
+/* 1. Nav container: deep black with soft glow & shimmer overlay */
 .site-nav {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 4rem;
-  background: linear-gradient(90deg, var(--bg-start), var(--bg-end));
-  color: var(--text-main);
+  background-color: #000;
   font-family: 'Cairo', sans-serif;
+  color: #fff;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 12px var(--shadow);
-  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
   overflow: hidden;
   z-index: 1000;
 }
 
-/* 4. Subtle shimmer overlay across the bar */
+/* Moving shimmer haze for a magical vibe */
 .site-nav::before {
   content: '';
   position: absolute;
-  top: 0; left: -100%;
-  width: 200%; height: 100%;
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255, 255, 255, 0.05),
-    transparent
-  );
-  animation: shimmer 3s infinite ease-in-out;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent 70%);
+  mix-blend-mode: overlay;
+  animation: shimmer-nav 10s infinite linear;
   pointer-events: none;
 }
 
-/* 5. Inner layout */
+/* Layout of inner content */
 .nav-inner {
   max-width: 1200px;
   width: 100%;
@@ -82,56 +66,52 @@ export default {
   position: relative;
 }
 
-/* 6. Logo & menu icons */
+/* 2. Logo & menu icons: scale + glow on hover */
 .nav-logo,
 .nav-menu {
   background: none;
   border: none;
-  color: var(--text-main);
+  color: inherit;
   font-size: 1.5rem;
   cursor: pointer;
-  transition: transform 0.2s ease, color 0.3s ease, text-shadow 0.3s ease;
+  transition: transform 0.2s ease, text-shadow 0.3s ease;
 }
 
 .nav-logo:hover,
 .nav-menu:hover {
-  transform: scale(1.1);
-  color: var(--accent);
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+  transform: scale(1.2);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
 
-/* 7. Title with animated underline */
+/* 3. Title with subtle animated underline */
 .nav-title {
   font-size: 1.25rem;
   font-weight: 700;
-  margin: 0;
   position: relative;
+  margin: 0;
 }
 
 .nav-title::after {
   content: '';
   position: absolute;
-  bottom: -3px;
+  bottom: -4px;
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--accent),
-    transparent
-  );
-  animation: slide-underline 3s infinite ease-in-out;
+  background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.8));
+  background-size: 200% 100%;
+  animation: slide-underline 5s infinite linear;
 }
 
-/* 8. Keyframes */
-@keyframes shimmer {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%);  }
+/* Keyframes */
+@keyframes shimmer-nav {
+  0%   { transform: translate(-50%, -50%) scale(1);    }
+  50%  { transform: translate(10%, 10%)   scale(1.1);  }
+  100% { transform: translate(-50%, -50%) scale(1);    }
 }
 
 @keyframes slide-underline {
-  0%,100% { transform: translateX(-100%); }
-  50%     { transform: translateX(0);     }
+  0%   { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
 }
 </style>
