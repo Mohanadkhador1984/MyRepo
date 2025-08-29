@@ -1,17 +1,17 @@
-<!-- src/components/NavBar.vue -->
 <template>
-  <nav class="site-nav">
-    <div class="nav-inner">
-      <button class="nav-logo" @click="$router.push('/')">
-        🏠
+  <nav class="navbar">
+    <div class="navbar-container">
+      <button class="navbar-logo" @click="$router.push('/')">
+        <span class="logo-icon">📘</span>
+        <span class="logo-text">English Bac</span>
       </button>
 
-      <h1 class="nav-title">انكليزي بكالوريا</h1>
+      <h1 class="navbar-title">انكليزي بكالوريا</h1>
 
-      <div class="nav-actions">
-        <button class="nav-menu" @click="$emit('toggle-drawer')">
-          ☰
-        </button>
+      <div class="navbar-actions">
+        <button class="icon-button" @click="$emit('search')" title="بحث">🔍</button>
+        <button class="icon-button" @click="$emit('profile')" title="الملف الشخصي">👤</button>
+        <button class="menu-button" @click="$emit('toggle-drawer')" title="القائمة">☰</button>
       </div>
     </div>
   </nav>
@@ -24,94 +24,112 @@ export default {
 </script>
 
 <style scoped>
-/* Arabic font for elegance */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-
-/* 1. Nav container: deep black with soft glow & shimmer overlay */
-.site-nav {
+.navbar {
   position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 4rem;
-  background-color: #000;
-  font-family: 'Cairo', sans-serif;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4.5rem;
+  background: linear-gradient(to right, #0f0f0f, #1f1f1f);
   color: #fff;
+  z-index: 1000;
   display: flex;
   align-items: center;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
-  overflow: hidden;
-  z-index: 1000;
-}
-
-/* Moving shimmer haze for a magical vibe */
-.site-nav::before {
-  content: '';
-  position: absolute;
-  top: -50%; left: -50%;
-  width: 200%; height: 200%;
-  background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent 70%);
-  mix-blend-mode: overlay;
-  animation: shimmer-nav 10s infinite linear;
-  pointer-events: none;
-}
-
-/* Layout of inner content */
-.nav-inner {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+  font-family: 'Segoe UI', Roboto, Tahoma, sans-serif;
   padding: 0 1rem;
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.navbar-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;
 }
 
-/* 2. Logo & menu icons: scale + glow on hover */
-.nav-logo,
-.nav-menu {
+.navbar-logo {
+  display: flex;
+  align-items: center;
   background: none;
   border: none;
-  color: inherit;
-  font-size: 1.5rem;
   cursor: pointer;
-  transition: transform 0.2s ease, text-shadow 0.3s ease;
-}
-
-.nav-logo:hover,
-.nav-menu:hover {
-  transform: scale(1.2);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
-}
-
-/* 3. Title with subtle animated underline */
-.nav-title {
+  color: #facc15;
+  font-weight: bold;
   font-size: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.08);
+  color: #fde68a;
+}
+
+.logo-icon {
+  font-size: 1.8rem;
+  margin-right: 0.4rem;
+  filter: drop-shadow(0 0 4px #facc15);
+}
+
+.logo-text {
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  color: #fef3c7;
+}
+
+.navbar-title {
+  color: #e0e7ff;
+  font-size: 1.6rem;
   font-weight: 700;
-  position: relative;
-  margin: 0;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.05);
+  flex: 1;
+  text-align: center;
 }
 
-.nav-title::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.8));
-  background-size: 200% 100%;
-  animation: slide-underline 5s infinite linear;
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
-/* Keyframes */
-@keyframes shimmer-nav {
-  0%   { transform: translate(-50%, -50%) scale(1);    }
-  50%  { transform: translate(10%, 10%)   scale(1.1);  }
-  100% { transform: translate(-50%, -50%) scale(1);    }
+.icon-button,
+.menu-button {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  color: #f3f4f6;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-@keyframes slide-underline {
-  0%   { background-position: 0% 0; }
-  100% { background-position: 200% 0; }
+.icon-button:hover,
+.menu-button:hover {
+  color: #facc15;
+  transform: scale(1.2);
+  text-shadow: 0 0 4px #facc15;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .navbar-title {
+    font-size: 1.1rem;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+  }
+
+  .icon-button,
+  .menu-button {
+    font-size: 1.4rem;
+  }
 }
 </style>
