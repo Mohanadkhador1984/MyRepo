@@ -9,8 +9,10 @@
         @click="select(year)"
         :class="['year-button', { locked: isLocked(year) }]"
       >
-        <span class="year-text">{{ year }}</span>
-        <span v-if="isLocked(year)" class="lock-icon">🔒</span>
+        <span class="year-content">
+          <span class="year-text">{{ year }}</span>
+          <span v-if="isLocked(year)" class="lock-icon">🔒</span>
+        </span>
       </button>
     </div>
   </div>
@@ -49,32 +51,30 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
 
 :root {
-  --gold-light:    #ffe16a;
-  --gold-med:      #c59e44;
-  --gold-dark:     #b07f17;
-  --gold-med-rgb:  197,158,68;
-  --locked-bg:     rgba(0, 0, 0, 0.75);
+  --gold-light: #ffe16a;
+  --gold-med: #c59e44;
+  --gold-dark: #b07f17;
+  --gold-med-rgb: 197,158,68;
+  --locked-bg: rgba(0, 0, 0, 0.8);
   --locked-border: var(--gold-med);
-  --white-soft:    #f5f5f5;
-  --glass-bg:      rgba(255,255,255,0.08);
-  --glass-border:  rgba(255,255,255,0.2);
-  --radius:        20px;
-  --gap:           2rem;
-  --padding:       2.5rem;
-  --transition:    0.4s ease-in-out;
+  --white-soft: #f5f5f5;
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --radius: 20px;
+  --gap: 2rem;
+  --padding: 3rem;
+  --transition: 0.35s ease-in-out;
 }
 
-/* إطار ذهبي متدرج حول الشاشة */
 .year-selector {
   position: relative;
-  padding: calc(var(--padding) + 12px);
+  padding: calc(var(--padding) + 10px);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: radial-gradient(circle at center, #111 0%, #000 75%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   font-family: 'Tajawal', sans-serif;
-  overflow: hidden;
   border: 12px solid transparent;
   border-image: conic-gradient(
     from 45deg,
@@ -85,43 +85,41 @@ export default {
     var(--gold-light)
   ) 1;
   box-shadow:
-    0 0 20px var(--gold-med),
-    inset 0 0 30px rgba(0,0,0,0.6);
+    inset 0 0 30px rgba(255, 255, 255, 0.05),
+    0 0 30px var(--gold-med);
+  overflow: hidden;
 }
 
-/* عنوان بتدرج ذهبي وشفافية */
 .title {
-  font-size: clamp(2.4rem, 6vw, 3.2rem);
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
   font-weight: 900;
   background: linear-gradient(90deg, var(--gold-light), var(--gold-med));
   -webkit-background-clip: text;
   color: transparent;
   margin-bottom: var(--gap);
-  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
 }
 
-/* حاوية الأزرار بزجاج ضبابي */
 .years-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: var(--gap);
   width: 90vw;
-  max-width: 540px;
+  max-width: 600px;
   padding: var(--padding);
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(12px);
   box-shadow:
-    inset 0 0 36px rgba(255,255,255,0.1),
-    0 10px 28px rgba(0,0,0,0.75);
+    inset 0 0 36px rgba(255, 255, 255, 0.08),
+    0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
-/* تصميم الأزرار العامة */
 .year-button {
   position: relative;
-  padding: clamp(0.8rem, 3vw, 1.2rem) 0;
-  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  padding: clamp(1rem, 3vw, 1.4rem) 0;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
   font-weight: 700;
   color: var(--white-soft);
   background: linear-gradient(145deg, var(--gold-light), var(--gold-med));
@@ -134,7 +132,7 @@ export default {
   ) 1;
   border-radius: var(--radius);
   box-shadow:
-    inset -3px -3px 12px rgba(255,255,255,0.3),
+    inset -3px -3px 12px rgba(255,255,255,0.25),
     inset 3px 3px 8px rgba(0,0,0,0.4),
     0 6px 20px rgba(0,0,0,0.8);
   cursor: pointer;
@@ -144,66 +142,60 @@ export default {
 
 .year-button:hover:not(.locked),
 .year-button:focus:not(.locked) {
-  transform: translateY(-5px) scale(1.07);
+  transform: translateY(-6px) scale(1.05);
   box-shadow:
-    inset -3px -3px 12px rgba(255,255,255,0.35),
-    inset 3px 3px 8px rgba(0,0,0,0.45),
-    0 8px 24px rgba(0,0,0,0.85),
-    0 0 16px var(--gold-light);
+    inset -3px -3px 12px rgba(255,255,255,0.3),
+    inset 3px 3px 10px rgba(0,0,0,0.45),
+    0 8px 22px rgba(0,0,0,0.9),
+    0 0 14px var(--gold-light);
   outline: none;
 }
 
-/* أسلوب فاخر للأزرار المؤمَّنة */
 .year-button.locked {
   background: var(--locked-bg);
   border: 2px solid var(--locked-border);
   color: var(--locked-border);
   box-shadow:
-    inset 0 0 8px rgba(0,0,0,0.8),
-    0 0 12px rgba(var(--gold-med-rgb),0.5);
+    inset 0 0 8px rgba(0, 0, 0, 0.8),
+    0 0 12px rgba(var(--gold-med-rgb), 0.4);
   text-shadow: 0 0 3px var(--locked-border);
-  backdrop-filter: blur(4px);
   cursor: not-allowed;
 }
 
-/* إخفاء نص السنة عند القفل */
-.year-button.locked .year-text {
-  visibility: hidden;
+.year-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-/* أيقونة قفل متوهجة ونابضة */
-.year-button.locked .lock-icon {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%) scale(1);
-  font-size: clamp(1.5rem, 4vw, 2rem);
+.lock-icon {
+  font-size: 1.4rem;
   color: var(--gold-light);
+  animation: pulseLock 2.5s ease-in-out infinite;
   text-shadow:
     0 0 6px var(--gold-light),
-    0 0 12px var(--gold-med);
-  animation: pulseLock 2.5s ease-in-out infinite;
-  opacity: 0.9;
+    0 0 8px var(--gold-med);
 }
 
 @keyframes pulseLock {
   0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
     opacity: 0.9;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.2);
+    transform: scale(1.2);
     opacity: 0.6;
   }
 }
 
-/* تحسين للشاشات الصغيرة */
 @media (max-width: 360px) {
   :root {
-    --gap: 1.5rem;
+    --gap: 1.2rem;
     --padding: 1.5rem;
   }
+
   .title {
-    margin-bottom: 1.5rem;
     font-size: clamp(2rem, 8vw, 2.6rem);
   }
 }

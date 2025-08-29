@@ -124,7 +124,7 @@ export default {
     const showActivationModal = ref(false)
 
     // 2) Year options and which are locked
-    const years       = [2021, 2022, 2023, 2024]
+    const years       = [2021, 2022, 2023, 2024,2025]
     const lockedYears = ref([2022])
 
     // 3) Quiz data holders
