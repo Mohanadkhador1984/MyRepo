@@ -62,7 +62,9 @@ DEBUG = False  # ← True فقط محلياً
 ALLOWED_HOSTS = ['*']  # أو ['.onrender.com']
 
 # ملفات Vue المبنية
+# DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
 DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
+
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
