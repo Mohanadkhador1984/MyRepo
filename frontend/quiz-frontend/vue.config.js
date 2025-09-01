@@ -13,15 +13,16 @@ module.exports = {
     devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'eval-source-map'
   },
 
-  // 2) إخراج البناء إلى مجلد Django frontend_dist/dist
-  outputDir: path.resolve(__dirname, '..', '..', 'backend', 'frontend_dist', 'dist'),
+  outputDir: path.resolve(__dirname, 'dist'),
+  
+  
+  assetsDir: '',
+  publicPath: '/',
 
-  // 3) جميع الموارد (CSS/JS/IMG) توضع في dist/static
-  assetsDir: 'static',
+
 
   // 4) publicPath يطابق STATIC_URL في Django
-  publicPath: process.env.NODE_ENV === 'production' ? '/static/' : '/',
-
+ 
   // 5) index.html ثابت بدون هاش
   indexPath: 'index.html',
   filenameHashing: false,

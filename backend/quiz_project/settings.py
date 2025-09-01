@@ -55,22 +55,25 @@ MIDDLEWARE = [
 ]
 
 # ─── 5. إعدادات Vue وملفات static ────────────────────────────────────
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = False  # ← True فقط محلياً
+DEBUG = False
+ALLOWED_HOSTS = ['*']
 
-ALLOWED_HOSTS = ['*']  # أو ['.onrender.com']
+# المسار إلى مجلد البناء الجديد
+DIST_DIR = BASE_DIR / 'frontend' / 'quiz-frontend'
 
-# ملفات Vue المبنية
-# DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
-DIST_DIR = BASE_DIR / 'frontend_dist' / 'dist'
+# URL prefix لملفات static (مطابق لـ publicPath في Vue)
+STATIC_URL = '/quiz-frontend/'
 
-
-STATIC_URL = '/static/'
+# تجميع كل ملفات static هنا عند collectstatic
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# إضافة ملفات الـ dist لمجلدات static القابلة للإرسال
 STATICFILES_DIRS = [
-    DIST_DIR ,  # ← مجلد static بداخل Vue
+    DIST_DIR,
 ]
 
 # WhiteNoise لتقديم static في الإنتاج
