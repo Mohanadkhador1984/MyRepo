@@ -24,7 +24,7 @@
       </svg>
     </button>
 
-    <!-- زر التعجب -->
+    <!-- زر التعجب الفخم -->
     <button
       v-if="showInfoBtn"
       class="info-btn"
@@ -50,10 +50,24 @@
             ×
           </button>
           <h3 class="popup-title">كيفية إضافة التطبيق</h3>
-          <p class="popup-text">
-            1. اضغط زر القائمة (⋮) في متصفحك<br>
-            2. اختر إضافة إلى الشاشة الرئيسية
-          </p>
+
+          <div class="popup-content">
+            <div class="arabic-steps">
+              <h4>الخطوات بالعربية</h4>
+              <ol>
+                <li>اضغط زر القائمة (⋮) في متصفحك.</li>
+                <li>اختر "إضافة إلى الشاشة الرئيسية".</li>
+              </ol>
+            </div>
+
+            <div class="english-steps">
+              <h4>Steps in English</h4>
+              <ol>
+                <li>Tap the menu button (⋮) in your browser.</li>
+                <li>Select “Add to Home Screen.”</li>
+              </ol>
+            </div>
+          </div>
         </div>
       </div>
     </transition>
@@ -69,7 +83,6 @@ const showInstallBtn  = ref(false)
 const showInfoBtn     = ref(true)
 const showPopup       = ref(false)
 
-// التقاط حدث beforeinstallprompt
 onMounted(() => {
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault()
@@ -94,107 +107,164 @@ function openPopup() {
 }
 
 function closePopup() {
-  showPopup.value  = false
+  showPopup.value   = false
   showInfoBtn.value = false
 }
 </script>
 
 <style scoped>
+/* حاوية الأزرار على اليسار وفوق */
 .actions-container {
   position: fixed;
-  bottom: 2rem;
+  bottom: 4rem;
   left: 2rem;
   display: flex;
+  gap: 1.2rem;
   align-items: center;
-  gap: 1rem;
   z-index: 10000;
 }
 
-/* زر التثبيت الدائري */
+/* زر التثبيت */
 .install-circle-btn {
-  width: 3.6rem;
-  height: 3.6rem;
-  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
   border: none;
+  border-radius: 50%;
   background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25),
+              inset 0 0 8px rgba(255, 255, 255, 0.2);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .install-circle-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transform: scale(1.15) rotate(-2deg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+              inset 0 0 12px rgba(255, 255, 255, 0.3);
 }
 
-/* أيقونة السهم داخل زر التثبيت */
+/* أيقونة التثبيت */
 .install-icon {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.8rem;
+  height: 1.8rem;
   color: #fff;
 }
 
-/* زر التعجب */
+/* زر التعجب الذهبي */
 .info-btn {
-  width: 3.6rem;
-  height: 3.6rem;
-  font-size: 1.5rem;
-  background: radial-gradient(circle, #ffd54f, #ffb300);
-  color: #fff;
+  width: 4rem;
+  height: 4rem;
+  font-size: 1.8rem;
   border: none;
   border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  background: linear-gradient(45deg, #f39c12, #f1c40f);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(243, 156, 18, 0.6),
+              0 4px 16px rgba(0, 0, 0, 0.25);
+  animation: pulse 2.5s infinite ease-in-out;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s;
 }
 .info-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  transform: scale(1.2);
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(243, 156, 18, 0.8); }
+  50%      { box-shadow: 0 0 24px rgba(243, 156, 18, 0.4); }
 }
 
-/* خلفية ونسق النافذة المنبثقة */
+/* خلفية النافذة المنبثقة */
 .popup-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10001;
 }
+
+/* بطاقة النافذة المنبثقة وفخامة النص */
 .popup-card {
   position: relative;
   background: #fff;
-  border-radius: 12px;
-  padding: 1.5rem 1.2rem;
-  width: 300px;
-  text-align: center;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+  border: 2px solid #d4af37;
+  border-radius: 16px;
+  padding: 1.6rem 1.4rem;
+  width: 320px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+  font-family: 'Arial', sans-serif;
+  color: #333;            /* نص واضح */
+  line-height: 1.6;       /* مسافة أسطر مريحة */
+  overflow: hidden;
 }
+
+/* زخرفة ذهبية صغيرة فوق البطاقة */
+.popup-card::before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #d4af37;
+  transform: rotate(45deg);
+  top: -6px;
+  right: calc(50% - 6px);
+}
+
+/* زر الإغلاق */
 .close-btn {
   position: absolute;
   top: 0.6rem;
   right: 0.6rem;
   background: none;
   border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
+  font-size: 1.3rem;
   color: #666;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 .close-btn:hover {
   color: #333;
 }
+
+/* عنوان النافذة */
 .popup-title {
-  margin-bottom: 0.8rem;
-  font-size: 1.1rem;
-  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #d4af37;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
-.popup-text {
+
+/* محتوى التعليمات مع نص مرئي */
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.popup-content ol {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #333;
   font-size: 0.95rem;
-  color: #555;
-  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* تنسيق أقسام اللغة */
+.arabic-steps {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 0.8rem;
+  direction: rtl;
+  text-align: right;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
+}
+.english-steps {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 0.8rem;
+  direction: ltr;
+  text-align: left;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
 }
 
 /* تأثير دخول/خروج */
@@ -208,3 +278,4 @@ function closePopup() {
   transform: scale(0.9);
 }
 </style>
+```
