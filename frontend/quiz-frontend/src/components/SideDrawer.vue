@@ -68,21 +68,21 @@
             <hr class="divider" />
 
             <!-- زر صفحة المطوّر -->
-            <button
+            <!-- <button
               type="button"
               class="drawer-item dev-btn"
               @click="devModalOpen = true"
             >
               <i class="fas fa-user-shield"></i>
               <span>أعمالنا  </span>
-            </button>
+            </button> -->
           </nav>
         </aside>
       </transition>
     </div>
   </transition>
 
-  <!-- نافذة صفحة المطوّر -->
+
   <DevModal
     v-if="devModalOpen"
     @close="devModalOpen = false"
