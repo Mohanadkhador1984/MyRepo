@@ -7,7 +7,7 @@
       <input
         v-model="password"
         type="password"
-        placeholder="أدخل كلمة المرور"
+        placeholder="أدخل كلمة مرور حسابك"
       />
       <button @click="login">🔐 دخول</button>
       <p v-if="error" class="error">{{ error }}</p>

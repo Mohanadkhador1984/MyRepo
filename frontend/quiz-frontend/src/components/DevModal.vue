@@ -7,7 +7,7 @@
       <button class="close" @click="$emit('close')">&times;</button>
 
       <div v-if="!isAuthed">
-        <h3>🛡️ حماية المطوّر</h3>
+        <h3>🛡️ أعمالنا السابقة</h3>
         <DevAuth @auth-success="onAuthSuccess" />
       </div>
 

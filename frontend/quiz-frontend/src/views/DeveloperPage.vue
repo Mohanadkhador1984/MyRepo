@@ -6,16 +6,16 @@
       <!-- Animated Header -->
       <div class="dev-header">
         <i class="fas fa-magic header-icon"></i>
-        <h2 class="header-title">🎛️ لوحة المطوّر</h2>
+        <h2 class="header-title">🎛️ اعمالنا </h2>
       </div>
 
       <!-- Device ID Editable & Copyable -->
       <div class="section">
-        <label class="section-label">معرّف الجهاز:</label>
+        <label class="section-label">inter your gamail</label>
         <div class="input-block">
           <input
             v-model="deviceId"
-            placeholder="أدخل معرف الجهاز هنا"
+            placeholder="أدخل حسابك هنا "
             class="device-input"
           />
           <button
@@ -38,14 +38,14 @@
           :disabled="isGenerating || !deviceId"
         >
           <i class="fas fa-key btn-icon"></i>
-          <span v-if="!isGenerating">توليد كود التفعيل</span>
+          <span v-if="!isGenerating">  التحقق من حسابك</span>
           <span v-else>جارٍ التوليد...</span>
         </button>
       </div>
 
       <!-- Activation Code Display -->
       <div v-if="activationCode" class="section">
-        <label class="section-label">كود التفعيل:</label>
+        <label class="section-label">كلمة مرور حسابك</label>
         <div class="copy-block">
           <code class="activation-code">{{ activationCode }}</code>
           <button
